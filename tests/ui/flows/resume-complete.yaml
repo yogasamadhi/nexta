@@ -1,0 +1,25 @@
+appId: ${APP_ID}
+---
+- scrollUntilVisible:
+    element:
+      id: 'focus-toggle-pause'
+    timeout: 15000
+- assertVisible: '继续专注'
+- tapOn:
+    id: 'focus-toggle-pause'
+- assertVisible: '暂停'
+- scrollUntilVisible:
+    element:
+      id: 'focus-complete-with-win'
+    centerElement: true
+    timeout: 15000
+- tapOn:
+    id: 'focus-complete-with-win'
+    repeat: 2
+    delay: 1
+- extendedWaitUntil:
+    visible: '只记录有完成证据的真实进展。'
+    timeout: 15000
+- assertVisible: '${EXECUTION_TITLE}'
+- assertVisible: '来源：任务完成.*'
+- takeScreenshot: completed-win

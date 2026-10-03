@@ -316,7 +316,9 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
 
   if (state.status === 'loading') {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
+      <SafeAreaView
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+      >
         <ActivityIndicator color="#047857" />
       </SafeAreaView>
     );
@@ -325,7 +327,14 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   const view = state.view;
   if (view === null) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center px-8">
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 32,
+        }}
+      >
         <Text className="text-center text-base text-stone-700">
           {state.message}
         </Text>
@@ -349,7 +358,7 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
     view.nowCard.kind === 'empty' ? view.nowCard.reason : null;
 
   return (
-    <SafeAreaView className="flex-1" edges={['top']} style={{ flex: 1 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <ScrollView
         className="flex-1"
         style={{ flex: 1 }}
@@ -373,6 +382,7 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Link asChild href="/inbox">
               <Pressable
                 accessibilityLabel="打开任务收件箱"
+                testID="today-inbox"
                 accessibilityRole="button"
                 className="rounded-full border border-stone-300 bg-white px-3 py-2"
               >
@@ -382,6 +392,7 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Link asChild href="/settings">
               <Pressable
                 accessibilityLabel="打开设置"
+                testID="today-settings"
                 accessibilityRole="button"
                 className="rounded-full border border-stone-300 bg-white px-3 py-2"
               >
@@ -517,6 +528,7 @@ function TodayContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
               <Pressable
                 accessibilityRole="button"
                 className="mt-5 items-center rounded-2xl bg-white py-3"
+                testID="today-return-focus"
                 onPress={() =>
                   router.push({
                     pathname: '/focus/[sessionId]',

@@ -315,6 +315,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             accessibilityRole="button"
             className="items-center rounded-2xl bg-white py-4"
             onPress={() => setTransitionEndsAtMs(null)}
+            testID="focus-skip-transition"
           >
             <Text className="font-semibold text-emerald-950">立即开始</Text>
           </Pressable>
@@ -342,7 +343,10 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         <Text className="mt-8 text-center text-3xl font-semibold leading-10 text-white">
           {details.task.title}
         </Text>
-        <Text className="mt-12 text-center text-6xl font-light tabular-nums text-white">
+        <Text
+          testID="focus-elapsed"
+          className="mt-12 text-center text-6xl font-light tabular-nums text-white"
+        >
           {formatElapsed(elapsedSeconds)}
         </Text>
         <Text className="mt-4 text-center text-base text-stone-400">
@@ -390,6 +394,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
               className="items-center rounded-2xl bg-white py-4"
               disabled={busy}
               onPress={() => void switchPause()}
+              testID="focus-toggle-pause"
             >
               <Text className="font-semibold text-stone-950">
                 {details.session.status === 'running' ? '暂停' : '继续专注'}
@@ -400,6 +405,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
               className="items-center rounded-2xl bg-emerald-600 py-4"
               disabled={busy}
               onPress={() => void completeTask(true)}
+              testID="focus-complete-with-win"
             >
               <Text className="font-semibold text-white">
                 完成整个任务并记录成就

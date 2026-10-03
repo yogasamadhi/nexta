@@ -1,0 +1,51 @@
+appId: ${APP_ID}
+---
+- tapOn:
+    id: 'tab-calendar'
+- repeat:
+    times: ${DAY_ADVANCE}
+    commands:
+      - tapOn:
+          id: 'calendar-next-day'
+- scrollUntilVisible:
+    element:
+      text: '.*${EXECUTION_TITLE}.*'
+    timeout: 25000
+- takeScreenshot: calendar-plan
+- openLink: ${APP_SCHEME}:///task/${TASK_ID}
+- scrollUntilVisible:
+    element:
+      id: 'task-start-focus'
+    timeout: 20000
+- tapOn:
+    id: 'task-start-focus'
+- runFlow:
+    when:
+      visible:
+        id: 'focus-skip-transition'
+    commands:
+      - tapOn:
+          id: 'focus-skip-transition'
+- extendedWaitUntil:
+    visible:
+      id: 'focus-elapsed'
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: 'focus-elapsed'
+      text: '(?!00:00$)[0-9]+:[0-9]{2}(:[0-9]{2})?'
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: 'focus-toggle-pause'
+    timeout: 15000
+- tapOn:
+    id: 'focus-toggle-pause'
+- scrollUntilVisible:
+    element:
+      text: '已暂停'
+    direction: UP
+    timeout: 15000
+- assertVisible: '已暂停'
+- takeScreenshot: paused-focus
+- stopApp

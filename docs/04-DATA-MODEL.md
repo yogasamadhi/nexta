@@ -705,6 +705,8 @@ Node SQLite 集成已覆盖 `0000 → 0001 → … → 0008` 升级、重复运�
 
 设计字段：`id, sessionId, kind(work|pause), startAt, endAt?, timingQuality`。与 Session 状态在同一事务更新；每个 Session 至多一个未关闭区间。耗时由有效 work 区间求和，累计暂停值只是派生缓存。
 
+当前可信投入统计以已关闭且 `timingQuality = trusted` 的 work 区间为来源：每个区间先取向下舍入的整秒，再汇总；pause、未关闭和待核对区间不计入可信投入。原始 start/end 时间戳保留精度，不为展示或聚合回写。CompletionRecord 的实际秒数与 Task 的实际分钟投影须使用同一口径，不能将逐区间整秒汇总替换成毫秒小数之和。
+
 ### CompletionRecord
 
 设计字段：`id, taskId, sourceSessionId?, operationId, completedAt, taskTitleSnapshot, actualDurationSeconds?, durationCoverage(complete|partial|unknown), achievementDisposition(record|skip), source(user|agent_authorized)`。

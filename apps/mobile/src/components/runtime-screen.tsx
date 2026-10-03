@@ -11,7 +11,15 @@ export function RuntimeScreen({
 
   if (state.status === 'initializing') {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-stone-100 px-8">
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f5f5f4',
+          paddingHorizontal: 32,
+        }}
+      >
         <ActivityIndicator color="#047857" />
         <Text className="mt-4 text-base text-stone-600">正在打开本地计划…</Text>
       </SafeAreaView>
@@ -20,7 +28,15 @@ export function RuntimeScreen({
 
   if (state.status === 'failed') {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-stone-100 px-8">
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f5f5f4',
+          paddingHorizontal: 32,
+        }}
+      >
         <Text className="text-center text-2xl font-semibold text-stone-950">
           本地数据暂时无法打开
         </Text>

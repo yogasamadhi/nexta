@@ -45,6 +45,16 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const startAnotherTask = useCallback(() => {
+    setNaturalInput('');
+    setTitle('');
+    setDescription('');
+    setDuration('');
+    setConstraints(emptyTaskConstraintDraft());
+    setSavedTaskId(null);
+    setMessage(null);
+  }, []);
+
   const continueManually = useCallback(() => {
     const preserved = naturalInput.trim();
     if (preserved === '') {
@@ -154,7 +164,7 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   ]);
 
   return (
-    <SafeAreaView className="flex-1" edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerClassName="gap-5 px-5 pb-12 pt-6">
         <View>
           <Text className="text-4xl font-semibold text-stone-950">
@@ -206,6 +216,7 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           <Text className="font-medium text-stone-700">标题</Text>
           <TextInput
             accessibilityLabel="任务标题"
+            testID="capture-title"
             className="rounded-2xl border border-stone-300 bg-white px-4 py-4 text-base text-stone-950"
             editable={savedTaskId === null}
             placeholder="例如：整理周会方案"
@@ -229,6 +240,7 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           <Text className="font-medium text-stone-700">预计分钟（可选）</Text>
           <TextInput
             accessibilityLabel="预计分钟"
+            testID="capture-duration"
             className="rounded-2xl border border-stone-300 bg-white px-4 py-4 text-base text-stone-950"
             editable={savedTaskId === null}
             inputMode="numeric"
@@ -252,6 +264,7 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           className="items-center rounded-2xl bg-stone-950 py-4"
           disabled={busy}
           onPress={() => void submit()}
+          testID="capture-save"
         >
           <Text className="font-semibold text-white">
             {busy
@@ -263,6 +276,24 @@ function CaptureContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
                   : '保存并查看排程'}
           </Text>
         </Pressable>
+        {savedTaskId === null ? null : (
+          <View className="gap-3">
+            <Text className="leading-5 text-stone-600">
+              任务已保存在本机。添加下一条只会清空表单，已保存的任务会保留。
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              className="items-center rounded-2xl border border-stone-400 py-4"
+              disabled={busy}
+              onPress={startAnotherTask}
+              testID="capture-new-task"
+            >
+              <Text className="font-semibold text-stone-900">
+                添加另一个任务
+              </Text>
+            </Pressable>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

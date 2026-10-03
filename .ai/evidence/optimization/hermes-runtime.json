@@ -1,0 +1,1445 @@
+{
+  "planId": "OPT-NC-20261003",
+  "timestamp": "2026-10-03T10:26:20.954Z",
+  "status": "passed",
+  "device": {
+    "owner": "OPT-NC-20261003",
+    "platform": "android",
+    "id": "emulator-5580",
+    "name": "ExecutionAgent_OPT_NC",
+    "runtime": "Android 36 / default arm64-v8a",
+    "path": "/Volumes/A/code/project/nexta/.artifacts/tools/android-avd/ExecutionAgent_OPT_NC.avd",
+    "os": "16",
+    "physicalDevice": false
+  },
+  "nativeVersion": "0.1.0",
+  "runtime": {
+    "engine": "Hermes",
+    "properties": {
+      "Bytecode Version": 98,
+      "Static Hermes": true,
+      "Builtins Frozen": false,
+      "VM Experiments": 0,
+      "Build": "Release",
+      "GC": "hades (concurrent)",
+      "OSS Release Version": "250829098.0.17",
+      "Debugger Enabled": true,
+      "CommonJS Modules": "None"
+    }
+  },
+  "nativePreference": {
+    "status": "passed",
+    "operationId": "diagnostic-operation",
+    "stage": "preference-read",
+    "sqlStage": "get"
+  },
+  "agents": [
+    {
+      "mode": "complete",
+      "status": "completed",
+      "turns": 2,
+      "toolCalls": 1,
+      "receiptVerified": true
+    },
+    {
+      "mode": "stream",
+      "status": "completed",
+      "turns": 2,
+      "toolCalls": 1,
+      "receiptVerified": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "50-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 9.967,
+          "medianMs": 10.066,
+          "p95Ms": 11.249,
+          "maxMs": 11.249
+        },
+        "changes": {
+          "added": 39,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 29,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2850,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2010,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 3
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 11.643,
+          "medianMs": 12.174,
+          "p95Ms": 12.575,
+          "maxMs": 12.575
+        },
+        "changes": {
+          "added": 3,
+          "removed": 1,
+          "moved": 12,
+          "resized": 5,
+          "unchanged": 27,
+          "totalStartOffsetMinutes": 4245
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 41,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2040,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "50-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 9.618,
+          "medianMs": 10.108,
+          "p95Ms": 10.184,
+          "maxMs": 10.184
+        },
+        "changes": {
+          "added": 36,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 15,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 36,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1725,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 3135,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 9.933,
+          "medianMs": 10.186,
+          "p95Ms": 11.566,
+          "maxMs": 11.566
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 37,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1695,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 3165,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 8
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "50-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 116.123,
+          "medianMs": 117.716,
+          "p95Ms": 127.439,
+          "maxMs": 127.439
+        },
+        "changes": {
+          "added": 69,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 49,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 69,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4860,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 0,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 122.986,
+          "medianMs": 123.471,
+          "p95Ms": 128.294,
+          "maxMs": 128.294
+        },
+        "changes": {
+          "added": 1,
+          "removed": 0,
+          "moved": 2,
+          "resized": 3,
+          "unchanged": 68,
+          "totalStartOffsetMinutes": 120
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 49,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 70,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4860,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 0,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "50-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 161.495,
+          "medianMs": 163.966,
+          "p95Ms": 189.297,
+          "maxMs": 189.297
+        },
+        "changes": {
+          "added": 91,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 48,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 91,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4770,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 90,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 168.085,
+          "medianMs": 169.061,
+          "p95Ms": 172.297,
+          "maxMs": 172.297
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 92,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 47,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 90,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4740,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 120,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "200-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 14.325,
+          "medianMs": 14.446,
+          "p95Ms": 18.217,
+          "maxMs": 18.217
+        },
+        "changes": {
+          "added": 41,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 41,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2880,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 14625,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 21
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 15.279,
+          "medianMs": 15.319,
+          "p95Ms": 15.355,
+          "maxMs": 15.355
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 3,
+          "unchanged": 40,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 27,
+          "partiallyScheduledTaskCount": 4,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 14685,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 24
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "200-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 16.341,
+          "medianMs": 16.518,
+          "p95Ms": 17.965,
+          "maxMs": 17.965
+        },
+        "changes": {
+          "added": 35,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1740,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 15765,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 31
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 16.71,
+          "medianMs": 16.896,
+          "p95Ms": 17.288,
+          "maxMs": 17.288
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 36,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 13,
+          "partiallyScheduledTaskCount": 4,
+          "generatedBlockCount": 34,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1710,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 15795,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 34
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "200-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 234.891,
+          "medianMs": 237.945,
+          "p95Ms": 247.828,
+          "maxMs": 247.828
+        },
+        "changes": {
+          "added": 199,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 142,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 199,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12705,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 4800,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 8
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 248.876,
+          "medianMs": 250.388,
+          "p95Ms": 258.298,
+          "maxMs": 258.298
+        },
+        "changes": {
+          "added": 1,
+          "removed": 1,
+          "moved": 12,
+          "resized": 6,
+          "unchanged": 186,
+          "totalStartOffsetMinutes": 4245
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 141,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 199,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12645,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 4860,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 9
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "200-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 207.662,
+          "medianMs": 209.46,
+          "p95Ms": 211.764,
+          "maxMs": 211.764
+        },
+        "changes": {
+          "added": 153,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 81,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 153,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7800,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 9705,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 15
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 210.001,
+          "medianMs": 214.667,
+          "p95Ms": 227.858,
+          "maxMs": 227.858
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 154,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 80,
+          "partiallyScheduledTaskCount": 7,
+          "generatedBlockCount": 152,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7770,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 9735,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 18
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "500-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 28.657,
+          "medianMs": 28.94,
+          "p95Ms": 29.68,
+          "maxMs": 29.68
+        },
+        "changes": {
+          "added": 40,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 27,
+          "partiallyScheduledTaskCount": 5,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2880,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 41820,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 80
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 29.492,
+          "medianMs": 30.212,
+          "p95Ms": 30.909,
+          "maxMs": 30.909
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 3,
+          "unchanged": 39,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 26,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 41880,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 83
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "500-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 34.49,
+          "medianMs": 34.802,
+          "p95Ms": 41.72,
+          "maxMs": 41.72
+        },
+        "changes": {
+          "added": 35,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 5,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1755,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 42945,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 93
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 35.187,
+          "medianMs": 35.691,
+          "p95Ms": 35.989,
+          "maxMs": 35.989
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 36,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 13,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 34,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1725,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 42975,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 96
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "500-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 233.548,
+          "medianMs": 261.314,
+          "p95Ms": 267.528,
+          "maxMs": 267.528
+        },
+        "changes": {
+          "added": 190,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 139,
+          "partiallyScheduledTaskCount": 10,
+          "generatedBlockCount": 190,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12645,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 32055,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 49
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 238.131,
+          "medianMs": 241.577,
+          "p95Ms": 247.147,
+          "maxMs": 247.147
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 2,
+          "unchanged": 189,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 139,
+          "partiallyScheduledTaskCount": 9,
+          "generatedBlockCount": 189,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12570,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 32130,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 49
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "500-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 270.538,
+          "medianMs": 272.07,
+          "p95Ms": 275.964,
+          "maxMs": 275.964
+        },
+        "changes": {
+          "added": 152,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 80,
+          "partiallyScheduledTaskCount": 9,
+          "generatedBlockCount": 152,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7785,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 36915,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 72
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 273.458,
+          "medianMs": 309.302,
+          "p95Ms": 416.499,
+          "maxMs": 416.499
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 153,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 79,
+          "partiallyScheduledTaskCount": 10,
+          "generatedBlockCount": 151,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7755,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 36945,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 75
+        }
+      },
+      "invariantsPassed": true
+    },
+    {
+      "id": "50-7-sparse-stability-example",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-stability-example/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 10.165,
+          "medianMs": 20.986,
+          "p95Ms": 24.284,
+          "maxMs": 24.284
+        },
+        "changes": {
+          "added": 39,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 29,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2850,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2010,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 3
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 11.4,
+          "medianMs": 13.048,
+          "p95Ms": 14.213,
+          "maxMs": 14.213
+        },
+        "changes": {
+          "added": 2,
+          "removed": 1,
+          "moved": 11,
+          "resized": 3,
+          "unchanged": 28,
+          "totalStartOffsetMinutes": 3045
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2805,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2055,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariantsPassed": true
+    }
+  ],
+  "warmup": 1,
+  "samples": 5,
+  "gitCommit": "23cf37d6739bdd74f0439b64f4d71d0c613541cb",
+  "sourceSHA256": "1c6416d384356bf19b785999a203c3e79a25f651f6d9fa6dd7803d334c79c822",
+  "limitations": [
+    "Synthetic Fake Provider; no real model request or production Capture.",
+    "Android emulator Debug host; not physical-device performance or native OS provider acceptance.",
+    "Bun and Hermes timing results must be compared separately."
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "emu",
+        "avd",
+        "name"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "getprop",
+        "sys.boot_completed"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "dumpsys",
+        "package",
+        "com.personalexecution.agent.development"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "getprop",
+        "ro.build.version.release"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "reverse",
+        "tcp:8089",
+        "tcp:8089"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "am",
+        "force-stop",
+        "com.personalexecution.agent.development"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-a",
+        "android.intent.action.VIEW",
+        "-d",
+        "execution-agent-development://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8089",
+        "com.personalexecution.agent.development"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "shell",
+        "pidof",
+        "com.personalexecution.agent.development"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/Volumes/A/code/project/nexta/.artifacts/tools/android-sdk/platform-tools/adb",
+        "-s",
+        "emulator-5580",
+        "logcat",
+        "-d",
+        "--pid=32389",
+        "-s",
+        "ReactNativeJS:I"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "artifacts": "/Volumes/A/code/project/nexta/.artifacts/optimization/hermes-runs/2026-10-03T10-26-20.954Z",
+  "failure": null
+}

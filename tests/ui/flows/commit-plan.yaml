@@ -1,0 +1,26 @@
+appId: ${APP_ID}
+---
+- runFlow: connect.yaml
+- runFlow:
+    file: create-task.yaml
+    env:
+      TASK_TITLE: '${EXECUTION_TITLE}'
+      ESTIMATE: '45'
+- extendedWaitUntil:
+    visible: '排程预览'
+    timeout: 15000
+- assertVisible: '${EXECUTION_TITLE}'
+- scrollUntilVisible:
+    element:
+      id: 'preview-commit'
+    timeout: 20000
+- tapOn:
+    id: 'preview-commit'
+    repeat: 2
+    delay: 1
+- extendedWaitUntil:
+    visible:
+      id: 'today-inbox'
+    timeout: 15000
+- assertVisible: '.*计划已保存.*'
+- takeScreenshot: committed-plan

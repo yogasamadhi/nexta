@@ -9,7 +9,7 @@
 | <a id="dec-001"></a>DEC-001 | Open | 首批试用人群、观察周期、产品成功阈值 | Phase 5 试用前由产品负责人确定；不阻塞 Phase 0 | 保留现有目标用户与 V1 范围；以手工任务到真实完成的闭环准备试用，不宣称价值已验证 |
 | <a id="dec-002"></a>DEC-002 | Open | 自动重排允许移动的块数、累计偏移量、临近开始保护窗口、Undo 保留期 | 自动提交分支启用前完成产品评审和边界验收 | 可自动计算 Preview；提交由用户确认。跨天、Deadline 风险、受保护块不进入自动提交 |
 | <a id="dec-003"></a>DEC-003 | Open | 最终品牌与可迁移包标识 | 原生应用标识锁定前 | 使用中性工程命名，不将暂定品牌绑定 bundle/package ID |
-| <a id="dec-004"></a>DEC-004 | Closed (2026-09-12) | Expo / RN / UI 库兼容组合及 Runtime Schema 库版本 | Phase 0 已完成最小 iOS/Android Development Build 与依赖验证 | 使用下方关闭记录中的锁定基线；任何升级重新执行相同验证 |
+| <a id="dec-004"></a>DEC-004 | Closed (2026-09-12) | Expo / RN / UI 库兼容组合及 Runtime Schema 库版本 | Phase 0 已完成最小 iOS/Android Development Build 与依赖验证 | 使用已验证的锁定基线；补丁维护见下方记录，任何升级重新执行相同验证 |
 | <a id="dec-005"></a>DEC-005 | Open | 首发模型 Provider 与生产调用凭据模式 | Phase 6 真实 Provider 接入前 | 先用 Fake Provider 验证统一接口；用户 BYOK 存 SecureStore；不把项目共享密钥打包进客户端 |
 | <a id="dec-006"></a>DEC-006 | Open | TaskDependency 是否进入 V1 实际交付 | Phase 1 正式关闭/Schema 范围定稿前确认存储范围；Phase 2 正式关闭前确认调度支持范围 | 当前 `0000/0001` Schema 不创建 TaskDependency，也不创建依赖 Repository/Service/Tool；Core 对依赖输入显式返回 unsupported，不假装能排依赖任务 |
 | <a id="dec-007"></a>DEC-007 | Open | Task 分类来源、用户模型窗口/阈值/置信度公式与策略权重 | Phase 7 启用个性化前，用固定样本和可解释规则评审 | 保留事实与版本化统计定义；缺样本/分类时不输出强结论，不调整排程权重 |
@@ -110,6 +110,8 @@ Android source/account 候选：由权限后的实际只读来源列表供用户
 - 包管理约束：Bun 使用 hoisted linker，精确解析结果保存在 `bun.lock`；NativeWind 仍是 preview 版本，因此升级前不得放宽其精确版本约束。
 - 验证依据：`expo install --check` 无版本偏差，`expo-doctor` 21/21 通过；iOS/Android Hermes Bundle 均成功；iOS Development Build 在模拟器完成编译、签名、安装和页面加载；Android arm64 Debug Development Build 成功生成 APK，另有默认四 ABI 构建通过记录。
 - 后续规则：任何影响该组合的升级必须重新运行 `bun run check`、`expo install --check`、`expo-doctor` 以及对应平台原生 Development Build；验证事实汇总于 [STATUS](../.ai/STATUS.md)。
+
+兼容维护（2026-10-03）：iOS 27 SDK 要求 Scene lifecycle，现有标准 Swift AppDelegate 通过 SDK 57 的 `expo-build-properties` / `ios.enableSceneSupport` 生成 Scene 配置，按 Expo SDK 57 检查对齐兼容 patch；不改变 RN、React、UI 或 Runtime Schema 组合。历史关闭记录保留，当前精确版本以 manifest / lockfile 为准，完整仓库门禁、Expo 版本检查/doctor 和两平台本地 Debug Build 的实际结果在 STATUS 汇总。此维护不选择新框架或产品策略，也不表示 UI/物理设备验收完成。依据：[Expo Scene lifecycle 说明](https://github.com/expo/fyi/blob/main/ios-scene-lifecycle.md)、[Apple Scene lifecycle 文档](https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle)。
 
 ## Decision Record Template
 

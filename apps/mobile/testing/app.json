@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "Isolated Hermes Test Host",
+    "slug": "isolated-hermes-test-host",
+    "scheme": "execution-agent-development",
+    "android": { "package": "com.personalexecution.agent.development" },
+    "ios": { "bundleIdentifier": "com.personalexecution.agent.development" }
+  }
+}

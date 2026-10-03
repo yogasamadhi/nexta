@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+---
+- runFlow: connect.yaml
+- scrollUntilVisible:
+    element:
+      id: 'today-return-focus'
+    timeout: 20000
+- assertVisible: '专注已暂停，记录安全保存在本地'
+- tapOn:
+    id: 'today-return-focus'
+- assertVisible: '已暂停'
+- assertNotVisible:
+    id: 'focus-skip-transition'
+- takeScreenshot: recovered-paused-focus

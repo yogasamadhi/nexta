@@ -1,0 +1,6 @@
+{
+  "name": "isolated-hermes-test-host",
+  "version": "0.0.0",
+  "private": true,
+  "main": "hermes-smoke-entry.tsx"
+}

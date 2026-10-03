@@ -55,10 +55,12 @@ Phase 0 已建立以下入口。实际通过记录只写入 STATUS；后续阶�
 | `bun run test:integration` | 当前阶段的 Repository/Application/Fake Adapter 集成 |
 | `bun run docs:check` | 文档链接、引用、覆盖矩阵与清单 |
 | `bun run release:check` | 校验版本、三套 Expo/EAS variant、OTA 默认、发布清单与隐私草案；只证明静态配置，不证明账号/签名/商店可用 |
-| `bun run build:check` | 当前阶段已建立 App 的配置与 bundler/export 检查；不等于原生签名/真机验证 |
-| `bun run check` | 顺序聚合 format:check、lint、typecheck、test、test:architecture、test:integration、docs:check、build:check |
+| `bun run build:check` | App 配置与双平台 production export/module inventory 检查，排除本地测试宿主/工具；不等于原生签名/真机验证 |
+| `bun run check` | 顺序聚合 format:check、lint、typecheck、test、test:architecture、test:integration、docs:check、release:check、build:check |
 | `bun run test:e2e` | 读取经审核的物理 iOS/Android 证据并要求 E2E-001…005 全部通过；缺文件、模拟器或 pending 项均失败 |
 | `bun run bench:scheduler` | 本地固定负载与计划移动测量，独立检查约束/确定性；不进入普通 check 的墙钟性能门禁，不证明 Hermes 或真机性能 |
+| `bun run test:ui` | 本地 Development Build UI 驱动与隔离测试库断言；不进入普通 check，不替代物理设备或真实模型证据 |
+| `bun run test:hermes` | 专用 Android Development Build 的隔离 Hermes/Fake Agent/排程基准执行；需另启测试 Metro，不进入普通 check，不替代真实模型/物理设备证据 |
 | `bun run build:preview:ios` / `build:preview:android` | 创建可内部安装的 EAS preview build |
 | `bun run build:ios` / `build:android` | 创建 production store build；需要已授权 EAS 项目与签名 |
 | `bun run submit:ios` / `submit:android` | 用 production submit profile 提交；Android 默认 internal track + draft，最终推广仍需人工审核 |
@@ -69,6 +71,14 @@ Phase 0 已建立以下入口。实际通过记录只写入 STATUS；后续阶�
 `bench:scheduler` 默认每个 preview/replan 预热 1 次、计时 5 次，结果输出到 `.ai/evidence/optimization/scheduler-benchmark.json`。可用 `--samples 10 --warmup 2` 改采样数量，`--case 200-30-sparse-neutral` 选择单个负载，`--output .artifacts/optimization/benchmark.json` 改输出位置；样本参数和重复/未知选项严格检查。结果记录 fixture seed、policy/代码版本、工作树状态、运行时/主机类别、耗时及移动/未排程指标。示例权重不改变 Mobile 中性策略；复现结果时应同时核对代码版本与输入，不能把主机测量当作真机验收。
 
 阶段报告必须说明实际覆盖。尚未接入的业务/平台集成写明未覆盖；不得用空套件成功宣称 V1 功能已通过。Phase 0 的最小原生 Development Build 单独验收并记录。
+
+`build:check` 在被忽略的 `.expo-export/` 生成本地 source map，并检查模块清单；缺少 map/inventory 或包含独立 Hermes entry、排程 benchmark、UI/Hermes 驱动、下载工具时退出失败。这些 map 仅服务本地验证，不作为发布产物上传。原生 Scene lifecycle 的 SDK 兼容维护按 [DEC-004](DECISIONS.md#dec-004) 复测，不能用 export 代替实际原生构建。
+
+本地 UI 测试需先准备无需账号的 Maestro CLI、Java 17+ 与对应原生宿主；不调用 Maestro Cloud 或 AI analysis。iOS 使用 `bun run test:ui --platform ios --app <Debug .app> --runs 2`；Android 使用 `bun run test:ui --platform android --device <owned emulator serial> --app <Debug .apk> --runs 2`。Metro 另用 `bun run dev --port 8087 --offline` 启动；Expo 的 `--offline` 只禁用开发工具网络查询，不表示 App/设备已断网，且不能与 `--localhost` 同时传入。根目录转发脚本使用 `bun run --cwd apps/mobile <script>`。
+
+iOS 默认创建并登记专用 Simulator，或传 ownership receipt 中已记录的 `--device`；`--runtime` 用于新设备。Android 工具放在 `.artifacts/tools/android-sdk`，先用该 SDK 创建 `.artifacts/tools/android-avd/` 中的专用 AVD，启动后将 owner=OPT-NC-20261003、platform=android、实际 serial/name/runtime/path 写入 `.artifacts/optimization/ui-devices.json`，禁止登记已有用户 AVD。Runner 核对 adb 返回的真实 AVD 名称后才允许重装 App。`--maestro` 可指定本地 CLI，`--port` 必须与 Metro 一致。配置错误退出 2，命令/旅程/业务断言失败退出 1；成功退出 0 只证明报告中实际执行的本地旅程。Android 飞行模式、Wi-Fi、移动数据及默认网络在离线旅程前后核对；驱动有界等待连接服务实际断开，结束后恢复专用设备网络；127.0.0.1 的 ADB/Metro bridge 保留为开发包加载例外。iOS 尚未实现网络禁用，报告不得标成通过；offline/planAcceptance 字段须单独核对。
+
+隔离 Hermes 宿主启动命令为 `EXPO_NO_TELEMETRY=1 CI=1 bunx expo start apps/mobile/testing --dev-client --offline --port 8089`，随后执行 `bun run test:hermes --device <owned Android emulator> --port 8089`。测试脚本核对专用 AVD、已安装 development App 和 manifest 中的独立 entry，重启该 App，并读取其唯一 PID 的合成日志；它不重装/清库。报告保存在 `.ai/evidence/optimization/hermes-runtime.json`，原始 markers 在 `.artifacts/optimization/hermes-runs/`。UI 与 Hermes 会重启同一个测试 App，必须顺序执行。所有脚本/测试源码、独立入口与对应依赖不应进入 production Router/export。
 
 Calendar/Notification 的 Application、SQLite、Expo Adapter 代码、注入 native facade 测试或仅前台 Mobile Runtime 组合通过，均不等于系统权限、真实投递或端到端产品路径通过。Phase 3 必须另外记录平台、OS 版本、账户/source、权限初始状态、前后台/终止场景及实际 readback。
 

@@ -250,6 +250,12 @@ Scheduler 变更必须：
 
 固定负载测量使用 `bun run bench:scheduler`。Fixture 与独立后置不变量位于 `tests/benchmarks/scheduler`，计时、Git/主机信息与结果文件写入仅位于 `scripts/benchmark-scheduler.ts`，不向 Pure Core 引入 Node、时钟或文件副作用。测试目录中的显式 policy 仅用于测量，不构成生产权重决定。
 
+本地 UI 驱动使用 `bun run test:ui`，流程源位于 `tests/ui/flows`，平台控制与只读测试库断言位于 `scripts/test-ui.ts`。稳定 testID 只标识现有控件，不作为业务 authority；合成 fixture 经真实 UI/Application Service 写入，禁止生产清库、任意写表或伪造成就的测试入口。Runner 只允许 ownership receipt 与实际名称/UDID/AVD 对齐的专用设备重装 development App；已有用户设备不能被自动接管。两平台新安装的测试沙盒仅调整 Expo 开发菜单的首启、引导和悬浮按钮偏好，避免诊断控件遮挡业务按钮，不写业务数据库。Android 只读事实经 run-as/sqlite3 -readonly 获取；短暂 ADB transport loss 可以有界等待重连后重新读取，但数据库错误和业务断言不能重试隐藏，任务创建和提交不自动重试。网络禁用与本地开发 bridge 分别记录。原始构建/驱动日志与截图位于忽略的 `.artifacts/`，结构化结果另存 `.ai/evidence/optimization/`。
+
+第三方组件不能仅凭 TypeScript 接受 `className` 就假设 NativeWind 已适配。当前 `react-native-safe-area-context` 的 SafeAreaView 使用原生 `style` 提供必要 flex、背景与居中布局；文字和原生滚动组件仍沿用现有样式体系。主动 Relax 内容须可滚动，窄屏/大字体下结束与离开动作保持可达。UI 驱动在每阶段前重建专用 Android 的 ADB localhost 转发，以应对连接恢复后映射丢失；该开发通道不启用业务网络。
+
+实际 Hermes 验证使用独立 `apps/mobile/testing` Expo 宿主及 `bun run test:hermes`。该入口不属于生产 Router，不访问业务 SQLite/真实 Provider；执行有限 Fake Agent、纯排程场景，以及仅在独立合成数据库上的 Native Preference 诊断。宿主计时允许使用 performance.now，不能将测试计时或文件/ADB 控制移入 Pure Core。脚本只重启已核对归属的 development App，记录 Hermes runtime properties、代码摘要、原生 App 版本、断言与样本；没有模拟器/宿主时单列未执行。
+
 本地构建、UI 驱动与 profiler 的大型生成物使用 `.artifacts/`，该目录由 Git、格式、lint 与文档清单检查排除。可入库的合成结果摘要位于 `.ai/evidence/optimization/`，实际验证结论统一记录在 STATUS；禁止保存真实用户内容或凭据。
 
 ---

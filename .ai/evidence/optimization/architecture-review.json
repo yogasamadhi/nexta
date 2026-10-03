@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "planId": "OPT-NC-20261003",
+  "package": "OPT-08",
+  "observedAt": "2026-10-03T10:33:17.223Z",
+  "status": "passed",
+  "commandEvidence": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": ".artifacts/optimization/check-optimization-accepted.log",
+    "unitFiles": 53,
+    "unitTests": 454,
+    "integrationFiles": 19,
+    "integrationTests": 79,
+    "architecturePackages": 11,
+    "canonicalMarkdownFiles": 27,
+    "note": "Includes conditional wait for actual Android offline state; subsequent changes are documentation/evidence only."
+  },
+  "architecture": [
+    {
+      "boundary": "Pure Core and reverse imports",
+      "result": "passed",
+      "evidence": "scripts/check-architecture.ts AST import/global and declared-dependency checks; full gate"
+    },
+    {
+      "boundary": "Agent Tools to Application and permission authority",
+      "result": "reviewed",
+      "evidence": "packages/agent-tools/src/index.ts schemas and context-generated operationId/authority; contract tests"
+    },
+    {
+      "boundary": "UI pages do not access tables",
+      "result": "reviewed",
+      "pagesScanned": 18,
+      "forbiddenPageImports": 0,
+      "evidence": "pages obtain services through RuntimeScreen; apps/mobile/src/runtime/mobile-runtime.ts composes database/native adapters"
+    },
+    {
+      "boundary": "Dev UI/Hermes tools excluded from production",
+      "result": "passed",
+      "inventory": [
+        {
+          "platform": "ios",
+          "sourceCount": 2242,
+          "localTestHostAndToolsExcluded": true
+        },
+        {
+          "platform": "android",
+          "sourceCount": 2336,
+          "localTestHostAndToolsExcluded": true
+        }
+      ],
+      "evidence": "scripts/check-mobile-bundle.ts actual production source maps"
+    },
+    {
+      "boundary": "Migration/schema/checksum stability",
+      "result": "unchanged",
+      "evidence": "no database schema/migration/checksum change since 23cf37d; docs/04 only clarifies existing per-interval integer seconds"
+    }
+  ],
+  "dependencies": [
+    {
+      "names": [
+        "expo",
+        "expo-build-properties",
+        "SDK 57 native module patches"
+      ],
+      "action": "compatible patch alignment",
+      "reason": "actual iOS 27 SDK launch rejected absent Scene lifecycle",
+      "validation": [
+        ".artifacts/optimization/ios-scene-build.log",
+        ".artifacts/optimization/android-scene-build.log",
+        ".artifacts/optimization/expo-scene-versions-3.log",
+        ".artifacts/optimization/expo-scene-doctor-3.log"
+      ],
+      "decision": "DEC-004 maintenance record; React/RN/UI/Schema versions unchanged"
+    },
+    {
+      "names": [
+        "expo-constants duplicate copies"
+      ],
+      "action": "deduplicated local installation by preserving displaced copies in ignored backup",
+      "reason": "Expo doctor duplicate native module check; current lock is the source",
+      "validation": "doctor 21/21; frozen Bun install exit 0"
+    },
+    {
+      "names": [
+        "react-aria",
+        "react-stately"
+      ],
+      "action": "retained",
+      "reason": "@gluestack-ui/core uses scoped React Aria/Stately dependencies; @gluestack-ui/utils declares aggregate peers; absence of direct app imports is insufficient to delete"
+    },
+    {
+      "names": [
+        "@legendapp/motion",
+        "@expo/html-elements"
+      ],
+      "action": "retained",
+      "reason": "no direct app source import found; established UI compatibility baseline purpose not conclusively removable; no speculative cleanup"
+    },
+    {
+      "names": [
+        "Maestro",
+        "Android SDK/emulator"
+      ],
+      "action": "local ignored tools only",
+      "reason": "no service account or production dependency"
+    }
+  ],
+  "sensitiveOutput": {
+    "filesScanned": 185,
+    "strongCredentialPatternMatches": 0,
+    "scope": "scoped source/config/structured synthetic evidence scan; not a general security certification",
+    "review": "UI reports store only synthetic business facts and command arguments; native diagnostic logs fixed stage/code and isolated database; no prompt/raw model/secret/stack added to production logging",
+    "existingWebOnlyLog": "gluestack-ui-provider/script.ts console.error applies to DOM color-mode failure; does not log business/Provider content"
+  },
+  "productDefaults": "DEC-001/002/005/007/009/011/012 remain Open; no production weight, personalization, auto-commit, backup/export, shared key or real Provider enabled",
+  "documentationImpact": {
+    "Product": "no normative change",
+    "Requirements": "no normative change",
+    "Architecture": "hard boundaries unchanged",
+    "DataModel": "existing trusted interval seconds semantics clarified; no schema change",
+    "APIContracts": "time Context already synchronized in 23cf37d",
+    "UIUX": "safe inset, explicit next Capture draft, native layout/scroll/status contrast",
+    "Development": "local runners and native layout caveat",
+    "Testing": "local UI/Hermes scope and source exclusion",
+    "Security": "time Context synchronized in 23cf37d; no new secret channel",
+    "BuildRelease": "UI/Hermes commands, native Scene patch verification and source-map inventory",
+    "ADR": "none required: compatible patch within DEC-004, no architecture change",
+    "AIContext": "runner route and sequential same-app constraint",
+    "ImplementationPlan": "new test:hermes entry; OPT scope/acceptance preserved",
+    "Status": "Final UI/Hermes/benchmark, all nine package acceptances, documentation checks and local implementation commit trace are synchronized in STATUS.",
+    "Manifest": "27 documents unchanged; no new Markdown"
+  },
+  "limitations": [
+    "local pattern and architecture checks do not replace penetration testing or a dependency-vulnerability audit",
+    "local Debug/emulator evidence does not close physical-device/Provider/release gates",
+    "native UI and final Hermes results are in their separate structured reports"
+  ],
+  "documentationValidation": {
+    "docsCheck": {
+      "exitCode": 0,
+      "files": 27,
+      "requirements": 24,
+      "acceptanceGroups": 24,
+      "cases": 27,
+      "e2eJourneys": 5,
+      "log": ".artifacts/optimization/docs-optimization-closeout.log"
+    },
+    "formatCheck": {
+      "exitCode": 0,
+      "log": ".artifacts/optimization/format-optimization-closeout.log"
+    },
+    "explicitRoundtrip": {
+      "exitCode": 0,
+      "log": ".artifacts/optimization/docs-evidence-roundtrip-final.log"
+    },
+    "nativeUi": "ui-results-android.json / two clean runs and observed offline before+after",
+    "hermes": "hermes-runtime.json / 13 cases, two finite Fake modes, separate native preference passed"
+  }
+}

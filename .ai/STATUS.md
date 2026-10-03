@@ -11,7 +11,7 @@
 - Phase 1 **IN PROGRESS**：实现与门禁已通过，但 [DEC-006](../docs/DECISIONS.md#dec-006) 尚未关闭，不能正式标记 DONE。
 - Phase 2 **TECHNICAL IMPLEMENTATION COMPLETE / FORMAL PRODUCT SCOPE IN PROGRESS**：Pure Scheduler、Application Preview/Commit 和本地 SQLite 交付项已实现并通过门禁；[DEC-006](../docs/DECISIONS.md#dec-006)、[DEC-011](../docs/DECISIONS.md#dec-011) 尚未关闭，因此依赖范围、生产词表/default 与 policy 语义不能正式定稿。生产 Snapshot/Mobile/设备/OS 证据是后续集成范围，不能由本地技术完成状态代替。
 - Phase 3 **IN PROGRESS**：平台无关 Calendar/Notification Domain/Application、`0002`/`0003` SQLite、Expo Adapter、write-ahead ExternalMutationIntent、仅前台 Mobile Runtime 协调器与提醒偏好安全重排已经实现并有自动化证据；ScheduleService/SchedulingSnapshot、显式权限、日历范围、有界 refresh 和 `0–1440` 分钟提醒设置已接入 Mobile，但真实 iOS/Android OS 行为尚未验收，[DEC-012](../docs/DECISIONS.md#dec-012) 仍为 Open，因此不能正式标记 DONE。
-- Phase 4 **IN PROGRESS**：`0004` UserPreference、Hermes Intl/DST Adapter、production SchedulingSnapshot、Today/Day Timeline、本周日期条、含排程约束的手工 Capture/Task 编辑与两步取消、有界分页收件箱、Schedule Preview/显式 Commit、TimeBlock drag/resize/lock 与 Settings 已实现并通过类型、lint、单元、真实 Node SQLite 及 Hermes bundle 门禁；iOS Simulator Development Build 核心交互、收件箱/未来块编辑入口、约束持久化及 15 分钟提醒偏好持久化/作业重排已通过，物理设备、Android 运行和 OS 权限/Provider 验收仍未完成。
+- Phase 4 **IN PROGRESS**：`0004` UserPreference、Hermes Intl/DST Adapter、production SchedulingSnapshot、Today/Day Timeline、本周日期条、含排程约束的手工 Capture/Task 编辑与两步取消、有界分页收件箱、Schedule Preview/显式 Commit、TimeBlock drag/resize/lock 与 Settings 已实现并通过类型、lint、单元、真实 Node SQLite 及 Hermes bundle 门禁；iOS Simulator Development Build 核心交互、收件箱/未来块编辑入口、约束持久化及 15 分钟提醒偏好持久化/作业重排已通过，Android 模拟器本地两轮完整 UI/离线证据见优化执行状态；物理设备和 OS 权限/Provider 验收仍未完成。
 - Phase 5 **TECHNICAL IMPLEMENTATION COMPLETE / FORMAL TRIAL EXIT IN PROGRESS**：`0005` Execution/Achievement 持久化、ExecutionService、AchievementService、完成事务扩展、Focus/Today 启动入口、可跳过/可关闭且恢复不重复的 10 秒 Mindful Transition、成就日/周/月/历史回顾与编辑/收起已经实现。自动化门禁与 iOS Simulator 的 start → pause → reload recovery → resume → complete_task → Achievement → edit/hide/restore 已通过；首轮试用定义 [DEC-001](../docs/DECISIONS.md#dec-001)、物理 iOS/Android 设备证据和前序 OS Provider 验收仍未关闭。
 - Phase 6 **TECHNICAL CORE COMPLETE / PROVIDER AND E2E IN PROGRESS**：Pure AgentRuntime、事件协调、统一 ModelProvider/Fake Provider、15 个 V1 Tool、最小 `0006` AgentRun metadata、自然语言结构化 Preview 边界与 Mobile 明确手工降级入口已经实现并通过自动化技术门禁。真实 Provider/生产凭据 [DEC-005](../docs/DECISIONS.md#dec-005)、真实自然语言解释质量与设备 E2E-001 尚未关闭，不能正式标记 DONE。
 - Phase 7 **TECHNICAL CORE COMPLETE / PRODUCT POLICY IN PROGRESS**：Pure facts-to-features builder、UserModelFeature Domain/Repository、`0007`、原子重建/新鲜度快照、直接用户完整投入覆盖确认、个性化关闭设置与 Scheduler policy 输入边界已实现并通过自动化技术门禁。[DEC-007](../docs/DECISIONS.md#dec-007) 仍为 Open，生产窗口/分类/样本阈值/权重未定；Mobile 当前不允许启用且中性 policy 不消费缓存，因此不能正式标记 DONE。
@@ -25,16 +25,16 @@
 
 `TASK-OPT-NC-20261003` — 按已交付计划执行无需凭据的九个优化工作包。
 
-**Status: IN PROGRESS — OPT-01/02/06 complete; OPT-03 host preparation; OPT-05 contract validation**
+**Status: COMPLETE — OPT-01 至 OPT-09 全部验收通过**
 
-既有 `TASK-TECHNICAL-PLAN-001` 保持 COMPLETE WITH USER-AUTHORIZED EXTERNAL SKIPS：原本地子集 80/80 已完成，正式决策、真实 Provider/设备与发布授权仍开放。新增优化工作包独立跟踪，不算作已完成，也不改写原 Engineering Readiness。
+既有 `TASK-TECHNICAL-PLAN-001` 保持 COMPLETE WITH USER-AUTHORIZED EXTERNAL SKIPS：原本地子集 80/80 已完成，正式决策、真实 Provider/设备与发布授权仍开放。新增优化工作包独立验收，不改写原 Engineering Readiness 或正式 Phase Exit。
 
 ## Implemented Baseline
 
 ### Repository Foundation
 
 - 已初始化 Git 和 Bun `1.4.0` Monorepo；初始默认分支为 `main`，本轮可追溯提交状态见 Optimization Execution Status。
-- `apps/mobile` 保持 Expo Development Build 骨架与 development / preview / production 配置；中性原生标识和 DEC-004 依赖基线不变。
+- `apps/mobile` 保持 Expo Development Build 骨架与 development / preview / production 配置；中性原生标识不变，SDK 57 兼容 patch 的实际验证见 Optimization Execution Status。
 - strict TypeScript、Prettier、ESLint、Vitest、架构检查、文档检查、Hermes bundle 检查和 GitHub Actions CI 已由 Phase 0 建立。
 - 11 个职责包和 pure TypeScript / Hermes 依赖边界继续由静态检查守护。
 
@@ -292,82 +292,74 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 
 ## Optimization Execution Status
 
-计划：[OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)。规划文档已完成；用户随后启动“按照 PLAN 执行”的目标，按会话明确的 OPT-NC-20261003 轨道开始实施，不设置额外 Token 预算。方案是否 Accepted 与工作包是否完成分别记录。
+计划：[OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)。用户启动“按照 PLAN 执行”的目标，范围为本轨道 OPT-01 至 OPT-09，不设置额外 Token 预算。九个包已完成实际验收与最终文档检查；本地实现提交在下方登记。方案是否 Accepted、优化包验收与原正式 Phase Exit 分别记录。
 
 | ID | 工作包 | 状态 | 实施 / 验收证据 |
 | --- | --- | --- | --- |
-| OPT-01 | 环境预检与本地 Git 基线 | DONE | 基线 f06bad8b1872eac2b51a3e73183b46691fb63f00；安全/隔离预检与 bun run check 通过，优化分支 codex/no-credential-optimization |
-| OPT-02 | 排程性能与计划移动基准 | DONE | 13 场景/26 完整结果等价、固定 seed、不变量、独立计时与移动统计；本地热点优化前后证据见下文，Hermes 宿主可运行后追加测量 |
-| OPT-03 | 本地 Development Build UI 自动化 | IN_PROGRESS | iOS 27 Debug 原生 build/install exit 0；test:ui、九个流程和稳定 testID 已建立，尚无实际旅程通过；正在恢复本地 UI 宿主并准备 Android 工具 |
-| OPT-04 | 移动端可用性审查与必要修复 | NOT_STARTED | 尚无本轮审查与复测记录 |
-| OPT-05 | 通用 ModelProvider / Agent 契约缺口 | IN_PROGRESS | complete/stream 错误脱敏与不合作 Abort 边界已修复；60 个 Agent tests、类型/lint/架构通过，等待可用 Hermes 宿主隔离 smoke |
-| OPT-06 | Capture 时间上下文与中文案例 | DONE | API/Security 先同步显式 Context Contract；所有调用方迁移；中文时间 fixture、非法 Context/额外字段/取消与失败测试通过，未接入真实 Provider |
-| OPT-07 | 本地事务与恢复覆盖审查 | DONE | 覆盖矩阵逐项审查，无需重复实现/测试；19 集成文件/79 tests 与 worker/provider/native facade 36 tests 本轮通过，真实文件关闭重开证据保留 |
-| OPT-08 | 架构、依赖与文档一致性收口 | NOT_STARTED | 本次编写计划不等于完成本轮实施收口 |
-| OPT-09 | 受决策约束的方案与验收包 | DONE | DECISIONS 候选包覆盖七个 Open 条目、取舍/数据影响/验收/最小输入；状态和生效前默认未变，docs:check exit 0 |
+| OPT-01 | 环境预检与本地 Git 基线 | DONE | 基线 f06bad8b1872eac2b51a3e73183b46691fb63f00；现有身份、安全/隔离预检及初始 check 通过，分支 codex/no-credential-optimization |
+| OPT-02 | 排程性能与计划移动基准 | DONE | 固定 seed 13 场景、26 完整输出等价与独立不变量；Bun 前后测量及实际 Android Hermes 13 场景均通过 |
+| OPT-03 | 本地 Development Build UI 自动化 | DONE | Android 16 / API 36 / App 0.1.0 / Maestro 2.11.0：两次干净起点各完成在线、真实断网、暂停重启与唯一完成/成就核对；planAcceptance passed |
+| OPT-04 | 移动端可用性审查与必要修复 | DONE | 九界面有界审查；320dp / 字体 1.3 实际复测底部安全区、下一 Capture 草稿、Relax 原生布局与滚动、动作语义和状态栏；无本轮未处理高优先级可复现缺陷 |
+| OPT-05 | 通用 ModelProvider / Agent 契约缺口 | DONE | 60 Agent tests；错误脱敏、有界取消、迟到隔离和成功收据复用；实际 Hermes complete/stream 有限 Fake 运行通过 |
+| OPT-06 | Capture 时间上下文与中文案例 | DONE | API/Security 与调用方同步显式参考 Instant/IANA/locale；八组合成中文 fixture、非法 Context/字段、取消/失败通过，未接入真实 Provider |
+| OPT-07 | 本地事务与恢复覆盖审查 | DONE | 既有真实文件型 SQLite 测试覆盖所有审查重点，无需重复实现；19 集成文件/79 tests 与 worker/provider/native facade 检查通过 |
+| OPT-08 | 架构、依赖与文档一致性收口 | DONE | 架构/敏感输出/依赖、最终完整 check 和文档检查通过；两平台 actual native build、Expo check/doctor 21/21 通过；证据与职责已同步 |
+| OPT-09 | 受决策约束的方案与验收包 | DONE | DECISIONS 候选包覆盖七个 Open 条目、取舍、数据影响、验收与最小输入；现行默认及 Open 状态不变 |
 
-OPT-01 验收证据：本轮 bun run check exit code 0，51 个单元文件/414 tests、19 个集成文件/79 tests、11 包架构、27 文件文档、静态发布检查与 iOS/Android Hermes export 均通过。日志位于 .artifacts/optimization/check-baseline.log；.artifacts 已加入 Git ignore，309 个文件纳入基线提交 f06bad8b1872eac2b51a3e73183b46691fb63f00。候选文件的凭据模式扫描无发现；git diff --cached --check 另报告既有 Markdown 硬换行空格和 .editorconfig 尾部空行，未将该检查记为通过，低影响格式问题留待 OPT-08 审查。现有原生目录保持忽略，模拟器测试将新建专用设备，未触碰既有 App 沙盒。Git 身份复用配置且不打印值；无远端推送。
+OPT-01：初始 check exit 0（51 unit files/414 tests、19 integration files/79 tests、11 包架构、27 文档、静态发布与双平台 export），日志 .artifacts/optimization/check-baseline.log。基线纳入 309 文件；复用已配置身份，不输出身份值、不推送。原生目录、下载工具和大型日志保持忽略。初始 staged diff 检查曾发现既有 Markdown 硬换行，未伪造通过；当前变更 diff 检查已通过。环境与后续实际工具准备见 [environment.json](evidence/optimization/environment.json)。
 
-OPT-02 验收证据：新增 scripts/benchmark-scheduler.ts、tests/benchmarks/scheduler 的固定 seed 场景/独立后置条件及 tests/unit/scheduler 的基准与区间补集测试；bun run bench:scheduler 实际执行 50/200/500 Task × 7/30 天 × sparse/dense 的 12 组中性 policy，加一组明确标注的稳定性示例，共 13 组，preview/replan 各 5 个预热后样本。未优化结果保存在 .ai/evidence/optimization/scheduler-baseline.json，当前结果含 source SHA-256 保存在 scheduler-after.json，同输入/同主机的 10 样本 CPU profile 对比见 scheduler-comparison.json；以上命令 exit code 0。Profile 显示 mergeIntervals/sort 为热点，仅在减去 Busy/保护区间时先过滤当前窗口外的区间，没有改变候选排序、权重、约束或 scheduler-core/1 版本。所有 26 份完整结果（含解释/警告/metrics）与保存的优化前输出 deep equality 通过；独立整数区间补集 oracle 200 组通过。6 个 Scheduler 单元文件/24 tests、typecheck、11 包架构、docs:check 与相关 ESLint 均 exit code 0。曾误用 Vitest 的不存在 project=unit 入口，退出 1；改为仓库真实配置的文件过滤后通过，没有删除测试。
+OPT-02：50/200/500 Task × 7/30 天 × sparse/dense 的 12 组中性场景，加一组显式稳定性示例，共 13 组，固定 seed 20261003，preview/replan 各五个预热后样本。热点修复仅在区间合并前过滤窗口外区间，候选、权重、版本与输出行为不变；26 完整输出等价、独立区间 oracle 200 次、确定性/反转/输入不变/约束保护通过。基线、优化后和十样本 profile 对比见 [scheduler-baseline](evidence/optimization/scheduler-baseline.json)、[scheduler-after](evidence/optimization/scheduler-after.json)、[scheduler-comparison](evidence/optimization/scheduler-comparison.json)。Bun 1.4.0 / 同主机 200 Task、30 天、sparse：preview p95 125.494 → 24.267 ms，replan p95 129.532 → 50.207 ms；仅为本地观察，不建立 SLA，也不外推手机耗时。提交 d27dea32cf7bd2a378a83fa6a3c9a4e1154b1c7f。
 
-同一 200 Task/30 天/sparse 的 profile 测量：preview p95 125.494 → 24.267 ms，replan p95 129.532 → 50.207 ms，样本数均 10。仅为本地 Bun 1.4.0/Mac 主机观察，不建立 SLA，也不能外推 Hermes/手机耗时；原始 profile/完整结果位于 .artifacts/optimization/。变化统计严格按 existingBlockId 匹配，新增/删除单列；示例稳定性 policy 是测试输入，不是生产决定。Development/Testing/Build 文档已同步入口职责，生成物目录从格式/ESLint/文档扫描排除，不排除业务源码。Hermes 当前尚未执行基准，待本地原生宿主实际可运行后追加隔离测量。
+OPT-03：新增 scripts/test-ui.ts、九个核心 YAML 与两个可用性 flow，稳定 testID、有界等待、development identifier/ownership receipt/实际 AVD 名称核对、命令失败退出码、Junit、原生 SQLite 只读断言。任务 fixture 经真实 UI/Application 写入，重装只作用于专用测试 App 沙盒，未增加生产清库或任意写表后门。两次运行命令 bun run test:ui --platform android --device emulator-5580 --runs 2 exit 0，日志 .artifacts/optimization/ui-android-accepted-run.log；[Android 结果](evidence/optimization/ui-results-android.json)与[当前结果](evidence/optimization/ui-results.json)均记录 consecutiveCleanRunsPassed=2、offline=passed、planAcceptance=passed。原始命令/截图位于 .artifacts/optimization/ui-runs/2026-10-03T10-12-57.353Z/，App/源码 SHA-256、OS 和驱动版本已保存，结束后源码摘要复核一致。
 
-OPT-03 准备：官方无需账号 CLI 2.11.0 位于 .artifacts/tools/maestro-2.11.0/，未修改 shell profile；后续执行禁用匿名 analytics 和 CLI analysis notification。专用设备 Execution Agent OPT-NC Test / UDID 828EE218-5681-4D83-B3B8-93345F837E42 使用 iOS 27.0 / iPhone 17；Debug 原生构建日志 .artifacts/optimization/ios-build.log。既有模拟器和业务库没有清理。Android SDK/adb/emulator 尚不可用；Maestro 官方说明 setAirplaneMode 仅 Android 生效，不能把 iOS 上无效命令当作离线证据，离线旅程需另行提供真实网络隔离方案或平台验证。
+每轮从干净沙盒核对一条缺估时 inbox Task、拒绝 Preview 不改 Plan/Block/revision；随后在线和断网各执行 Task → Preview → Commit → Calendar → Focus → Pause → App 进程重启 → Resume → 明确完成 → Achievement。重复点击保留唯一 Task/Plan/Completion/Achievement，暂停重启保留 Session 身份且可信投入不增长，关闭区间按 Domain 的逐区间向下取整秒汇总，Task 分钟投影与 Completion 秒数一致，成就 FK 正确，SQLite integrity=ok。离线前后均观察 airplane=1、wifi=0、mobile_data=0、Active default network:none；仅保留 ADB localhost:8087 开发包通道，结束后恢复专用 AVD 网络。Expo --offline 不被当作设备断网证据。
 
-OPT-02 收口：完整 bun run check exit 0（53 个单元文件/418 tests、19 个集成文件/79 tests、架构/文档/静态发布/双平台 Hermes export），日志 .artifacts/optimization/check-scheduler.log；优化提交 d27dea32cf7bd2a378a83fa6a3c9a4e1154b1c7f。该门禁执行期间开始添加 UI testID，因此仅作为 Scheduler/脚本基准收口证据，本轮 UI 源码、runner 和后续改动仍需相关及最终完整门禁。
+UI 驱动诊断边界：重复开发 bundle 加载曾产生 adapter_error，改为单次连接和普通路由后设置保存通过，独立 Native Preference 也通过，没有修改业务数据库掩盖错误。Maestro 清理后 ADB 曾短暂 offline 并丢失 reverse；每阶段仅恢复本地 bridge，transport loss 的只读 snapshot 最多三次恢复，不重试业务写入或吞掉 SQLite/assertion 失败。第一次完整在线通过后的断网观测曾过早读取旧默认网络；驱动增加有界条件等待实际断开，后续两轮前后观测通过，失败报告保留在忽略的历史 artifacts 中。
 
-OPT-03 当前实现：scripts/test-ui.ts 使用 Maestro 本地 CLI，支持命名/UDID ownership receipt 校验、development bundle identifier 校验、测试 App 重装、独立运行产物、Junit/结构化记录和真实 SQLite 只读检查。tests/ui/flows 的九个 YAML 覆盖连接、任务创建、设置/缺估时 inbox、拒绝 Preview、计划提交、Calendar/开始/暂停、重启恢复、继续/明确完成及完成来源；控件使用 testID 和有界条件等待，无固定坐标或长 sleep。断言包括唯一 Task/Plan/Completion/Achievement、来源 FK、暂停投入不增长和可信区间汇总一致。Source/入口存在不等于旅程通过，当前 iOS runner 明确输出 offline 未执行和 planAcceptance=partial；Android 参数目前明确拒绝，不会假装支持。
+另一平台：[iOS 结果](evidence/optimization/ui-results-ios.json)保留失败的完整驱动尝试，不能标为 UI 通过。iOS 27 Scene 兼容修复后 actual Debug build/install/launch exit 0，专用 Device Hub 实际进入 Today；完整 iOS 自动化和 iOS 网络隔离未完成。旧 Simulator.app 路径被 Xcode 27 DeviceHub.app 替代，不据旧路径缺失判定工具安装不完整。所有模拟器证据均 physicalDevice=false，不填造 E2E-001 或物理验收。
 
-OPT-03 验证/环境事实：iOS 27 Debug xcodebuild 与安装 exit 0，Maestro 两次启动探测均 exit 1，停在 SpringBoard 首次深链“打开”确认框；驱动读到按钮并报告 tap 成功，但截图/层级仍保留确认框，Metro 未收到 App bundle 请求，不能据此认定 App 已进入业务 UI。另建隔离 iOS 18.3 / iPhone 16，UDID F254416D-A447-4963-948A-1A63079FA90F；探测在 launchApp 处退出 1，cleanup 报模拟器 Shutting Down。当前 /Applications/Xcode.app 含 SDK/CLI，但没有 Developer/Applications/Simulator.app，mdfind 也未发现其旧 bundle；随后查到 /Applications/Xcode.app/Contents/Applications/DeviceHub.app（com.apple.dt.Devices）替代界面并显示专用测试设备，不能据旧路径缺失判定 Xcode 安装不完整。正在用该实际界面复测，触摸失败根因尚未证明。原始 probe/XCTest 日志和合成截图位于 .artifacts/optimization/ui-probe*。不改业务代码掩盖这些环境问题。
+OPT-04：[usability-review.json](evidence/optimization/usability-review.json)列出 Today、Capture、Task、Calendar/调整、Preview、Focus、Achievement、Settings、Relax 的实际/静态审查、五项发现、复测与截图。实际 Android 320dp、三键导航、字体 1.3；结束恢复原字体 1.0。修复 Tab 点击区域侵入系统导航栏；保存到 Preview 后 Back 的只读表单增加显式下一草稿且保留事实；SafeAreaView 必要布局改用当前适配支持的 native style，已存在的 active Relax 可读且结束/离开可滚动；Task/Settings 动作 role/checkbox 状态及权限目标高度；深浅页面状态栏对比。原始四条 Task 保留并新增两条合成 Task、Plan/Block 不变；非法估时与调整 Preview 拒绝的只读事实完全不变；暂停重启 pilot 全部观察事实一致；真实完成及来源截图通过。实际 TalkBack/VoiceOver、原生拖动/缩放手势和物理设备未执行；手势边界仅源码与已有 timeline 单元测试审查，不宣称无障碍认证。
 
-UI runner 的 typecheck、相关 ESLint、--help 均 exit 0；Android 未实现参数明确 exit 2；传入未登记 UDID 的保护探测在任何重装前拒绝，exit 1（现行配置/运行拒绝），记录 .artifacts/optimization/ui-unowned-device.log。docs:check exit 0，Development/Testing/Build 文档同步本地驱动职责与当前限制。另修根目录 Bun wrapper 顺序：原 `bun --cwd apps/mobile run ...` 只输出帮助后 exit 0，改为 `bun run --cwd apps/mobile ...`，Expo --help 与实际 Metro 启动已验证；Metro 使用 8087/--offline，只代表开发工具不联网，不能用作 App 断网证据。
+OPT-05/06：通用 Provider complete/stream、自定义 mapper、包装错误和 Tool 异常只产生稳定通用码/消息，红灯后修复并复测；Agent 对忽略 Abort 的 Provider/stream/approval/tool 停止等待并隔离迟到事件，不宣称撤销已开始事务，成功收据在后续失败后可复用。Tool 权限/risk floor 不变，无新 SDK 或生产 Fake AI。timeContext 的严格 UTC/Z referenceInstant、IANA timeZone、BCP47 locale 由宿主注入，非法 Context 在 Provider 前拒绝；草稿不持久化，模糊日期、缺估时不补造。八个中文脚本 fixture 证明 Context 传递/输出校验，不代表自然语言准确率。60 Agent tests、类型/lint/架构及 check-agent-capture.log 均通过；契约矩阵见 [agent-contracts](evidence/optimization/agent-contracts.json)。提交 23cf37d6739bdd74f0439b64f4d71d0c613541cb。
 
-Android 准备：官方 commandlinetools-mac_arm64-15859902 下载 SHA-256 与官方值 835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e 一致；SDK 包列表查询 exit 0。工具仅解压在 .artifacts/tools/android-sdk/，未更改全局 profile/用户 SDK。正在安装无需账号的 platform-tools、emulator 与 API 36 default arm64-v8a system image（具体 live handle 由当前会话保存，日志 .artifacts/optimization/android-sdk-install.log），尚无 emulator 或 Android 旅程通过证据。仓库既有 app-debug.apk 可用于 native host 准备，但尚未验证当前 JS/UI/设备运行。
+实际 Hermes：apps/mobile/testing 独立 Expo manifest/entry 不由生产 Router 导入，不访问业务 SQLite；与 UI 顺序运行同一专用 App。最新 bun run test:hermes --device emulator-5580 --port 8089 exit 0，日志 .artifacts/optimization/hermes-accepted-run.log；[hermes-runtime.json](evidence/optimization/hermes-runtime.json)记录 App 0.1.0、Hermes 250829098.0.17 / Bytecode 98 / hades、13 场景各五个预热后样本、独立不变量、complete/stream 各两轮/一次只读 Tool/成功收据，以及独立合成 Native SQLite Preference update/read passed。源码摘要、原生版本与命令保留；该 Debug 模拟器/Fake 测量独立于 Bun，不代表真实模型、物理设备性能或 OS Provider 验收。
 
-OPT-05/06 收口门禁：bun run check exit 0（53 unit files/454 tests、19 integration files/79 tests、架构/文档/静态发布/双平台 Hermes export），日志 check-agent-capture.log。该结果不代替仍未通过的 UI 旅程或实际 Hermes 执行。
+OPT-07：[recovery-coverage.json](evidence/optimization/recovery-coverage.json)逐项引用 Preview TTL/版本冲突、响应丢失重放、active/paused 文件关闭重开、唯一完成与成就、migration 失败回滚、offline pending、ExternalMutationIntent、lease/claim/attempt/迟到 fence。既有覆盖已证明审查重点，无需新增重复测试。19 files/79 integration tests、worker 31 tests 与 provider/native facade 五个 tests exit 0，日志 recovery-{integration,unit,provider-native-facade}.log。没有 schema、migration、checksum 或备份/导出改动；文件关闭重开不能代替物理 OS 强杀。
 
-OPT-05/06 实施：通用 Provider complete/stream、自定义 mapper、已包装错误和 Agent Tool 异常均使用稳定错误码与通用消息，防止合成 raw payload/category/code 泄露；新增红灯测试先确认 4 个 ModelProvider 和 3 个 Agent 缺口，再修复并复测。Agent 对忽略 Abort 的 Provider/stream/Approval/Tool 停止等待并隔离迟到结果，不宣称撤销已开始的事务；complete/stream 的成功收据在后续 Provider 失败后均可复用。Tool Matrix/风险 floor 未变，没有引入 SDK、权限或生产 Fake AI。契约覆盖矩阵见 .ai/evidence/optimization/agent-contracts.json；Hermes 有实际可运行宿主后执行隔离 smoke，当前尚未执行。
+OPT-08：[architecture-review.json](evidence/optimization/architecture-review.json)保存 11 包 AST 架构、18 UI 页面无表访问、Agent Tool 到受限 Application、185 个文件的候选凭据模式扫描、依赖用途与文档影响。未发现强凭据模式，不宣称全面安全认证；React Aria/Stately 因 gluestack 依赖/peer 保留，motion/html 用途未被证实可删，不做推测性清理。production 实际 source-map inventory 的 iOS 2242 / Android 2336 sources 排除独立 Hermes entry、benchmark、驱动和下载工具；map 仅本地验证，不上传。
 
-OPT-06：docs/05-API 与 docs/09-SECURITY 先定义 preview(text, timeContext, signal)，referenceInstant 严格 UTC/Z、IANA timeZone 和 BCP 47 locale 由宿主显式提供并运行时校验；未知/非法 Context 在 Provider 前拒绝，草稿 Schema/非持久化与用户确认边界保持。调用搜索只发现 Previewer 与测试，无生产配置 Provider 的调用方；已全部迁移，不对手工 Capture 接入 Fake。8 个合成中文 fixture 覆盖同 Instant 不同时区、周界/跨年、DST 缺失/重复本地时刻、仅日期 Deadline 和模糊/缺估时；额外 Context、模型伪造字段、取消后迟到回复和 Provider 失败均验证。测试仅证明上下文传递/输出校验，不证明中文理解准确率。
+iOS 27 SDK 的 Scene lifecycle 启动故障按 SDK 57 expo-build-properties enableSceneSupport 兼容修复，Expo 及相应 native 模块对齐 SDK 57 patch，RN/React/UI/Schema 组合未变；DEC-004 保留历史 Closed 并追加兼容维护。ios-scene-build.log 与 android-scene-build.log 两平台 actual native Debug build exit 0，当前 App 0.1.0。两个重复 expo-constants 副本移入忽略的备份，bun install --frozen-lockfile exit 0；expo install --check exit 0，expo-doctor 21/21 exit 0，日志 expo-scene-{versions,doctor}-3.log。没有删除检查、伪造 native 结果或引入新框架。
 
-本轮 Agent/Capture 验证：bunx vitest run tests/unit/agent exit 0（4 files/60 tests）；typecheck、相关 ESLint、docs:check 均 exit 0；Agent 初次修改后的 test:architecture exit 0，新增 Context import 后在最终门禁复核。日志 .artifacts/optimization/{model,agent}-contract-{red,green}.log 与 capture-time-{tests,types,lint,docs}.log。API/Security/Testing 同步当前 Contract 与覆盖；没有 Schema migration 或新 ADR；完整仓库最终门禁尚待后续修改收口。
+最终代码门禁：bun run check exit 0，日志 .artifacts/optimization/check-optimization-accepted.log，53 unit files/454 tests、19 integration files/79 tests、11 包架构、27 文档、release:check 和双平台 production export 均通过；包含最终网络状态有界等待与 UI 修复。随后只修改文档/结构化证据，文档验证单独执行，不重复全量业务测试。最终 docs:check exit 0（27 文件、24 Requirement、24 Acceptance、27 CASE、5 E2E），format:check exit 0；被普通格式入口排除的文档与 JSON 另做显式 Prettier debug-check，exit 0。日志 docs-optimization-closeout.log、format-optimization-closeout.log、docs-evidence-roundtrip-final.log。一次新引用的生成 anchor 失败已修复并复测，没有把失败记为通过。最终实现提交稍后按已生成 SHA 登记，原始日志和截图保持本地忽略。
 
-OPT-07：逐项阅读真实 ScheduleService/Execution/Repository/Migration/ExternalIntent 和 Phase 9 文件型 SQLite 关闭重开测试，形成 recovery-coverage.json；既有测试已证明全部审查重点，未发现需要新增实现或重复故障测试的缺口。bun run test:integration exit 0（19 files/79 tests），worker 31 tests 和 provider timeout/native SQLite facade 5 tests exit 0，日志 recovery-{integration,unit,provider-native-facade}.log。一次文件过滤包含不存在的 provider-call-bounds 名称，但 Vitest 只运行存在的 integration-service（31 tests）；随后使用实际 provider-timeout 文件独立执行并通过，没有把前次过滤当该文件通过。没有 migration/checksum 修改或备份/导出；Node/Facade 不代表真实 OS 强杀与投递。
+OPT-09：[DECISIONS 候选包](../docs/DECISIONS.md#optimization-candidate-packet-opt-nc-20261003)覆盖 DEC-001/002/005/007/009/011/012 的试用指标、基础/学习 policy/窗口/容量、前台合并/Undo、Provider/BYOK、备份恢复和 OS 投影故障验收。每项包含取舍、数据影响和最小负责人输入，所有条目仍 Open，生效前默认保持；没有远端遥测、真实请求、共享 Key、生产个性化、自动提交、备份/导出或发布。docs:check exit 0，MANIFEST 仍 27 个文档。
 
-OPT-09：docs/DECISIONS.md 新增候选评审包，覆盖 DEC-001/002/005/007/009/011/012，包含试用指标分母/最小本地数据、基础与学习 policy/窗口/容量、前台合并与 Undo、Provider/BYOK、备份恢复 ADR 草案要点以及 OS 隐私/source/投递故障检查。所有关联条目继续 Open，现行默认保持；没有要求负责人本轮提供信息，没有真实请求或新产品行为。docs:check exit 0，日志 decision-docs.log；未新增 Markdown，MANIFEST 不变。
-
-当前实施 Documentation Impact Assessment：Product/Requirements 无范围或必要程度变化；Architecture 沿既有 Pure Core/Application 边界并修复取消隔离；Data Model 无 Schema/迁移变化；API/Contracts 与 Security 同步时间 Context/错误脱敏/有界中止；UI/UX 尚待实际审查，当前只增加 testID；Development/Testing/Build 记录基准与部分 UI 入口；ADR 无新重大决策；AI Context 更新命令可用性路由；Implementation Plan 验收范围/依赖不变；Status 汇总实际证据和未完成项。DECISIONS 仅候选建议，未关闭决策。最终影响评估和完整门禁待 OPT-08。
-
-状态约定：NOT_STARTED、IN_PROGRESS、PARTIAL、DONE、BLOCKED。每次更新附变更文件、命令/退出码、环境/覆盖、证据、未解决问题和下一步；审查类任务无修改时仍需审查证据。BLOCKED/PARTIAL 不能计为 DONE；工作包状态不代替宿主 Goal 生命周期。
-
-当前动作：继续 OPT-03 实际宿主准备与旅程验证；若宿主准备等待或失败，推进依赖已满足的 OPT-05/06/07 审查与实现，不把 UI 部分准备算作完成。候选文件扫描仅覆盖所列凭据模式，不宣称完整安全认证；工具版本/隔离路径记录于 .ai/evidence/optimization/environment.json，原始本地日志使用被忽略的 .artifacts/。bun run bench:scheduler 已可用；bun run test:ui 入口已建立但实际旅程未通过，现有 test:e2e 仍是物理设备证据校验器。
-
-本次规划的 Documentation Impact Assessment：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR 无生效规范或业务实现变化；AI Context 增加优化摘要与边界，Implementation Plan 增加九个包/验收/启动目标文本，Status 增加独立执行表及下一步。没有新增 Markdown 文件，MANIFEST 清单不变；必要的 Canonical/ADR 变更在对应工作包实施时完成。
-
-2026-10-03 本次文档验证：bun run docs:check 通过（27 文件、24 Requirement、24 Acceptance、27 CASE、5 E2E），bun run format:check 通过；.ai 按现有规则排除于普通格式检查，另用 Prettier 显式覆盖 ignore 的 debug-check 验证这三个修改文件的格式往返，exit code 0。独立计划一致性核查通过：九个工作包都有章节和 NOT_STARTED 行、目标文本与 Context 路由存在、两条拟新增脚本尚未被当成当前命令、blocked 生命周期约束明确；链接/引用/清单与跨文档语义已复核。业务实现、代码测试与设备验收不适用：本次仅修改计划与上下文，不启动优化目标；本日先前 bun run check 证据保留，不作为本轮优化已实现的证据。
+边界：本轨道完成仅表示本轮无需凭据的本地优化。真实 Provider/自然语言质量、物理 iOS/Android、OS 权限/日历/通知/强杀、长期试用、Open Decision、EAS/商店/签名与 release:gate 继续未完成。没有推送、登录、发布或测试真实用户数据库。原 80/80 可执行子集与 80/101 正式清单保持各自口径，跳过项不记 DONE。
 
 ## Documentation Impact Assessment
 
+本表对应 OPT-NC-20261003；既有 Phase 的实现与外部门禁仍按前文和 Engineering Readiness 维护。
+
 | 项目 | 结果 |
 | --- | --- |
-| Product | 无产品范围变化；补充 Open Decision 的最小输入清单，但未替代产品负责人关闭 DEC-001 / DEC-002 / DEC-005 / DEC-006 / DEC-007 / DEC-008 / DEC-009 / DEC-011 / DEC-012 |
-| Requirements | 补齐 Task 取消、Goal/Project 可达性及 Calendar 待核对恢复的实现证据；未把缺真实 Provider、设备或产品决策的 MUST/SHOULD 标记完成 |
-| Architecture | Task 终态计划事务、Goal/Project 有界查询和 Mobile integration user-action wake 均复用既有 Application/前台事件驱动边界 |
-| Data Model | UserPreference generic JSON 表保存提醒与 Focus 过渡开关，无新实体或 SQL migration；IntegrationJob 只开放受限安全终态重排，不抢占 processing/intent |
-| API / Contracts | 增加 Task cancel 结果、Goal/Project 有界 list、Mobile 权限/恢复后 wake 接线与一次性 Focus 展示信号；直接用户 authority、幂等、Execution 状态机与 durable Job 边界不变 |
-| UI/UX | Task/收件箱/Goal/Project 流程已补齐；Settings 对 Calendar provisioning unknown 提供受状态约束的两步核对恢复，增加可关闭 Focus Mindful Transition，并统一秒级事实派生的分钟展示 |
-| Development | 明确终态计划事务、有界列表、权限/recovery 本地提交与 best-effort wake 分离；不把 wake 失败伪装成事务回滚 |
-| Testing | 新增 Task 取消、完整约束、Goal/Project 列表/关联、integration user-action wake 与 Focus 过渡开关/边界覆盖；Simulator/Facade 证据仍不计入真机 OS 验收 |
-| Security | Task/Goal/Project 终态操作与 Calendar provisioning intent 释放均要求直接用户和两步 UI；DEC-012 隐私与最终通知 policy 仍开放 |
-| Build / Release | 真机证据增加零/非零提前量实际触发与非法值拒绝；补充不含凭据的授权发布交接顺序，既有 release gate 不放宽 |
-| ADR | 无新重大设计决定；未把当前中性 policy 或静默环境入口固化为产品决策 |
-| AI Context | 同步 Task/Goal/Project、提醒偏好、安全重排、待核对恢复、投影竞态 fence 与用户授权的外部跳过边界 |
-| Implementation Plan | 补充 Phase 1/3/4 当前 Mobile 功能边界、仍需真机验证的 Exit 与用户授权的阻塞任务跳过登记 |
-| Status | 本文件记录新增可达性/恢复证据、当前主机授权环境复核、Open Decision 最小输入、三个可追溯 Skip ID 与仍需授权人员完成的发布门禁 |
+| Product | 无产品范围变化；候选试用/Provider/policy/恢复方案未替代负责人决策 |
+| Requirements | MUST/SHOULD/FUTURE、既有 Acceptance 与正式 Phase Exit 不变；优化包独立验收 |
+| Architecture | scheduler/agent/application 继续 Pure TypeScript 与受限应用边界；局部排程热点、取消 fence 和隔离测试宿主符合既有规则 |
+| Data Model | 无 schema/migration/checksum 变化；文档明确既有可信 work 区间逐区间取整秒、Task 分钟与 Completion 秒数一致 |
+| API / Contracts | Capture Preview 显式时间 Context 先同步文档再迁移调用方；Tool 权限/Schema/幂等不变 |
+| UI/UX | 修复底部设备安全区、保存后显式下一草稿、SafeAreaView native 布局、Relax 可滚动结束、动作语义和状态栏对比；不启用新排程策略 |
+| Development | 文档化固定基准、本地 UI/Hermes 宿主、所有权/隔离、只读恢复与开发 bridge 规则 |
+| Testing | 有限 Provider/Abort/迟到/收据/时间 fixture、独立区间 oracle、本地两轮在线/离线和可用性复测；真实模型/物理/OS 证据单列 |
+| Security | Provider/Tool 错误脱敏，时间 Context 允许字段与边界同步；无新凭据、真实用户数据、遥测或业务日志通道 |
+| Build / Release | 修正 Bun wrapper；SDK 57 Scene 兼容 patch 两平台 actual native build、Expo check/doctor；实际 production source inventory 排除测试代码，release gate 不放宽 |
+| ADR | 无新重大架构决定；DEC-004 只追加已验证的兼容维护，七个候选条目保持 Open |
+| AI Context | 优化轨道与命令职责路由同步，UI/Hermes 对同一测试 App 顺序运行 |
+| Implementation Plan | 增加 test:hermes 拟新增入口及启动文本说明；九个包、依赖和验收范围不变 |
+| Status | 统一记录实际命令、源码摘要、UI/Hermes/基准/审查结果、提交与剩余外部门禁；历史失败不计通过 |
 
 ## Engineering Readiness
 
-`PHASE 10 TECHNICAL RELEASE SCAFFOLD COMPLETE — FORMAL PRODUCT/DEVICE/SIGNING/STORE GATES OPEN`；按用户授权排除三个外部 Skip ID 后，80 / 80 项本地可执行清单均已完成，最新 `bun run check` 通过（51 个单元测试文件 / 414 tests、19 个集成测试文件 / 79 tests、架构、文档、静态发布检查和 iOS/Android Hermes bundle）。计划中没有 Phase 11，但原始 101 项清单中的 21 个正式 Exit 尚未满足，当前仍不能称为已发布且功能完善的 App。
+`PHASE 10 TECHNICAL RELEASE SCAFFOLD COMPLETE — FORMAL PRODUCT/DEVICE/SIGNING/STORE GATES OPEN`；按用户授权排除三个外部 Skip ID 后，80 / 80 项本地可执行清单均已完成，原清单收口时 `bun run check` 通过（51 个单元测试文件 / 414 tests、19 个集成测试文件 / 79 tests）；本轮最新完整门禁及本地 Android/Hermes 证据见 Optimization Execution Status。计划中没有 Phase 11，但原始 101 项清单中的 21 个正式 Exit 尚未满足，当前仍不能称为已发布且功能完善的 App。
 
 Phase 1 技术实现与正式关闭项：
 
@@ -394,7 +386,7 @@ Phase 2 技术实现与后续产品/集成项：
 - [ ] 关闭 DEC-011，确定生产 Task 词表/default 与 Scheduler policy 映射
 - [x] 生产 SchedulingSnapshot / 工作窗口-DST / pre-decision neutral policy Adapter 接入 Mobile；正式 policy 仍待 DEC-011
 - [ ] Phase 4 补齐 CASE-SCHED-03 物理设备拖动、迟开始与跨天真实交互；iOS Simulator 精调/锁定/解锁已验证
-- [x] iOS Simulator Development Build 完成真实 `0000 → 0001 → 0002 → 0003 → 0004 → 0005` SQLite 写读、事务与重启 smoke；Android/物理设备仍待验收
+- [x] iOS Simulator Development Build 完成真实 `0000 → 0001 → 0002 → 0003 → 0004 → 0005` SQLite 写读、事务与重启 smoke；Android 本轮新建库/重启闭环见优化证据，物理设备升级仍待验收
 
 Phase 3 技术实现与正式关闭项：
 
@@ -430,7 +422,7 @@ Phase 4 实现与正式关闭项：
 - [x] 提醒提前分钟数 UI、前置校验、持久化与当前计划提醒重检
 - [x] drag/resize 受信 Preview、原子持久化提交、提交后锁定与显式解锁
 - [x] iOS Simulator Development Build：离线 Capture/设置/Preview/Commit/Timeline/精调/锁定/解锁、收件箱/未来块进入 Task 编辑、取消确认面板与未授权状态
-- [ ] 物理设备触摸 drag/resize、Android 运行与 Calendar/Notification 成功权限状态验收
+- [ ] 物理设备触摸 drag/resize 与 Calendar/Notification 成功权限状态验收；Android 模拟器本轮本地闭环已通过
 
 Phase 5 技术实现与正式关闭项：
 
@@ -505,7 +497,7 @@ Phase 10 技术实现与正式关闭项：
 - Phase 1 正式关闭：[DEC-006](../docs/DECISIONS.md#dec-006)。
 - Phase 2 产品范围正式关闭：DEC-006、DEC-011。技术实现和当前门禁已经完成；生产 Snapshot/Mobile、Expo SQLite 与 OS 同步作为后续集成证据单独跟踪。
 - Phase 3 正式关闭：DEC-012，以及真实 iOS/Android SQLite/OS 故障验收。当前 Node/fake/native facade/bundle 证据都不能替代这些项。
-- Phase 4 正式关闭：物理设备 CASE-TODAY-01/拖动缩放、Android 运行及 OS 权限状态验收；iOS Simulator 核心链路已通过。
+- Phase 4 正式关闭：物理设备 CASE-TODAY-01/拖动缩放及真实 OS 权限状态验收；iOS Simulator 核心链路已通过。
 - Phase 5 正式关闭：DEC-001 与物理 iOS/Android CASE-EXEC-01/02、CASE-ACH-01/E2E-003 验收；iOS Simulator 核心链路已通过。
 - Phase 6 正式关闭：DEC-005、真实 Provider/凭据与自然语言质量、物理 iOS/Android E2E-001；Fake Provider 和自动化技术子集不能替代这些项。
 - Phase 7 正式关闭：DEC-007 与按接受参数启用/刷新/消费特征，以及物理 iOS/Android 长期行为数据验收；显式参数测试与中性降级不能替代产品决定。
@@ -530,6 +522,6 @@ Phase 10 技术实现与正式关闭项：
 
 ## Next Task
 
-继续已启动的[无需凭据优化计划 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)，当前优先恢复隔离 UI/Hermes 宿主并审查 OPT-07/09；逐包状态见 Optimization Execution Status。
+[无需凭据优化计划 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)的九个包已完成；本轮没有剩余优化实施项。实际证据见 Optimization Execution Status。
 
 既有用户授权的 80/80 子集没有剩余非跳过项，这不表示产品没有后续代码实施。恢复正式 Phase Exit 时，先解除上述三个 Skip ID 中相应的决策/服务/设备/授权条件，再实施真实 Provider 与 Mobile Agent/凭据接线、生产 policy/特征刷新等对应范围，完成真实 Provider/设备验收、`bun run release:gate`、production build/submit，并更新真实发布结论。本轮优化完成也不解除这些外部门禁。

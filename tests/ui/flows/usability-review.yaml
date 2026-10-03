@@ -1,0 +1,52 @@
+appId: ${APP_ID}
+---
+- runFlow: connect.yaml
+- takeScreenshot: large-font-today
+- openLink: ${APP_SCHEME}:///settings
+- assertVisible:
+    id: 'settings-work-start'
+- scrollUntilVisible:
+    element:
+      text: '允许读取日历|前往系统设置'
+    timeout: 15000
+- takeScreenshot: large-font-permission-actions
+- openLink: ${APP_SCHEME}:///task/${TASK_ID}
+- scrollUntilVisible:
+    element:
+      text: '预计总分钟'
+    timeout: 15000
+- tapOn: '预计总分钟'
+- eraseText
+- inputText: '0'
+- takeScreenshot: large-font-task-keyboard
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: '保存'
+    timeout: 25000
+- tapOn: '保存'
+- scrollUntilVisible:
+    element:
+      text: '预计总时长必须是大于 0 的分钟数。'
+    direction: UP
+    timeout: 15000
+- takeScreenshot: invalid-task-duration-recovery
+- openLink: ${APP_SCHEME}:///time-block/${BLOCK_ID}
+- assertVisible: '调整时间块'
+- scrollUntilVisible:
+    element:
+      text: '后移 15 分钟'
+    timeout: 25000
+- tapOn: '后移 15 分钟'
+- scrollUntilVisible:
+    element:
+      text: '查看调整预览'
+    timeout: 25000
+- tapOn: '查看调整预览'
+- scrollUntilVisible:
+    element:
+      text: '调整预览'
+    direction: UP
+    timeout: 15000
+- takeScreenshot: large-font-block-adjustment-preview
+- openLink: ${APP_SCHEME}:///today

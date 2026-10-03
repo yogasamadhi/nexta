@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
+  StatusBar,
   Text,
   View,
 } from 'react-native';
@@ -70,6 +71,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   const [now, setNow] = useState(0);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [focused, setFocused] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -86,7 +88,9 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
 
   useFocusEffect(
     useCallback(() => {
+      setFocused(true);
       void load();
+      return () => setFocused(false);
     }, [load]),
   );
 
@@ -182,7 +186,9 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
+      <SafeAreaView
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+      >
         <ActivityIndicator color="#047857" />
       </SafeAreaView>
     );
@@ -191,8 +197,16 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   if (session !== null) {
     const remaining = Math.max(session.plannedMinutes * 60 - elapsed, 0);
     return (
-      <SafeAreaView className="flex-1 bg-emerald-950" edges={['top']}>
-        <View className="flex-1 justify-between px-6 pb-10 pt-10">
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: '#022c22' }}
+        edges={['top']}
+      >
+        {focused ? <StatusBar barStyle="light-content" /> : null}
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="justify-between gap-8 px-6 pb-10 pt-10"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
           <View>
             <Text className="text-center text-sm font-medium uppercase tracking-widest text-emerald-200">
               短暂恢复
@@ -237,14 +251,14 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
               <Text className="font-medium text-emerald-300">现在离开</Text>
             </Pressable>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
   if (finished !== null) {
     return (
-      <SafeAreaView className="flex-1" edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
         <ScrollView contentContainerClassName="gap-4 px-5 pb-12 pt-8">
           <Text className="text-4xl font-semibold text-stone-950">
             现在怎么样？
@@ -295,7 +309,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   }
 
   return (
-    <SafeAreaView className="flex-1" edges={['top']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView contentContainerClassName="gap-4 px-5 pb-12 pt-6">
         <Text className="text-4xl font-semibold text-stone-950">放松</Text>
         <Text className="text-lg text-stone-500">现在需要什么？</Text>

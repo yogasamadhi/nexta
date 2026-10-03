@@ -67,6 +67,7 @@ export function createAppConfig(
     plugins: [
       'expo-router',
       'expo-dev-client',
+      ['expo-build-properties', { ios: { enableSceneSupport: true } }],
       'expo-sqlite',
       'expo-secure-store',
       'expo-notifications',

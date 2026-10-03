@@ -426,6 +426,7 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         <View className="mt-4 flex-row gap-3">
           <TextInput
             accessibilityLabel="工作开始时间"
+            testID="settings-work-start"
             className="flex-1 rounded-2xl border border-stone-300 px-4 py-3 text-stone-950"
             value={start}
             onChangeText={setStart}
@@ -433,6 +434,7 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           />
           <TextInput
             accessibilityLabel="工作结束时间"
+            testID="settings-work-end"
             className="flex-1 rounded-2xl border border-stone-300 px-4 py-3 text-stone-950"
             value={end}
             onChangeText={setEnd}
@@ -450,14 +452,16 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         </Text>
         {calendarPermission?.read.settingsRequired ? (
           <Pressable
-            className="mt-3 self-start rounded-xl bg-stone-200 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl bg-stone-200 px-4 py-2"
             onPress={() => void Linking.openSettings()}
           >
             <Text>前往系统设置</Text>
           </Pressable>
         ) : calendarStatus !== 'granted' ? (
           <Pressable
-            className="mt-3 self-start rounded-xl bg-stone-950 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl bg-stone-950 px-4 py-2"
             disabled={busy}
             onPress={() => void requestCalendar('read')}
           >
@@ -470,14 +474,16 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         </Text>
         {calendarPermission?.write.settingsRequired ? (
           <Pressable
-            className="mt-3 self-start rounded-xl bg-stone-200 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl bg-stone-200 px-4 py-2"
             onPress={() => void Linking.openSettings()}
           >
             <Text>前往系统设置</Text>
           </Pressable>
         ) : calendarPermission?.write.status !== 'granted' ? (
           <Pressable
-            className="mt-3 self-start rounded-xl border border-stone-400 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl border border-stone-400 px-4 py-2"
             disabled={busy}
             onPress={() => void requestCalendar('write')}
           >
@@ -493,6 +499,8 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
               return (
                 <Pressable
                   key={key}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: enabled }}
                   className={`rounded-2xl border px-4 py-3 ${enabled ? 'border-emerald-600 bg-emerald-50' : 'border-stone-200'}`}
                   onPress={() => toggle(calendar)}
                 >
@@ -624,14 +632,16 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         </Text>
         {notificationPermission?.settingsRequired ? (
           <Pressable
-            className="mt-3 self-start rounded-xl bg-stone-200 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl bg-stone-200 px-4 py-2"
             onPress={() => void Linking.openSettings()}
           >
             <Text>前往系统设置</Text>
           </Pressable>
         ) : notificationPermission?.status !== 'granted' ? (
           <Pressable
-            className="mt-3 self-start rounded-xl bg-stone-950 px-4 py-2"
+            accessibilityRole="button"
+            className="mt-3 min-h-12 justify-center self-start rounded-xl bg-stone-950 px-4 py-2"
             disabled={busy}
             onPress={() => void requestNotifications()}
           >
@@ -675,6 +685,7 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         className="items-center rounded-2xl bg-stone-950 py-4"
         disabled={busy}
         onPress={() => void save()}
+        testID="settings-save"
       >
         <Text className="font-semibold text-white">
           {busy ? '处理中…' : '保存设置'}

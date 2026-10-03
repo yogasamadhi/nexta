@@ -31,7 +31,9 @@
     "submit:android": "bun run --cwd apps/mobile submit:android",
     "test:e2e": "bun scripts/check-device-e2e.ts",
     "bench:scheduler": "bun scripts/benchmark-scheduler.ts",
-    "check": "bun scripts/check.ts"
+    "check": "bun scripts/check.ts",
+    "test:ui": "bun scripts/test-ui.ts",
+    "test:hermes": "bun scripts/test-hermes.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.2.22",

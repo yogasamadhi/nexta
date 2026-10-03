@@ -232,6 +232,7 @@ function PreviewContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         className={`items-center rounded-2xl py-4 ${blocking ? 'bg-stone-300' : 'bg-stone-950'}`}
         disabled={blocking || committing}
         onPress={() => void commit()}
+        testID="preview-commit"
       >
         <Text className="font-semibold text-white">
           {committing

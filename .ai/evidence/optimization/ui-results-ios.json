@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-03T08:02:59.336Z",
+  "platform": "ios",
+  "physicalDevice": false,
+  "device": {
+    "owner": "OPT-NC-20261003",
+    "id": "828EE218-5681-4D83-B3B8-93345F837E42",
+    "name": "Execution Agent OPT-NC Test",
+    "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-27-0"
+  },
+  "appId": "com.personalexecution.agent.development",
+  "driverVersion": "2.11.0",
+  "requestedRuns": 1,
+  "consecutiveCleanRunsPassed": 0,
+  "localJourney": "failed",
+  "offline": {
+    "status": "not_executed",
+    "reason": "iOS network isolation not executed; Android provides the offline journey."
+  },
+  "planAcceptance": "partial",
+  "results": [
+    {
+      "run": 1,
+      "checkpoints": [],
+      "status": "failed"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "PlistBuddy",
+      "arguments": [
+        "-c",
+        "Print CFBundleIdentifier",
+        "/Volumes/A/code/project/nexta/.artifacts/optimization/ios-build/Build/Products/Debug-iphonesimulator/ExecutionAgentdevelopment.app/Info.plist"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "maestro",
+      "arguments": [
+        "--version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "list",
+        "devices",
+        "available",
+        "-j"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "list",
+        "devices",
+        "-j"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "bootstatus",
+        "828EE218-5681-4D83-B3B8-93345F837E42",
+        "-b"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "uninstall",
+        "828EE218-5681-4D83-B3B8-93345F837E42",
+        "com.personalexecution.agent.development"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "install",
+        "828EE218-5681-4D83-B3B8-93345F837E42",
+        "/Volumes/A/code/project/nexta/.artifacts/optimization/ios-build/Build/Products/Debug-iphonesimulator/ExecutionAgentdevelopment.app"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "xcrun",
+      "arguments": [
+        "simctl",
+        "get_app_container",
+        "828EE218-5681-4D83-B3B8-93345F837E42",
+        "com.personalexecution.agent.development",
+        "data"
+      ],
+      "exitCode": 0
+    },
+    {
+      "executable": "maestro",
+      "arguments": [
+        "--device",
+        "828EE218-5681-4D83-B3B8-93345F837E42",
+        "test",
+        "--no-ansi",
+        "--test-output-dir",
+        "/Volumes/A/code/project/nexta/.artifacts/optimization/ui-runs/2026-10-03T08-01-55.224Z/run-1/setup-inbox",
+        "--format",
+        "JUNIT",
+        "--output",
+        "/Volumes/A/code/project/nexta/.artifacts/optimization/ui-runs/2026-10-03T08-01-55.224Z/run-1/setup-inbox/report.xml",
+        "-e",
+        "APP_ID=com.personalexecution.agent.development",
+        "-e",
+        "APP_SCHEME=execution-agent-development",
+        "-e",
+        "EXECUTION_TITLE=UI Execution Task",
+        "-e",
+        "METRO_URL=http://127.0.0.1:8087",
+        "-e",
+        "DEV_URL=execution-agent-development://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8087",
+        "/Volumes/A/code/project/nexta/tests/ui/flows/setup-inbox.yaml"
+      ],
+      "exitCode": 1
+    }
+  ],
+  "artifacts": "/Volumes/A/code/project/nexta/.artifacts/optimization/ui-runs/2026-10-03T08-01-55.224Z",
+  "failure": "Subcommand failed: maestro (exit 1). See local artifacts."
+}

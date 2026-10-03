@@ -509,6 +509,7 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 | --- | --- | --- |
 | bun run bench:scheduler | OPT-02 的固定负载基准；默认不进入普通正确性 CI 的时间阈值门禁 | 实际结果、seed/版本/运行时与约束检查 |
 | bun run test:ui | OPT-03 的本地 UI 驱动；平台通过显式参数/配置选择 | Development Build 旅程断言、两次运行结果 |
+| bun run test:hermes | OPT-02/05 的隔离 Hermes 测试宿主；与 UI 顺序执行 | 实际 Hermes runtime、有限 Fake Agent 与固定排程场景结果 |
 
 既有 bun run test:e2e 保持双物理设备证据门禁，bun run check 不因本轮优化自动要求未配置的 native runtime。UI runner 的 CI 接入如需本地 runner/原生宿主，按真实可用环境单独配置，不把未运行 job 描述为远端 CI 已通过。
 
@@ -534,7 +535,7 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 
 ### Ready-to-use goal prompt
 
-在当前项目聊天中启用目标模式后，使用下列目标文本；也可直接发送“启动目标模式，按以下目标执行”。本次计划文档交付不执行这段目标。
+在当前项目聊天中启用目标模式后，使用下列目标文本；也可直接发送“启动目标模式，按以下目标执行”。目标文本只定义执行范围；计划文件本身不自动启动目标。
 
 ```text
 完成 /Volumes/A/code/project/nexta/.ai/PLAN.md 中 OPT-NC-20261003（No-Credential Optimization Plan）的 OPT-01 至 OPT-09。先读 AGENTS.md、CONTEXT、STATUS 和对应 Canonical Docs，按依赖逐包实施，不要求我填写 Token、API Key 或发布账号。允许准备必要的无需账号本地测试工具、创建本地 Git 提交与 codex/ 分支；不推送或发布，不选择未接受的 Provider，不关闭 Open Decision，不改生产权重/个性化/自动提交/备份默认。

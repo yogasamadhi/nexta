@@ -1,0 +1,37 @@
+appId: ${APP_ID}
+---
+- tapOn:
+    id: 'tab-capture'
+- scrollUntilVisible:
+    element:
+      text: '添加任务'
+    direction: UP
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: 'capture-title'
+    timeout: 15000
+- tapOn:
+    id: 'capture-title'
+- inputText: ${TASK_TITLE}
+- hideKeyboard
+- runFlow:
+    when:
+      true: ${ESTIMATE !== ''}
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: 'capture-duration'
+          timeout: 15000
+      - tapOn:
+          id: 'capture-duration'
+      - inputText: ${ESTIMATE}
+      - hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: 'capture-save'
+    timeout: 20000
+- tapOn:
+    id: 'capture-save'
+    repeat: 2
+    delay: 1

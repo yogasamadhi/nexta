@@ -1,0 +1,7 @@
+appId: ${APP_ID}
+---
+- tapOn: '.*${EXECUTION_TITLE}.*'
+- assertVisible: '可追溯完成证据'
+- assertVisible: '${EXECUTION_TITLE}'
+- assertVisible: 'CompletionRecord.*${COMPLETION_ID}'
+- takeScreenshot: achievement-evidence

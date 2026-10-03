@@ -1,0 +1,41 @@
+appId: ${APP_ID}
+---
+- runFlow: connect.yaml
+- scrollUntilVisible:
+    element:
+      id: 'today-settings'
+    direction: UP
+    timeout: 15000
+- tapOn:
+    id: 'today-settings'
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible:
+      id: 'settings-work-start'
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: 'settings-save'
+    timeout: 25000
+- tapOn:
+    id: 'settings-save'
+- assertVisible: '已保存：仅使用本地计划，不读取系统日历。'
+- openLink: ${APP_SCHEME}:///today
+- extendedWaitUntil:
+    visible:
+      id: 'today-inbox'
+    timeout: 10000
+- runFlow:
+    file: create-task.yaml
+    env:
+      TASK_TITLE: 'UI Inbox Task'
+      ESTIMATE: ''
+- extendedWaitUntil:
+    visible:
+      id: 'today-inbox'
+    timeout: 10000
+- tapOn:
+    id: 'today-inbox'
+- assertVisible: 'UI Inbox Task'
+- assertVisible: '等待补充预计时长'
+- takeScreenshot: inbox

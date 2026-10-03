@@ -31,5 +31,51 @@
     "rawArtifacts": ".artifacts/optimization/",
     "structuredSyntheticEvidence": ".ai/evidence/optimization/",
     "devicePolicy": "Use a dedicated simulator and synthetic task data; never erase an existing user sandbox"
+  },
+  "localRuntimePreparation": {
+    "observedAt": "2026-10-03T10:16:40.485Z",
+    "scope": "owned local Development Build simulators and ignored tools; no login/key",
+    "maestro": "2.11.0",
+    "android": {
+      "platformTools": "37.0.1",
+      "emulator": "37.2.12",
+      "systemImage": "API 36 AOSP default arm64-v8a rev 2",
+      "buildTools": [
+        "36.0.0",
+        "35.0.0"
+      ],
+      "ndk": "27.1.12297006",
+      "cmake": "3.22.1",
+      "serial": "emulator-5580",
+      "name": "ExecutionAgent_OPT_NC",
+      "receipt": ".artifacts/optimization/ui-devices.json",
+      "apk": "apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk",
+      "buildLog": ".artifacts/optimization/android-scene-build.log",
+      "platforms": [
+        "android-36"
+      ],
+      "ndkInstalled": [
+        "27.1.12297006"
+      ],
+      "cmakeInstalled": [
+        "3.22.1"
+      ]
+    },
+    "ios": {
+      "runtime": "iOS 27.0",
+      "name": "Execution Agent OPT-NC Test",
+      "udid": "828EE218-5681-4D83-B3B8-93345F837E42",
+      "deviceHub": "Xcode 27 DeviceHub.app replaces the old Simulator.app path",
+      "buildLog": ".artifacts/optimization/ios-scene-build.log",
+      "launch": "Today observed after Scene support repair; full iOS UI journey remains partial"
+    },
+    "validation": {
+      "expoInstallCheck": 0,
+      "expoDoctor": 0,
+      "expoDoctorChecks": "21/21",
+      "iosDebugBuild": 0,
+      "androidArm64DebugBuild": 0
+    },
+    "note": "Initial preflight observations above remain historical; actual journeys and Hermes assertions are reported separately."
   }
 }

@@ -1,0 +1,24 @@
+appId: ${APP_ID}
+---
+- openLink: ${APP_SCHEME}:///today
+- extendedWaitUntil:
+    visible:
+      id: 'today-inbox'
+    timeout: 10000
+- runFlow:
+    file: create-task.yaml
+    env:
+      TASK_TITLE: 'UI Rejected Preview'
+      ESTIMATE: '30'
+- extendedWaitUntil:
+    visible: '排程预览'
+    timeout: 15000
+- assertVisible: 'UI Rejected Preview'
+- takeScreenshot: rejected-preview
+# Leaving the preview is the user's rejection. The runner checks plan facts.
+- openLink: ${APP_SCHEME}:///today
+- extendedWaitUntil:
+    visible:
+      id: 'today-inbox'
+    timeout: 10000
+- stopApp

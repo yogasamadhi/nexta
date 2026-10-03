@@ -126,14 +126,16 @@ function WinsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
 
   if (items === null && message === null) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
+      <SafeAreaView
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+      >
         <ActivityIndicator color="#047857" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1" edges={['top']} style={{ flex: 1 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <ScrollView
         className="flex-1"
         style={{ flex: 1 }}

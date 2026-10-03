@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { StatusBar } from 'react-native';
 
 import '../global.css';
 
@@ -9,11 +10,13 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider mode="system">
       <MobileRuntimeProvider>
+        <StatusBar barStyle="dark-content" />
         <Stack
           screenOptions={{
             headerBackTitle: '返回',
             headerShadowVisible: false,
             headerStyle: { backgroundColor: '#f5f5f4' },
+            statusBarStyle: 'dark',
           }}
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -30,7 +33,11 @@ export default function RootLayout() {
           <Stack.Screen name="task/[taskId]" options={{ title: '编辑任务' }} />
           <Stack.Screen
             name="focus/[sessionId]"
-            options={{ title: '专注', headerShown: false }}
+            options={{
+              title: '专注',
+              headerShown: false,
+              statusBarStyle: 'light',
+            }}
           />
           <Stack.Screen
             name="achievement/[achievementId]"

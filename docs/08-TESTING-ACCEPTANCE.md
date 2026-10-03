@@ -81,6 +81,10 @@ Scheduler 固定负载基准由 `bun run bench:scheduler` 执行，覆盖 50/200
 
 Provider complete/原生 stream/自定义错误 mapper 使用合成敏感文本验证脱敏；Tool 异常和流错误事件不得泄露原始消息或任意 code/category。预算测试包括忽略 Abort 的 Provider、流、审批和 Tool，验证有界结束、无迟到事件/新工具启动，以及 complete/stream 中成功收据在后续 Provider 失败后可复用。停止等待不替代 Application durable 幂等和设备进程恢复证据。
 
+`test:hermes` 在隔离开发宿主检查 HermesInternal/runtime properties，完整/流式 Fake Agent 必须有限结束、Tool 只执行一次且成功收据正确；同一宿主复用 Scheduler 合成场景与独立后置条件。每个模式的断言、固定 seed、预热/样本数和测量独立入证据。该 smoke 不消费生产 Capture、真实模型、业务 SQLite 或 OS Provider，不代替上述完整主机契约矩阵。Native Preference 诊断只使用独立合成数据库，经 Application Service 写读，记录固定阶段与错误类别，不输出 SQL/参数/stack；它与 Agent/Scheduler 结果单独判定。
+
+本地可用性审查可单独执行 `usability-capture.yaml` 与 `usability-review.yaml`，使用已核对归属的 Android 测试设备、合成 Task/未来 Block 和显式 App/Metro 参数。覆盖 Preview 返回后显式添加下一任务、键盘/窄屏大字体、非法估时不写事实、设置动作与调整 Preview；结果和只读事实核对见 STATUS。改变测试设备字体后恢复原值；Native hierarchy/源码语义审查不能描述成实际 TalkBack/VoiceOver 已通过。
+
 ---
 
 ## 5. Database Tests

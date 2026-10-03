@@ -1,0 +1,66 @@
+appId: ${APP_ID}
+---
+- launchApp:
+    permissions:
+      all: deny
+# Only native connection/navigation is retried. Business writes stay outside.
+# The client may restore the recent bundle or show its launcher on startup.
+- retry:
+    maxRetries: 1
+    commands:
+      - extendedWaitUntil:
+          visible: 'Development Build|今天|添加任务|已暂停|现在只处理这一件事|本次专注已结束|编辑任务|排程预览|成就详情|任务收件箱|Continue'
+          timeout: 30000
+      - waitForAnimationToEnd:
+          timeout: 5000
+      - runFlow:
+          when:
+            visible: 'Continue'
+          commands:
+            - tapOn: 'Continue'
+      - runFlow:
+          when:
+            platform: Android
+            visible: 'Development Build'
+          commands:
+            - tapOn: 'http://'
+            - inputText: ${METRO_URL}
+            - hideKeyboard
+            - tapOn: 'Connect'
+      - runFlow:
+          when:
+            platform: iOS
+            visible: 'Development Build'
+          commands:
+            - openLink: ${DEV_URL}
+      - runFlow:
+          when:
+            visible: '打开|Open'
+          commands:
+            - tapOn: '打开|Open'
+      - runFlow:
+          when:
+            visible: 'Continue'
+          commands:
+            - tapOn: 'Continue'
+      - runFlow:
+          when:
+            platform: Android
+            visible: 'Reload'
+          commands:
+            - pressKey: Back
+      - extendedWaitUntil:
+          visible: '今天|添加任务|已暂停|现在只处理这一件事|本次专注已结束|编辑任务|排程预览|成就详情|任务收件箱'
+          timeout: 30000
+      - openLink: ${APP_SCHEME}:///today
+      - extendedWaitUntil:
+          visible:
+            id: 'tab-today'
+          timeout: 15000
+      - scrollUntilVisible:
+          element:
+            id: 'today-settings'
+          direction: UP
+          timeout: 20000
+      - assertVisible:
+          id: 'today-settings'

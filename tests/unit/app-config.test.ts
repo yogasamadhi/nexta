@@ -42,6 +42,10 @@ describe('resolveAppVariant', () => {
         ios: { buildNumber: IOS_BUILD_NUMBER },
         android: { versionCode: ANDROID_VERSION_CODE },
       });
+      expect(config.plugins).toContainEqual([
+        'expo-build-properties',
+        { ios: { enableSceneSupport: true } },
+      ]);
     },
   );
 

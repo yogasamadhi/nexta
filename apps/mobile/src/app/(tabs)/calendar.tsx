@@ -176,7 +176,9 @@ function CalendarContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
 
   if (renderedView === null && error === null) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
+      <SafeAreaView
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+      >
         <ActivityIndicator color="#047857" />
       </SafeAreaView>
     );
@@ -218,7 +220,7 @@ function CalendarContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
     : [];
 
   return (
-    <SafeAreaView className="flex-1" edges={['top']} style={{ flex: 1 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <View className="flex-row items-center justify-between px-5 py-5">
         <Pressable
           accessibilityLabel="前一天"
@@ -233,6 +235,7 @@ function CalendarContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         </View>
         <Pressable
           accessibilityLabel="后一天"
+          testID="calendar-next-day"
           accessibilityRole="button"
           onPress={() => setDate(shiftLocalDate(date, 1))}
         >

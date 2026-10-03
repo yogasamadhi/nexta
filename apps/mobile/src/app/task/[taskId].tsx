@@ -282,6 +282,7 @@ function TaskEditor({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         </Text>
       )}
       <Pressable
+        accessibilityRole="button"
         className="items-center rounded-2xl bg-stone-950 py-4"
         disabled={busy || task === null || terminal}
         onPress={() => void save(false)}
@@ -289,6 +290,7 @@ function TaskEditor({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         <Text className="font-semibold text-white">保存</Text>
       </Pressable>
       <Pressable
+        accessibilityRole="button"
         className="items-center rounded-2xl border border-stone-400 py-4"
         disabled={
           busy ||
@@ -331,6 +333,7 @@ function TaskEditor({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             className="items-center rounded-2xl bg-emerald-700 py-4"
             disabled={busy}
             onPress={() => void startFocus()}
+            testID="task-start-focus"
           >
             <Text className="font-semibold text-white">开始专注</Text>
           </Pressable>
