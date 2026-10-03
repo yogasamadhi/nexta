@@ -96,7 +96,13 @@ export function subtractIntervals(
   const result: NumericInterval[] = [];
   let cursor = container.start;
 
-  for (const interval of mergeIntervals(occupied)) {
+  // Only the intersection with this window matters. Avoid sorting the full
+  // horizon's occupancy again for every candidate's capacity check.
+  const relevant = occupied.filter(
+    (interval) =>
+      interval.end > container.start && interval.start < container.end,
+  );
+  for (const interval of mergeIntervals(relevant)) {
     if (interval.end <= cursor || interval.start >= container.end) continue;
     if (interval.start > cursor) {
       result.push({

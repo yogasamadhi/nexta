@@ -10,6 +10,7 @@ import {
 
 const workspaceRoot = join(import.meta.dir, '..');
 const ignoredDirectories = new Set([
+  '.artifacts',
   '.expo',
   '.expo-export',
   '.git',

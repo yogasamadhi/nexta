@@ -248,6 +248,10 @@ Scheduler 变更必须：
 - 记录 algorithm version；
 - 不破坏已提交 Plan 的审计解释。
 
+固定负载测量使用 `bun run bench:scheduler`。Fixture 与独立后置不变量位于 `tests/benchmarks/scheduler`，计时、Git/主机信息与结果文件写入仅位于 `scripts/benchmark-scheduler.ts`，不向 Pure Core 引入 Node、时钟或文件副作用。测试目录中的显式 policy 仅用于测量，不构成生产权重决定。
+
+本地构建、UI 驱动与 profiler 的大型生成物使用 `.artifacts/`，该目录由 Git、格式、lint 与文档清单检查排除。可入库的合成结果摘要位于 `.ai/evidence/optimization/`，实际验证结论统一记录在 STATUS；禁止保存真实用户内容或凭据。
+
 ---
 
 ## 16. Code Review Checklist

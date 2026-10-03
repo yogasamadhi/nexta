@@ -60,6 +60,8 @@ Architecture
 
 建议增加随机化 invariant test。
 
+Scheduler 固定负载基准由 `bun run bench:scheduler` 执行，覆盖 50/200/500 Task、7/30 天范围、两种 Busy 密度及显式示例稳定性 policy。每次测量独立核对受保护事实、硬约束、工作量守恒、集合排列稳定性与输入不变；移动统计按既有块身份匹配，新增/删除不算移动。耗时在预热后采样，正确性检查不计入测量；经验 p95 必须附样本数和环境，不作为既定性能 SLA。Bun/Node 与 Hermes 结果单独报告，不设置会在普通 CI 中抖动的墙钟阈值。
+
 ---
 
 ## 4. Agent Tests

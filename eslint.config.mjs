@@ -4,6 +4,7 @@ import expoConfig from 'eslint-config-expo/flat.js';
 export default defineConfig([
   {
     ignores: [
+      '**/.artifacts/**',
       '**/.expo/**',
       '**/.expo-export/**',
       '**/coverage/**',

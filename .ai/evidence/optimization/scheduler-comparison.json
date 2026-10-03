@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-03T06:21:14.934Z",
+  "baselineRevision": "f06bad8b1872eac2b51a3e73183b46691fb63f00",
+  "environment": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4"
+  },
+  "runtime": "Bun 1.4.0",
+  "baselineTimeSourceSha256": "500cc286988cf7331e792c2874d171ff350781915d33579301017e605931d338",
+  "afterSourceHashes": {
+    "packages/scheduler-core/src/scheduler.ts": "9281adbb82fb65876fe9022de0877ebbcacda728fb6dc08df709574db7a4cac3",
+    "packages/scheduler-core/src/time.ts": "26e57e182a82ec41e7cf81e9307a2911a6a4156fbffbb45785b3e929bf129621",
+    "packages/scheduler-core/src/types.ts": "80d9bdf6195823b7fb823f955600a01ae9226412b5a4142c83e6eb6342813de8",
+    "packages/scheduler-core/src/validation.ts": "52bd6ec51706157714244e35bb647b7caadea30aa3f2ffdfe293c21a61b6751c",
+    "tests/benchmarks/scheduler/scenarios.ts": "4ab91ee3bad1f753a3fae30f15050e15f8f3f4b0ab972d60c0086ea84dc6828f",
+    "tests/benchmarks/scheduler/analysis.ts": "ffc245829f4f6e981bd60a6929c63bb39b7cc9ba8dff00476ad9f8e63f967f87",
+    "scripts/benchmark-scheduler.ts": "90ea62a861a024607c0cfa6ed84ec0319ac9c38990f1d416d89f50ed71e66e36"
+  },
+  "comparison": {
+    "case": "200-30-sparse-neutral",
+    "samples": 10,
+    "warmup": 1,
+    "profileEnabled": true,
+    "before": {
+      "preview": {
+        "samples": 10,
+        "minMs": 115.08,
+        "medianMs": 120.137,
+        "p95Ms": 125.494,
+        "maxMs": 125.494
+      },
+      "replan": {
+        "samples": 10,
+        "minMs": 112.975,
+        "medianMs": 120.024,
+        "p95Ms": 129.532,
+        "maxMs": 129.532
+      }
+    },
+    "after": {
+      "preview": {
+        "samples": 10,
+        "minMs": 23.69,
+        "medianMs": 23.93,
+        "p95Ms": 24.267,
+        "maxMs": 24.267
+      },
+      "replan": {
+        "samples": 10,
+        "minMs": 24.902,
+        "medianMs": 28.551,
+        "p95Ms": 50.207,
+        "maxMs": 50.207
+      }
+    }
+  },
+  "equivalence": {
+    "completeResultPairs": 13,
+    "including": [
+      "blocks",
+      "warnings",
+      "metrics",
+      "explanations",
+      "versions"
+    ],
+    "result": "deep equality passed",
+    "beforeOutputsSha256": "b4c52502c28083a48790dc65ea4fbf29e1461378f1f9ce81c24c0f410cc8f5a3"
+  },
+  "correctness": {
+    "schedulerFiles": 6,
+    "schedulerTests": 24,
+    "independentIntegerIntervalOracleTrials": 200
+  },
+  "method": "Local observational comparison, same host/input/profiling settings; not a production SLA or Hermes measurement.",
+  "change": "Filter intervals outside the subtraction window before merging; candidate selection, scoring, constraints and versions unchanged."
+}

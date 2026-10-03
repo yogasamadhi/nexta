@@ -25,7 +25,7 @@
 
 `TASK-OPT-NC-20261003` — 按已交付计划执行无需凭据的九个优化工作包。
 
-**Status: IN PROGRESS — OPT-01 environment/security preflight and Git baseline**
+**Status: IN PROGRESS — OPT-01/02 complete; OPT-03 local UI host preparation**
 
 既有 `TASK-TECHNICAL-PLAN-001` 保持 COMPLETE WITH USER-AUTHORIZED EXTERNAL SKIPS：原本地子集 80/80 已完成，正式决策、真实 Provider/设备与发布授权仍开放。新增优化工作包独立跟踪，不算作已完成，也不改写原 Engineering Readiness。
 
@@ -296,9 +296,9 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 
 | ID | 工作包 | 状态 | 实施 / 验收证据 |
 | --- | --- | --- | --- |
-| OPT-01 | 环境预检与本地 Git 基线 | IN_PROGRESS | Git 身份可用；308 个候选文件未发现私钥/Provider Key/GitHub Token/签名文件模式；Xcode 27、iOS 18.3/27 runtime 可用；尚待完整基线检查与提交 |
-| OPT-02 | 排程性能与计划移动基准 | NOT_STARTED | 尚无本轮 benchmark 脚本或测量结果 |
-| OPT-03 | 本地 Development Build UI 自动化 | NOT_STARTED | 尚无本轮 UI 驱动或实际旅程证据 |
+| OPT-01 | 环境预检与本地 Git 基线 | DONE | 基线 f06bad8b1872eac2b51a3e73183b46691fb63f00；安全/隔离预检与 bun run check 通过，优化分支 codex/no-credential-optimization |
+| OPT-02 | 排程性能与计划移动基准 | DONE | 13 场景/26 完整结果等价、固定 seed、不变量、独立计时与移动统计；本地热点优化前后证据见下文，Hermes 宿主可运行后追加测量 |
+| OPT-03 | 本地 Development Build UI 自动化 | IN_PROGRESS | Maestro 2.11.0 已准备；新建专用 iOS 27 模拟器并开始 Debug Development Build，尚无旅程通过证据 |
 | OPT-04 | 移动端可用性审查与必要修复 | NOT_STARTED | 尚无本轮审查与复测记录 |
 | OPT-05 | 通用 ModelProvider / Agent 契约缺口 | NOT_STARTED | 既有 Fake/核心测试保留；本轮缺口矩阵未建立 |
 | OPT-06 | Capture 时间上下文与中文案例 | NOT_STARTED | 尚未修改时间 Context Contract 或测试 |
@@ -306,11 +306,17 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 | OPT-08 | 架构、依赖与文档一致性收口 | NOT_STARTED | 本次编写计划不等于完成本轮实施收口 |
 | OPT-09 | 受决策约束的方案与验收包 | NOT_STARTED | 现有研究建议是输入；逐项候选方案尚未交付 |
 
-OPT-01 当前证据：本轮 bun run check exit code 0，51 个单元文件/414 tests、19 个集成文件/79 tests、11 包架构、27 文件文档、静态发布检查与 iOS/Android Hermes export 均通过。日志位于 .artifacts/optimization/check-baseline.log；.artifacts 已加入 Git ignore。现有原生目录保持忽略，模拟器测试将新建专用设备，未触碰既有 App 沙盒。Git 身份可用但不打印身份值；本地基线提交即将建立，尚不把该包标 DONE。
+OPT-01 验收证据：本轮 bun run check exit code 0，51 个单元文件/414 tests、19 个集成文件/79 tests、11 包架构、27 文件文档、静态发布检查与 iOS/Android Hermes export 均通过。日志位于 .artifacts/optimization/check-baseline.log；.artifacts 已加入 Git ignore，309 个文件纳入基线提交 f06bad8b1872eac2b51a3e73183b46691fb63f00。候选文件的凭据模式扫描无发现；git diff --cached --check 另报告既有 Markdown 硬换行空格和 .editorconfig 尾部空行，未将该检查记为通过，低影响格式问题留待 OPT-08 审查。现有原生目录保持忽略，模拟器测试将新建专用设备，未触碰既有 App 沙盒。Git 身份复用配置且不打印值；无远端推送。
+
+OPT-02 验收证据：新增 scripts/benchmark-scheduler.ts、tests/benchmarks/scheduler 的固定 seed 场景/独立后置条件及 tests/unit/scheduler 的基准与区间补集测试；bun run bench:scheduler 实际执行 50/200/500 Task × 7/30 天 × sparse/dense 的 12 组中性 policy，加一组明确标注的稳定性示例，共 13 组，preview/replan 各 5 个预热后样本。未优化结果保存在 .ai/evidence/optimization/scheduler-baseline.json，当前结果含 source SHA-256 保存在 scheduler-after.json，同输入/同主机的 10 样本 CPU profile 对比见 scheduler-comparison.json；以上命令 exit code 0。Profile 显示 mergeIntervals/sort 为热点，仅在减去 Busy/保护区间时先过滤当前窗口外的区间，没有改变候选排序、权重、约束或 scheduler-core/1 版本。所有 26 份完整结果（含解释/警告/metrics）与保存的优化前输出 deep equality 通过；独立整数区间补集 oracle 200 组通过。6 个 Scheduler 单元文件/24 tests、typecheck、11 包架构、docs:check 与相关 ESLint 均 exit code 0。曾误用 Vitest 的不存在 project=unit 入口，退出 1；改为仓库真实配置的文件过滤后通过，没有删除测试。
+
+同一 200 Task/30 天/sparse 的 profile 测量：preview p95 125.494 → 24.267 ms，replan p95 129.532 → 50.207 ms，样本数均 10。仅为本地 Bun 1.4.0/Mac 主机观察，不建立 SLA，也不能外推 Hermes/手机耗时；原始 profile/完整结果位于 .artifacts/optimization/。变化统计严格按 existingBlockId 匹配，新增/删除单列；示例稳定性 policy 是测试输入，不是生产决定。Development/Testing/Build 文档已同步入口职责，生成物目录从格式/ESLint/文档扫描排除，不排除业务源码。Hermes 当前尚未执行基准，待本地原生宿主实际可运行后追加隔离测量。
+
+OPT-03 准备：官方无需账号 CLI 2.11.0 位于 .artifacts/tools/maestro-2.11.0/，未修改 shell profile；后续执行禁用匿名 analytics 和 CLI analysis notification。专用设备 Execution Agent OPT-NC Test / UDID 828EE218-5681-4D83-B3B8-93345F837E42 使用 iOS 27.0 / iPhone 17；Debug 原生构建日志 .artifacts/optimization/ios-build.log。既有模拟器和业务库没有清理。Android SDK/adb/emulator 尚不可用；Maestro 官方说明 setAirplaneMode 仅 Android 生效，不能把 iOS 上无效命令当作离线证据，离线旅程需另行提供真实网络隔离方案或平台验证。
 
 状态约定：NOT_STARTED、IN_PROGRESS、PARTIAL、DONE、BLOCKED。每次更新附变更文件、命令/退出码、环境/覆盖、证据、未解决问题和下一步；审查类任务无修改时仍需审查证据。BLOCKED/PARTIAL 不能计为 DONE；工作包状态不代替宿主 Goal 生命周期。
 
-当前动作：完成 OPT-01 基线检查与本地提交，再实施 OPT-02。候选文件扫描仅覆盖所列凭据模式，不宣称完整安全认证；工具版本/隔离路径记录于 .ai/evidence/optimization/environment.json，原始本地日志使用被忽略的 .artifacts/。bun run bench:scheduler 与 bun run test:ui 尚未建立；现有 test:e2e 仍是物理设备证据校验器。
+当前动作：完成本地原生宿主准备，建立 OPT-03 的实际 UI runner、稳定选择器和旅程断言。候选文件扫描仅覆盖所列凭据模式，不宣称完整安全认证；工具版本/隔离路径记录于 .ai/evidence/optimization/environment.json，原始本地日志使用被忽略的 .artifacts/。bun run bench:scheduler 已可用；bun run test:ui 尚未建立，现有 test:e2e 仍是物理设备证据校验器。
 
 本次规划的 Documentation Impact Assessment：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR 无生效规范或业务实现变化；AI Context 增加优化摘要与边界，Implementation Plan 增加九个包/验收/启动目标文本，Status 增加独立执行表及下一步。没有新增 Markdown 文件，MANIFEST 清单不变；必要的 Canonical/ADR 变更在对应工作包实施时完成。
 

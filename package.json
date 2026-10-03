@@ -9,9 +9,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun --cwd apps/mobile run start",
-    "ios": "bun --cwd apps/mobile run ios",
-    "android": "bun --cwd apps/mobile run android",
+    "dev": "bun run --cwd apps/mobile start",
+    "ios": "bun run --cwd apps/mobile ios",
+    "android": "bun run --cwd apps/mobile android",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check --ignore-unknown .",
     "lint": "eslint . --max-warnings=0",
@@ -23,13 +23,14 @@
     "release:check": "bun scripts/check-release.ts",
     "release:gate": "bun run check && bun run test:e2e",
     "build:check": "bun scripts/check-mobile-bundle.ts",
-    "build:preview:ios": "bun --cwd apps/mobile run build:preview:ios",
-    "build:preview:android": "bun --cwd apps/mobile run build:preview:android",
-    "build:ios": "bun --cwd apps/mobile run build:ios",
-    "build:android": "bun --cwd apps/mobile run build:android",
-    "submit:ios": "bun --cwd apps/mobile run submit:ios",
-    "submit:android": "bun --cwd apps/mobile run submit:android",
+    "build:preview:ios": "bun run --cwd apps/mobile build:preview:ios",
+    "build:preview:android": "bun run --cwd apps/mobile build:preview:android",
+    "build:ios": "bun run --cwd apps/mobile build:ios",
+    "build:android": "bun run --cwd apps/mobile build:android",
+    "submit:ios": "bun run --cwd apps/mobile submit:ios",
+    "submit:android": "bun run --cwd apps/mobile submit:android",
     "test:e2e": "bun scripts/check-device-e2e.ts",
+    "bench:scheduler": "bun scripts/benchmark-scheduler.ts",
     "check": "bun scripts/check.ts"
   },
   "devDependencies": {

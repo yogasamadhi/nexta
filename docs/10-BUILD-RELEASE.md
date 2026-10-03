@@ -58,12 +58,15 @@ Phase 0 已建立以下入口。实际通过记录只写入 STATUS；后续阶�
 | `bun run build:check` | 当前阶段已建立 App 的配置与 bundler/export 检查；不等于原生签名/真机验证 |
 | `bun run check` | 顺序聚合 format:check、lint、typecheck、test、test:architecture、test:integration、docs:check、build:check |
 | `bun run test:e2e` | 读取经审核的物理 iOS/Android 证据并要求 E2E-001…005 全部通过；缺文件、模拟器或 pending 项均失败 |
+| `bun run bench:scheduler` | 本地固定负载与计划移动测量，独立检查约束/确定性；不进入普通 check 的墙钟性能门禁，不证明 Hermes 或真机性能 |
 | `bun run build:preview:ios` / `build:preview:android` | 创建可内部安装的 EAS preview build |
 | `bun run build:ios` / `build:android` | 创建 production store build；需要已授权 EAS 项目与签名 |
 | `bun run submit:ios` / `submit:android` | 用 production submit profile 提交；Android 默认 internal track + draft，最终推广仍需人工审核 |
 | `bun run release:gate` | 先执行完整仓库门禁，再验证两平台物理设备 E2E 证据；不自动构建或提交商店 |
 
 `test:e2e` 要求设置 `NEXTA_IOS_DEVICE_EVIDENCE` 与 `NEXTA_ANDROID_DEVICE_EVIDENCE`，指向根据 `release/device-evidence.*.example.json` 复制并填写的审阅结果。每个平台必须是 physicalDevice，记录设备、OS、build identifier、测试者、时间，并为 E2E-001 至 E2E-005 每项提供至少一条证据引用。该命令验证证据完整性，不替代实际按第 11 节和 Testing 文档执行旅程。
+
+`bench:scheduler` 默认每个 preview/replan 预热 1 次、计时 5 次，结果输出到 `.ai/evidence/optimization/scheduler-benchmark.json`。可用 `--samples 10 --warmup 2` 改采样数量，`--case 200-30-sparse-neutral` 选择单个负载，`--output .artifacts/optimization/benchmark.json` 改输出位置；样本参数和重复/未知选项严格检查。结果记录 fixture seed、policy/代码版本、工作树状态、运行时/主机类别、耗时及移动/未排程指标。示例权重不改变 Mobile 中性策略；复现结果时应同时核对代码版本与输入，不能把主机测量当作真机验收。
 
 阶段报告必须说明实际覆盖。尚未接入的业务/平台集成写明未覆盖；不得用空套件成功宣称 V1 功能已通过。Phase 0 的最小原生 Development Build 单独验收并记录。
 
