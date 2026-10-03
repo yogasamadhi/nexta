@@ -79,6 +79,8 @@ Scheduler 固定负载基准由 `bun run bench:scheduler` 执行，覆盖 50/200
 - Agent 不能直接写 DB；
 - Context minimization。
 
+Provider complete/原生 stream/自定义错误 mapper 使用合成敏感文本验证脱敏；Tool 异常和流错误事件不得泄露原始消息或任意 code/category。预算测试包括忽略 Abort 的 Provider、流、审批和 Tool，验证有界结束、无迟到事件/新工具启动，以及 complete/stream 中成功收据在后续 Provider 失败后可复用。停止等待不替代 Application durable 幂等和设备进程恢复证据。
+
 ---
 
 ## 5. Database Tests
@@ -160,6 +162,8 @@ Scheduler 固定负载基准由 `bun run bench:scheduler` 执行，覆盖 50/200
 - Offline；
 - Empty；
 - Error。
+
+`bun run test:ui` 与 `test:e2e` 分开：前者用本地 Maestro 驱动 Development Build，后者保留物理设备证据门禁。手工旅程包含缺估时收件箱、拒绝 Preview 不改变计划、Task/Preview/Commit/Calendar/Focus/暂停/进程重启/继续/明确完成/成就来源，并用隔离 SQLite 只读断言核对唯一事实与暂停计时不增长。每次从重装测试 App 的干净沙盒开始；至少两次连续通过才满足对应重复性要求。网络禁用必须有实际平台证据，iOS 上无效果的飞行模式命令不能记为离线通过；未执行离线时结果必须明确标记 partial。当前实现/平台限制与实跑结果只记入 STATUS。
 
 ---
 

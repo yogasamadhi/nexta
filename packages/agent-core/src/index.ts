@@ -251,6 +251,34 @@ export type StartAgentRunInput = Readonly<{
 }>;
 
 class ProviderProtocolError extends Error {}
+class RuntimeAbortError extends Error {}
+
+function waitForRunSignal<Value>(
+  operation: Promise<Value>,
+  signal: AgentAbortSignal,
+): Promise<Value> {
+  return new Promise((resolve, reject) => {
+    const abort = () => {
+      signal.removeEventListener('abort', abort);
+      reject(new RuntimeAbortError('Agent run was aborted.'));
+    };
+    // Attach both handlers even when already aborted: a late rejection must not
+    // become unhandled, and a late result cannot resume the terminated run.
+    operation.then(
+      (value) => {
+        signal.removeEventListener('abort', abort);
+        if (signal.aborted) abort();
+        else resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', abort);
+        reject(error);
+      },
+    );
+    if (signal.aborted) abort();
+    else signal.addEventListener('abort', abort);
+  });
+}
 
 class RuntimeAbortController {
   readonly #listeners = new Set<() => void>();
@@ -386,6 +414,24 @@ function sanitizeToolFailure(error: unknown): Readonly<{
   message: string;
   retryable: boolean;
 }> {
+  const codes = new Set([
+    'validation_error',
+    'not_found',
+    'permission_required',
+    'active_session_conflict',
+    'invalid_transition',
+    'preview_not_found',
+    'preview_expired',
+    'plan_conflict',
+    'idempotency_conflict',
+    'undo_unavailable',
+    'reconciliation_required',
+    'scheduling_setup_required',
+    'adapter_error',
+    'provider_error',
+    'provider_timeout',
+    'aborted',
+  ]);
   if (typeof error === 'object' && error !== null) {
     const candidate = error as {
       code?: unknown;
@@ -394,12 +440,12 @@ function sanitizeToolFailure(error: unknown): Readonly<{
     };
     if (
       typeof candidate.code === 'string' &&
-      typeof candidate.message === 'string' &&
+      codes.has(candidate.code) &&
       typeof candidate.retryable === 'boolean'
     ) {
       return {
         code: candidate.code,
-        message: candidate.message,
+        message: 'The tool did not complete.',
         retryable: candidate.retryable,
       };
     }
@@ -439,9 +485,16 @@ async function collectStream(
     { name: string; argumentsJson: string; ended: boolean }
   >();
   for await (const event of provider.stream(request, signal)) {
+    if (signal.aborted) throw new RuntimeAbortError('Agent run was aborted.');
     emit(
       event.type === 'error'
-        ? { ...event, message: 'The model provider stream failed.' }
+        ? {
+            type: 'error',
+            code:
+              event.code === 'rate_limited' ? 'rate_limited' : 'provider_error',
+            message: 'The model provider stream failed.',
+            retryable: event.retryable === true,
+          }
         : event,
     );
     if (event.type === 'text_delta') text += event.delta;
@@ -634,17 +687,17 @@ export class AgentRuntime {
         let response: ModelResponse;
         try {
           response = validateResponse(
-            this.#options.modelMode === 'stream'
-              ? await collectStream(
-                  this.#options.provider,
-                  request,
-                  controller.signal,
-                  (event) => input.onEvent?.({ type: 'model_event', event }),
-                )
-              : await this.#options.provider.complete(
-                  request,
-                  controller.signal,
-                ),
+            await waitForRunSignal(
+              this.#options.modelMode === 'stream'
+                ? collectStream(
+                    this.#options.provider,
+                    request,
+                    controller.signal,
+                    (event) => input.onEvent?.({ type: 'model_event', event }),
+                  )
+                : this.#options.provider.complete(request, controller.signal),
+              controller.signal,
+            ),
           );
         } catch (error) {
           const abortedDuringModel = stopIfAborted();
@@ -665,6 +718,8 @@ export class AgentRuntime {
             input.onEvent,
           );
         }
+        const afterModelAbort = stopIfAborted();
+        if (afterModelAbort !== null) return afterModelAbort;
         latestText = response.text;
         totalUsage = mergeUsage(totalUsage, response.usage);
         state = {
@@ -747,21 +802,46 @@ export class AgentRuntime {
               reason: 'External-sensitive tools are not enabled in V1.',
             };
           } else if (risk !== 'read') {
-            authorization = (await this.#options.approval?.(
-              {
-                runId: state.runId,
-                trigger: state.trigger,
-                toolCallId: call.id,
-                toolName: call.name,
-                input: parsed,
-                risk,
-              },
-              controller.signal,
-            )) ?? {
-              approved: false,
-              reason: 'This write requires explicit authorization.',
-            };
+            try {
+              authorization =
+                this.#options.approval === undefined
+                  ? {
+                      approved: false,
+                      reason: 'This write requires explicit authorization.',
+                    }
+                  : await waitForRunSignal(
+                      this.#options.approval(
+                        {
+                          runId: state.runId,
+                          trigger: state.trigger,
+                          toolCallId: call.id,
+                          toolName: call.name,
+                          input: parsed,
+                          risk,
+                        },
+                        controller.signal,
+                      ),
+                      controller.signal,
+                    );
+            } catch {
+              const afterApprovalAbort = stopIfAborted();
+              if (afterApprovalAbort !== null) return afterApprovalAbort;
+              return finalize(
+                state,
+                'failed',
+                latestText,
+                totalUsage,
+                {
+                  code: 'tool_execution_error',
+                  message: 'Tool authorization did not complete.',
+                  retryable: false,
+                },
+                input.onEvent,
+              );
+            }
           }
+          const afterApprovalAbort = stopIfAborted();
+          if (afterApprovalAbort !== null) return afterApprovalAbort;
           if (!authorization.approved) {
             const reason =
               authorization.reason ?? 'Tool execution was not authorized.';
@@ -786,14 +866,17 @@ export class AgentRuntime {
           });
           try {
             const output = tool.outputSchema.parse(
-              await tool.execute(parsed, {
-                runId: state.runId,
-                trigger: state.trigger,
-                toolCallId: call.id,
-                risk,
-                authorizationId: authorization.authorizationId ?? null,
-                signal: controller.signal,
-              }),
+              await waitForRunSignal(
+                tool.execute(parsed, {
+                  runId: state.runId,
+                  trigger: state.trigger,
+                  toolCallId: call.id,
+                  risk,
+                  authorizationId: authorization.authorizationId ?? null,
+                  signal: controller.signal,
+                }),
+                controller.signal,
+              ),
             );
             const receipt: AgentToolReceipt = {
               toolCallId: call.id,

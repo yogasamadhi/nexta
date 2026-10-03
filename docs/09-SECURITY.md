@@ -161,13 +161,19 @@ ExternalMutationIntent 是 OS 副作用前必须落盘、解决后必须与 veri
 
 Mobile 只在同步状态明确为 `calendar_provisioning_unknown`、仍有对应 jobId 时展示释放入口，并采用“已检查系统 Calendar”→“确认不存在并重新尝试”两步动作。其他 duplicate、用户修改或归属冲突不得复用该入口；保留待核对是安全选项。确认后协调器唤醒属于 best-effort，不能因唤醒失败撤销或隐瞒已提交的 intent 删除/requeue。
 
-Phase 6 `AgentRun` 只落盘运行 ID、起止时刻、状态、触发、Provider 名称、turnCount 和脱敏 errorCode；不保存消息、Prompt、模型响应、Tool 参数或 Tool Result。自然语言 Preview 请求只包含固定 system 约束与本次用户原文；通用 Agent Context 必须先由应用选择允许事实，再按消息数、字符数与 tool argument 长度裁剪。`calendar.listBusy` 不返回 title/notes/location/attendee/external ID，Preference Tool 只允许四个非 Secret key。任意未知 Tool/Provider 异常只暴露稳定通用错误，stack、raw cause、SQL、Provider body 与凭据不得进入 Agent message/event 日志。
+Phase 6 `AgentRun` 只落盘运行 ID、起止时刻、状态、触发、Provider 名称、turnCount 和脱敏 errorCode；不保存消息、Prompt、模型响应、Tool 参数或 Tool Result。自然语言 Preview 请求只包含固定 system 约束、下述允许的时间 Context 与本次用户原文；通用 Agent Context 必须先由应用选择允许事实，再按消息数、字符数与 tool argument 长度裁剪。`calendar.listBusy` 不返回 title/notes/location/attendee/external ID，Preference Tool 只允许四个非 Secret key。任意未知 Tool/Provider 异常只暴露稳定通用错误，stack、raw cause、SQL、Provider body 与凭据不得进入 Agent message/event 日志。
 
 Phase 7 `UserModelFeature` 是可从本地最小事实重建的版本化数值派生缓存，只保存 feature/scope、数值、窗口、来源 stateVersion、sampleCount、confidence、algorithmVersion 与更新时间；不复制 Task 标题、描述、用户原文、日历内容、消息或自由文本标签。统计 builder 不访问 Provider，不产出人格/心理标签。完整投入覆盖只能由直接用户明确确认，Agent 不能把模型推测写成 complete 样本。个性化缺省关闭；DEC-007 接受前生产排程即使读到缓存也保持中性。
 
 Phase 8 的 Reflection、Energy Check-in 与 Relax 只保存在本地业务 SQLite。Reflection 系统摘要只能来自指定日的 CompletionRecord/TimeBlock 事实，用户备注保持独立；当前路径不把备注或主观精力发送给 Provider。Check-in level 只作为用户可关闭的主观软信号，不得推导疾病、人格或工作能力，生产 policy 未接受前保持中性。Relax 只记录类型、来源、状态与区间，不把完成 Relax 冒充任务成就；环境声入口当前使用不需音频权限的静默模式。三类写操作只接受直接用户 authority，Agent Tool 不能创建这些心理/节奏事实。
 
 系统 Calendar 与锁屏 Notification 是本地 SQLite 之外、可能被共享账户或旁观者看到的额外披露面。哪些 TimeBlock 投影、Calendar event/Notification title/body、产品推荐的默认提前量/预设、Android source/account 以及声音/振动/channel 必须由显式 production policy/config 决定。提醒提前量本身只作为 `0–1440` 的本地数值偏好保存，不包含通知内容、Secret 或 Calendar identity；它只能由直接用户修改，Agent Tool 不能借此扩大外部投影。当前测试字符串与配置不是用户同意或产品默认；[DEC-012](DECISIONS.md#dec-012) 关闭前采用可替换的保守实现基线，不发送 Task description，不猜测 Android account/source，也不默认请求通知声音。
+
+自然语言 Capture 的时间 Context 仅允许宿主显式注入 referenceInstant、IANA timeZone 与 BCP 47 locale，严格校验后作为独立 system 元数据消息发送；未知字段和非法值在 Provider 调用前拒绝，不读取隐式时钟。该元数据不含 Calendar 正文、用户历史、Check-in 或 Secret，不增加工具权限；模型返回同名额外字段、authority 或 operationId 也不能绕过草稿 Schema。invalid_context 只暴露通用错误，不反射输入值。仅日期或多义时间不补造确定时刻，仍需用户确认。
+
+Provider 适配器的自定义错误映射也不构成可信披露授权：complete、原生 stream 的错误事件/异常与已包装 ProviderError 都必须再次规范化，不能把原始 message/category/code、body 或 cause 带入公开结果。Agent Tool 异常只保留允许的稳定错误码和 retryable，消息统一为通用文案；不得依赖“对象有 code/message 字段”判定其已经脱敏。
+
+Agent 的预算与 Abort 停止等待并隔离迟到结果；未开始的工具/审批写入不得在取消后启动。取消并不能证明已开始的写入未提交，恢复仍经过稳定 operationId 与 Application 事务，不能盲目生成新的身份重做。
 
 其他审计/活动记录继续保持最小结构化事实。保留期与删除策略须随对应功能明确；自动重排依赖的 Undo 保留期未确定时不开放自动提交。
 

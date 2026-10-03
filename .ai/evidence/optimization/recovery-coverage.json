@@ -1,0 +1,113 @@
+{
+  "plan": "OPT-NC-20261003",
+  "package": "OPT-07",
+  "result": "reviewed; existing invariants covered; no new implementation or duplicate tests required",
+  "coverage": [
+    {
+      "invariant": "Preview TTL / process memory / state conflict",
+      "file": "tests/integration/database-schedule-service.test.ts",
+      "evidence": [
+        "rejects expired and process-cleared previews without commit writes",
+        "rejects an old preview after a persisted Task scheduling change"
+      ]
+    },
+    {
+      "invariant": "lost commit response and exact durable replay",
+      "file": "tests/integration/database-schedule-service.test.ts",
+      "evidence": [
+        "previews without writes, commits all facts, and exactly replays after response loss"
+      ]
+    },
+    {
+      "invariant": "real file close/reopen with active and paused execution",
+      "file": "tests/integration/phase9-offline-reliability.test.ts",
+      "evidence": [
+        "keeps local facts and exact replay receipts across repeated process loss while integrations remain pending"
+      ]
+    },
+    {
+      "invariant": "Completion/Achievement uniqueness, FK and replay",
+      "file": "tests/integration/database-repositories.test.ts",
+      "evidence": [
+        "stores one completion per Task and rolls back a duplicate operation with it"
+      ]
+    },
+    {
+      "invariant": "migration rollback / immutable checksums",
+      "file": "tests/integration/database-migration.test.ts",
+      "evidence": [
+        "rolls back every statement and history write from a failed migration",
+        "rejects edited or non-prefix migration history before applying new SQL"
+      ]
+    },
+    {
+      "invariant": "external side effect before local binding checkpoint",
+      "file": "tests/integration/database-phase3-external-intents.test.ts",
+      "evidence": [
+        "survives the OS-before-binding crash window and deletes only with a committed checkpoint"
+      ]
+    },
+    {
+      "invariant": "unknown external create reconciliation",
+      "file": "tests/integration/database-phase3-integration-worker.test.ts",
+      "evidence": [
+        "reconciles an unknown create on retry without duplicating the external event"
+      ]
+    },
+    {
+      "invariant": "lease / claim / attempt / channel stale worker fences",
+      "file": "tests/integration/database-phase3-repositories.test.ts",
+      "evidence": [
+        "serializes each job channel, recovers expired leases, and fences stale workers",
+        "enforces verified calendar authority and revision-fenced event bindings"
+      ]
+    },
+    {
+      "invariant": "late checkpoint fence and bounded provider call",
+      "file": "tests/unit/application/integration-service.test.ts",
+      "evidence": [
+        "rolls back all binding mutations after a late fence failure",
+        "bounds a hanging provider and keeps durable work eligible for a later retry"
+      ]
+    },
+    {
+      "invariant": "native exclusive transaction queue / bounded adapter",
+      "file": "tests/unit/database/expo-sqlite.test.ts",
+      "evidence": [
+        "actual native facade queue and rollback tests; not OS process kill"
+      ]
+    },
+    {
+      "invariant": "read timeout retry vs mutation uncertainty",
+      "file": "tests/unit/application/provider-timeout.test.ts",
+      "evidence": [
+        "timeouts/late results through timer-injected provider facade"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "command": "bun run test:integration",
+      "exitCode": 0,
+      "files": 19,
+      "tests": 79
+    },
+    {
+      "command": "bunx vitest run tests/unit/application/integration-service.test.ts",
+      "exitCode": 0,
+      "files": 1,
+      "tests": 31
+    },
+    {
+      "command": "bunx vitest run tests/unit/application/provider-timeout.test.ts tests/unit/database/expo-sqlite.test.ts",
+      "exitCode": 0,
+      "files": 2,
+      "tests": 5
+    }
+  ],
+  "limits": [
+    "Node file SQLite and injected native/provider facades; no physical OS force-kill or delivery evidence",
+    "No migration/checksum rewrite, backup, export or recovery backdoor",
+    "unknown external result remains unknown, never inferred missing"
+  ]
+}

@@ -37,6 +37,70 @@
 | DEC-011 | priority 词表和排序、splittable 默认值、schedulingPolicy 词表及每个值的调度语义 |
 | DEC-012 | 投影哪些 Block/status、Calendar/Notification 可见字段、推荐提醒默认/预设、Android source/account、声音/振动/channel 与对应隐私审核结论 |
 
+## Optimization Candidate Packet — OPT-NC-20261003
+
+以下为本轮无需凭据优化的可评审方案。全部关联条目继续 **Open**；表首生效前默认行为不变，不启用候选参数、生产个性化、自动提交、备份或新的 OS 投影。候选需要的负责人输入见上表，当前无需填写 Token 或账号。
+
+### DEC-001 — Small trial and evidence
+
+候选 A：先由少量自愿用户验证手工 Task → Preview → 明确完成闭环，观察一周；候选 B：待真实 Provider 验收后试用自然语言入口，能评估输入收益，但依赖模型选择、费用与隐私同意。人数、一周周期和成功阈值均是待评审建议，不是招募承诺或已验证结论。
+
+| 指标 | 候选定义与解释边界 | 最小采集方式 |
+| --- | --- | --- |
+| 首次开始耗时 | 从本次试用首个 Capture 提交到用户首次 execution.start；分别报告输入耗时与等待排程/主动延后，不把空闲等待算为 UI 速度 | 用户同意后本地记录合成事件时间；也可由试用主持人记录，不新增默认远端遥测 |
+| Preview 接受/修改 | 以唯一 previewId 为分母，区分提交、放弃、失效与修改后重新预览；重复点击不重复计数 | 现有 Preview 内存生命周期不足以还原历史；如需长期统计，先评审最小本地事件 Schema/保留期 |
+| 计划移动 | 同 existingBlockId 的 moved/resized、新增/删除分别计数；报告开始时间偏移绝对值及跨日，不把新块当移动 | OPT-02 已有合成基准方法，可作为离线分析定义，不代表真实用户容忍阈值 |
+| 维护时间 | 用户主动设置、编辑、核对 Preview/同步失败的时间，与专注时长分开；离开 App 的间隔不推断为维护 | 自愿短问卷或有界本地会话记录；不记录原文、键盘输入或屏幕内容 |
+| 事实质量 | 完成/成就唯一来源、未知耗时比例、暂停恢复失败和计划冲突率；单个缺陷优先按事实修复 | 已有事务/计时事实加匿名数量；不以成功率掩盖数据损坏 |
+
+验收：试用前定稿同意与退出/删除流程、指标分母和停止条件；同一行为重复提交不增加次数，缺数据明确 unknown；负责人给出人群、人数/周期、可接受阈值和提前停止条件。当前基准/UI/脚本化模型结果只验证工程行为，不证明产品价值。
+
+### DEC-011 / DEC-007 — Scheduling policy candidates
+
+基础策略候选：以显式 priorityRanks、deadline/earliestStart、splittable 与 min/maxBlock 作为可解释输入，保持硬约束优先；比较不引入稳定性偏好与较强保留原位置两个版本。OPT-02 的移动统计和同输入等价方法可用于评审，但示例权重不得复制到生产。splittable 缺省是否允许仍由 DEC-011 决定，现行 false 不变。
+
+时间偏好候选 A：只提供显式允许窗口，作为硬约束；候选 B：允许窗口之外另有偏好窗口，作为软评分并显示偏离原因。增加字段需版本化 Domain/Schema、Snapshot/API 和迁移；旧 Task 没有窗口时沿用现行工作窗口，不从历史行为推断硬禁止，也不默认扩展工作时段。
+
+容量候选：Preview 显示需求分钟、可用分钟、未排程分钟及覆盖/Busy 新鲜度；不能把部分日历缓存当完整容量。补救项为用户明确改估时/优先级、允许拆分、改截止或调整工作窗口，每项重新 preview；不自动延后 Deadline、填造估时或扩大工作窗口。容量提醒阈值、窗口长度和是否只提示一次待评审。
+
+学习候选 A：只展示事实与置信度，不影响排程；候选 B：用户开启后，以充分样本的估时偏差或时段完成分布影响有界软评分，设置最大影响幅度和解释/关闭入口。Check-in 是单次主观软信号，可用作用户可关闭的低影响参考，不得生成诊断或强制降负荷。分类来源、样本阈值、窗口、置信度算法与权重都由 DEC-007 定稿；缺样本/关闭开关维持中性。
+
+验收：固定输入重跑确定性；锁定/开始/完成块保护；硬约束优先于软偏好；跨时区/DST 与空容量可解释；关掉学习后恢复中性输出，缺样本不改变权重。最小输入：词表/顺序、拆分默认、policy 语义、窗口硬/软取舍、容量提示阈值、统计窗口/置信度和最大影响幅度。不能用本地 Bun 时间测量推断手机 SLA。
+
+### DEC-002 — Foreground coalescing and commit safety
+
+候选 A：在现有前台 Event Coordinator 中按 trigger/业务版本合并重复事件，仅生成最新 Preview；输入变化或 TTL 失效后重新读取 Snapshot。候选 B：保留用户可见的待核对 Preview 队列，信息更完整，但要处理过时项与维护成本。两者都不建立常驻后台 Agent，coalescing 不丢弃 durable IntegrationJob。
+
+自动提交候选限于负责人明确接受的低风险 diff：移动块数、累计开始时间偏移、临近开始保护窗口和跨日规则全部显式；任何 Busy 不完整、Deadline 风险、版本冲突或受保护块变动均回到用户核对。未定义 Undo 前继续手工提交。Undo 候选保存有界的计划前后快照及 operation 身份，只回退仍匹配版本且未开始的块；外部同步是新作业，不能撤销已经发生的执行事实。
+
+验收：重复事件只计算一次或合并到最新版本；旧 Preview 不提交；本地成功后响应丢失不生成新 operation；Undo 过期/版本变化/执行开始明确拒绝；进程重启不扩大批准范围。最小输入：是否启用自动提交、四类阈值、Undo 保留期与冲突/过期体验，另需明确审批绑定的版本。候选不改变当前 Preview + 用户提交默认。
+
+### DEC-005 — Provider and BYOK acceptance
+
+选择维度：目标地区可用性、中文结构化输出、工具/流式协议完整度、Hermes/RN 的 HTTP/SSE 兼容、取消与超时、费用/配额可见性、数据保留/区域承诺和用户撤销能力。候选 A 为一个最小直连适配器；候选 B 为宿主后端代理，能集中费用/限流，但增加服务器、账号和数据披露范围，不能默认为 V1 范围。当前不选择厂商、模型或 SDK。
+
+BYOK 候选流程：用户了解发送范围和费用后主动保存到 SecureStore；调用时按需读取，Prompt、普通 SQLite、AgentRun 和日志不含 Key。撤销时删除对应 Secret 并中止新请求/清除内存引用；已发送的请求能否撤销由 Provider 能力决定，不宣称保证删除远端数据。后台自动请求、重试额度、最大输出和费用展示需要显式设置；断网/未配置仍可手工 Capture。
+
+验收包：真实 complete/stream、分段/缺失/重复 tool 参数、429/auth/network/invalid response、上游忽略 Abort、超时与迟到结果、Schema/authority 伪造、Context 允许字段和错误脱敏；再执行实际中文时间语料与用户确认旅程。OPT-05/06 的 Fake 与上下文 fixture 只完成通用契约准备，真实质量/费用/区域结论待接入验证。最小输入：Provider/模型、地区/账号与数据保留边界、BYOK 获取/撤销、请求费用和错误展示规则。
+
+### DEC-009 — Backup, export and restore boundaries
+
+候选 A：依赖明确审核的系统备份，维护成本低，但恢复可见性和用户控制受 OS 限制；候选 B：用户主动导出加密归档并选择位置，控制更强，但涉及口令丢失、密钥派生、格式维护与错误恢复；候选 C：SQLite 加密与上述备份组合，需要实际 native/升级/性能验证。App 私有目录内的文件不能被当作独立于卸载的数据保障。当前无新增导出/备份通道，不宣称数据库加密。
+
+独立 ADR 草案要点：归档版本、完整性校验、加密/密钥所有权、备份目的地与保留/删除、支持的 schema 范围、恢复到新库后校验再原子替换、失败时保留原库、Secret 与 OS identity 的排除/重核对。导出包括哪些 Task/Completion/Session/Interval/Achievement/偏好由负责人明确；派生缓存可重建，未解决 intent 不能被解释为副作用未发生。
+
+恢复验收：截断/篡改/错误口令/未知 schema/不足空间均不破坏原库；迁移保持 checksum 历史与唯一 Completion/Achievement FK；恢复后重新请求必要权限、核对外部 binding/未解决意图，unknown 不作 missing；重试不重复创建事件。OPT-07 的事务/进程重开证据证明本地可靠性，不证明备份或设备卸载后恢复。最小输入：加密取舍、位置/保留期、导出实体、密钥与丢失提示、恢复兼容窗口及隐私审核。
+
+### DEC-012 — OS projection and fault verification
+
+隐私候选 A：事件/锁屏使用通用任务提醒，不显示 Task title；候选 B：用户明确开启后显示标题，说明共享 Calendar/锁屏可见性，仍不发送 description。声音/振动、channel 和提前量预设单独同意，不把当前测试值当推荐默认。
+
+Android source/account 候选：由权限后的实际只读来源列表供用户选择，或由产品明确支持的 App-owned 本地容器方案；来源不支持/不存在时显示可恢复状态，不猜账户、不修改原第三方事件。权限恢复只来自前台明确动作，worker 仅核对现有授权。
+
+真机验收清单：首次拒绝/再次拒绝/设置撤销再授权；source 删除/账户切换；App-owned marker 被复制或外部对象已改；create/schedule 成功后响应丢失；部分 inventory/unknown；进程强杀后 intent/lease 恢复；旧 worker 迟到；0 与非 0 提前量真实投递、时区/DST/重启与通知交互。记录平台/OS、授权范围、回读和可见内容，模拟器或 Fake 不填 physicalDevice。最小输入：投影的 block/status、标题披露、推荐提前量/预设、source/account、声音/振动/channel 与隐私结论。
+
+上述候选引用 [执行计划](../.ai/PLAN.md#no-credential-optimization-plan) 与 [实际证据](../.ai/STATUS.md#optimization-execution-status)。除可由本地代码/测试直接证明的事实，其收益、阈值和生产选择仍是假设，评审后才更新 Canonical Docs/必要 ADR。
+
 ## Closed Decision Records
 
 ### DEC-004 — Expo / RN / UI / Runtime Schema 基线

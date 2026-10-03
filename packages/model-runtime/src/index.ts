@@ -36,7 +36,37 @@ export class ProviderError extends Error {
 }
 
 export function mapProviderError(error: unknown): ProviderError {
-  if (error instanceof ProviderError) return error;
+  if (error instanceof ProviderError) {
+    const descriptions: Record<ProviderErrorCode, string> = {
+      aborted: 'The model request was aborted.',
+      authentication: 'The model provider credentials were rejected.',
+      rate_limited: 'The model provider is temporarily rate limited.',
+      network: 'The model provider could not be reached.',
+      invalid_response: 'The model provider returned an invalid response.',
+      unavailable: 'The model provider is unavailable.',
+      unknown: 'The model provider request failed.',
+    };
+    const code = Object.hasOwn(descriptions, error.code)
+      ? error.code
+      : 'unknown';
+    const categories = new Set([
+      'provider_abort',
+      'provider_authentication',
+      'provider_rate_limit',
+      'provider_network',
+      'provider_protocol',
+      'provider_stream',
+      'provider_unknown',
+      'provider_unavailable',
+      'fake_provider_exhausted',
+    ]);
+    return new ProviderError(code, descriptions[code], {
+      retryable: error.retryable === true,
+      category: categories.has(error.category)
+        ? error.category
+        : `provider_${code}`,
+    });
+  }
   if (typeof error === 'object' && error !== null) {
     const candidate = error as {
       code?: unknown;
@@ -148,7 +178,7 @@ export async function collectModelStream(
     else if (event.type === 'error') {
       throw new ProviderError(
         event.code === 'rate_limited' ? 'rate_limited' : 'unknown',
-        event.message,
+        'The model provider stream failed.',
         {
           retryable: event.retryable,
           category: 'provider_stream',
@@ -156,6 +186,7 @@ export async function collectModelStream(
       );
     } else if (event.type === 'done') finishReason = event.finishReason;
   }
+  throwIfAborted(signal);
   if (
     finishReason === null ||
     [...calls.values()].some((call) => !call.ended)
@@ -212,13 +243,22 @@ export function createModelProvider(
   if (adapter.complete === undefined && adapter.stream === undefined) {
     throw new TypeError('A model provider adapter needs complete or stream.');
   }
-  const convertError = adapter.mapError ?? mapProviderError;
+  const convertError = (error: unknown): ProviderError => {
+    if (error instanceof ProviderError) return mapProviderError(error);
+    try {
+      return mapProviderError(adapter.mapError?.(error) ?? error);
+    } catch {
+      return mapProviderError(error);
+    }
+  };
   return {
     async complete(request, signal) {
       throwIfAborted(signal);
       try {
         if (adapter.complete !== undefined) {
-          return await adapter.complete(request, signal);
+          const response = await adapter.complete(request, signal);
+          throwIfAborted(signal);
+          return response;
         }
         return await collectModelStream(
           adapter.stream!(request, signal),
@@ -229,14 +269,29 @@ export function createModelProvider(
       }
     },
     stream(request, signal) {
-      if (adapter.stream !== undefined) {
-        return adapter.stream(request, signal);
-      }
       return (async function* () {
         throwIfAborted(signal);
         try {
-          const response = await adapter.complete!(request, signal);
-          yield* responseEvents(response, signal);
+          if (adapter.stream !== undefined) {
+            for await (const event of adapter.stream(request, signal)) {
+              throwIfAborted(signal);
+              yield event.type === 'error'
+                ? {
+                    type: 'error',
+                    code:
+                      event.code === 'rate_limited'
+                        ? 'rate_limited'
+                        : 'unknown',
+                    message: 'The model provider stream failed.',
+                    retryable: event.retryable === true,
+                  }
+                : event;
+            }
+            throwIfAborted(signal);
+          } else {
+            const response = await adapter.complete!(request, signal);
+            yield* responseEvents(response, signal);
+          }
         } catch (error) {
           throw convertError(error);
         }

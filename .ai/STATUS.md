@@ -25,7 +25,7 @@
 
 `TASK-OPT-NC-20261003` — 按已交付计划执行无需凭据的九个优化工作包。
 
-**Status: IN PROGRESS — OPT-01/02 complete; OPT-03 local UI host preparation**
+**Status: IN PROGRESS — OPT-01/02/06 complete; OPT-03 host preparation; OPT-05 contract validation**
 
 既有 `TASK-TECHNICAL-PLAN-001` 保持 COMPLETE WITH USER-AUTHORIZED EXTERNAL SKIPS：原本地子集 80/80 已完成，正式决策、真实 Provider/设备与发布授权仍开放。新增优化工作包独立跟踪，不算作已完成，也不改写原 Engineering Readiness。
 
@@ -298,13 +298,13 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 | --- | --- | --- | --- |
 | OPT-01 | 环境预检与本地 Git 基线 | DONE | 基线 f06bad8b1872eac2b51a3e73183b46691fb63f00；安全/隔离预检与 bun run check 通过，优化分支 codex/no-credential-optimization |
 | OPT-02 | 排程性能与计划移动基准 | DONE | 13 场景/26 完整结果等价、固定 seed、不变量、独立计时与移动统计；本地热点优化前后证据见下文，Hermes 宿主可运行后追加测量 |
-| OPT-03 | 本地 Development Build UI 自动化 | IN_PROGRESS | Maestro 2.11.0 已准备；新建专用 iOS 27 模拟器并开始 Debug Development Build，尚无旅程通过证据 |
+| OPT-03 | 本地 Development Build UI 自动化 | IN_PROGRESS | iOS 27 Debug 原生 build/install exit 0；test:ui、九个流程和稳定 testID 已建立，尚无实际旅程通过；正在恢复本地 UI 宿主并准备 Android 工具 |
 | OPT-04 | 移动端可用性审查与必要修复 | NOT_STARTED | 尚无本轮审查与复测记录 |
-| OPT-05 | 通用 ModelProvider / Agent 契约缺口 | NOT_STARTED | 既有 Fake/核心测试保留；本轮缺口矩阵未建立 |
-| OPT-06 | Capture 时间上下文与中文案例 | NOT_STARTED | 尚未修改时间 Context Contract 或测试 |
-| OPT-07 | 本地事务与恢复覆盖审查 | NOT_STARTED | 既有 Node SQLite 证据保留；本轮审查未开始 |
+| OPT-05 | 通用 ModelProvider / Agent 契约缺口 | IN_PROGRESS | complete/stream 错误脱敏与不合作 Abort 边界已修复；60 个 Agent tests、类型/lint/架构通过，等待可用 Hermes 宿主隔离 smoke |
+| OPT-06 | Capture 时间上下文与中文案例 | DONE | API/Security 先同步显式 Context Contract；所有调用方迁移；中文时间 fixture、非法 Context/额外字段/取消与失败测试通过，未接入真实 Provider |
+| OPT-07 | 本地事务与恢复覆盖审查 | DONE | 覆盖矩阵逐项审查，无需重复实现/测试；19 集成文件/79 tests 与 worker/provider/native facade 36 tests 本轮通过，真实文件关闭重开证据保留 |
 | OPT-08 | 架构、依赖与文档一致性收口 | NOT_STARTED | 本次编写计划不等于完成本轮实施收口 |
-| OPT-09 | 受决策约束的方案与验收包 | NOT_STARTED | 现有研究建议是输入；逐项候选方案尚未交付 |
+| OPT-09 | 受决策约束的方案与验收包 | DONE | DECISIONS 候选包覆盖七个 Open 条目、取舍/数据影响/验收/最小输入；状态和生效前默认未变，docs:check exit 0 |
 
 OPT-01 验收证据：本轮 bun run check exit code 0，51 个单元文件/414 tests、19 个集成文件/79 tests、11 包架构、27 文件文档、静态发布检查与 iOS/Android Hermes export 均通过。日志位于 .artifacts/optimization/check-baseline.log；.artifacts 已加入 Git ignore，309 个文件纳入基线提交 f06bad8b1872eac2b51a3e73183b46691fb63f00。候选文件的凭据模式扫描无发现；git diff --cached --check 另报告既有 Markdown 硬换行空格和 .editorconfig 尾部空行，未将该检查记为通过，低影响格式问题留待 OPT-08 审查。现有原生目录保持忽略，模拟器测试将新建专用设备，未触碰既有 App 沙盒。Git 身份复用配置且不打印值；无远端推送。
 
@@ -314,9 +314,33 @@ OPT-02 验收证据：新增 scripts/benchmark-scheduler.ts、tests/benchmarks/s
 
 OPT-03 准备：官方无需账号 CLI 2.11.0 位于 .artifacts/tools/maestro-2.11.0/，未修改 shell profile；后续执行禁用匿名 analytics 和 CLI analysis notification。专用设备 Execution Agent OPT-NC Test / UDID 828EE218-5681-4D83-B3B8-93345F837E42 使用 iOS 27.0 / iPhone 17；Debug 原生构建日志 .artifacts/optimization/ios-build.log。既有模拟器和业务库没有清理。Android SDK/adb/emulator 尚不可用；Maestro 官方说明 setAirplaneMode 仅 Android 生效，不能把 iOS 上无效命令当作离线证据，离线旅程需另行提供真实网络隔离方案或平台验证。
 
+OPT-02 收口：完整 bun run check exit 0（53 个单元文件/418 tests、19 个集成文件/79 tests、架构/文档/静态发布/双平台 Hermes export），日志 .artifacts/optimization/check-scheduler.log；优化提交 d27dea32cf7bd2a378a83fa6a3c9a4e1154b1c7f。该门禁执行期间开始添加 UI testID，因此仅作为 Scheduler/脚本基准收口证据，本轮 UI 源码、runner 和后续改动仍需相关及最终完整门禁。
+
+OPT-03 当前实现：scripts/test-ui.ts 使用 Maestro 本地 CLI，支持命名/UDID ownership receipt 校验、development bundle identifier 校验、测试 App 重装、独立运行产物、Junit/结构化记录和真实 SQLite 只读检查。tests/ui/flows 的九个 YAML 覆盖连接、任务创建、设置/缺估时 inbox、拒绝 Preview、计划提交、Calendar/开始/暂停、重启恢复、继续/明确完成及完成来源；控件使用 testID 和有界条件等待，无固定坐标或长 sleep。断言包括唯一 Task/Plan/Completion/Achievement、来源 FK、暂停投入不增长和可信区间汇总一致。Source/入口存在不等于旅程通过，当前 iOS runner 明确输出 offline 未执行和 planAcceptance=partial；Android 参数目前明确拒绝，不会假装支持。
+
+OPT-03 验证/环境事实：iOS 27 Debug xcodebuild 与安装 exit 0，Maestro 两次启动探测均 exit 1，停在 SpringBoard 首次深链“打开”确认框；驱动读到按钮并报告 tap 成功，但截图/层级仍保留确认框，Metro 未收到 App bundle 请求，不能据此认定 App 已进入业务 UI。另建隔离 iOS 18.3 / iPhone 16，UDID F254416D-A447-4963-948A-1A63079FA90F；探测在 launchApp 处退出 1，cleanup 报模拟器 Shutting Down。当前 /Applications/Xcode.app 含 SDK/CLI，但没有 Developer/Applications/Simulator.app，mdfind 也未发现其旧 bundle；随后查到 /Applications/Xcode.app/Contents/Applications/DeviceHub.app（com.apple.dt.Devices）替代界面并显示专用测试设备，不能据旧路径缺失判定 Xcode 安装不完整。正在用该实际界面复测，触摸失败根因尚未证明。原始 probe/XCTest 日志和合成截图位于 .artifacts/optimization/ui-probe*。不改业务代码掩盖这些环境问题。
+
+UI runner 的 typecheck、相关 ESLint、--help 均 exit 0；Android 未实现参数明确 exit 2；传入未登记 UDID 的保护探测在任何重装前拒绝，exit 1（现行配置/运行拒绝），记录 .artifacts/optimization/ui-unowned-device.log。docs:check exit 0，Development/Testing/Build 文档同步本地驱动职责与当前限制。另修根目录 Bun wrapper 顺序：原 `bun --cwd apps/mobile run ...` 只输出帮助后 exit 0，改为 `bun run --cwd apps/mobile ...`，Expo --help 与实际 Metro 启动已验证；Metro 使用 8087/--offline，只代表开发工具不联网，不能用作 App 断网证据。
+
+Android 准备：官方 commandlinetools-mac_arm64-15859902 下载 SHA-256 与官方值 835b62a26162b229b441d1f6d4680383815a270809eb33522c0d480fa5002c4e 一致；SDK 包列表查询 exit 0。工具仅解压在 .artifacts/tools/android-sdk/，未更改全局 profile/用户 SDK。正在安装无需账号的 platform-tools、emulator 与 API 36 default arm64-v8a system image（具体 live handle 由当前会话保存，日志 .artifacts/optimization/android-sdk-install.log），尚无 emulator 或 Android 旅程通过证据。仓库既有 app-debug.apk 可用于 native host 准备，但尚未验证当前 JS/UI/设备运行。
+
+OPT-05/06 收口门禁：bun run check exit 0（53 unit files/454 tests、19 integration files/79 tests、架构/文档/静态发布/双平台 Hermes export），日志 check-agent-capture.log。该结果不代替仍未通过的 UI 旅程或实际 Hermes 执行。
+
+OPT-05/06 实施：通用 Provider complete/stream、自定义 mapper、已包装错误和 Agent Tool 异常均使用稳定错误码与通用消息，防止合成 raw payload/category/code 泄露；新增红灯测试先确认 4 个 ModelProvider 和 3 个 Agent 缺口，再修复并复测。Agent 对忽略 Abort 的 Provider/stream/Approval/Tool 停止等待并隔离迟到结果，不宣称撤销已开始的事务；complete/stream 的成功收据在后续 Provider 失败后均可复用。Tool Matrix/风险 floor 未变，没有引入 SDK、权限或生产 Fake AI。契约覆盖矩阵见 .ai/evidence/optimization/agent-contracts.json；Hermes 有实际可运行宿主后执行隔离 smoke，当前尚未执行。
+
+OPT-06：docs/05-API 与 docs/09-SECURITY 先定义 preview(text, timeContext, signal)，referenceInstant 严格 UTC/Z、IANA timeZone 和 BCP 47 locale 由宿主显式提供并运行时校验；未知/非法 Context 在 Provider 前拒绝，草稿 Schema/非持久化与用户确认边界保持。调用搜索只发现 Previewer 与测试，无生产配置 Provider 的调用方；已全部迁移，不对手工 Capture 接入 Fake。8 个合成中文 fixture 覆盖同 Instant 不同时区、周界/跨年、DST 缺失/重复本地时刻、仅日期 Deadline 和模糊/缺估时；额外 Context、模型伪造字段、取消后迟到回复和 Provider 失败均验证。测试仅证明上下文传递/输出校验，不证明中文理解准确率。
+
+本轮 Agent/Capture 验证：bunx vitest run tests/unit/agent exit 0（4 files/60 tests）；typecheck、相关 ESLint、docs:check 均 exit 0；Agent 初次修改后的 test:architecture exit 0，新增 Context import 后在最终门禁复核。日志 .artifacts/optimization/{model,agent}-contract-{red,green}.log 与 capture-time-{tests,types,lint,docs}.log。API/Security/Testing 同步当前 Contract 与覆盖；没有 Schema migration 或新 ADR；完整仓库最终门禁尚待后续修改收口。
+
+OPT-07：逐项阅读真实 ScheduleService/Execution/Repository/Migration/ExternalIntent 和 Phase 9 文件型 SQLite 关闭重开测试，形成 recovery-coverage.json；既有测试已证明全部审查重点，未发现需要新增实现或重复故障测试的缺口。bun run test:integration exit 0（19 files/79 tests），worker 31 tests 和 provider timeout/native SQLite facade 5 tests exit 0，日志 recovery-{integration,unit,provider-native-facade}.log。一次文件过滤包含不存在的 provider-call-bounds 名称，但 Vitest 只运行存在的 integration-service（31 tests）；随后使用实际 provider-timeout 文件独立执行并通过，没有把前次过滤当该文件通过。没有 migration/checksum 修改或备份/导出；Node/Facade 不代表真实 OS 强杀与投递。
+
+OPT-09：docs/DECISIONS.md 新增候选评审包，覆盖 DEC-001/002/005/007/009/011/012，包含试用指标分母/最小本地数据、基础与学习 policy/窗口/容量、前台合并与 Undo、Provider/BYOK、备份恢复 ADR 草案要点以及 OS 隐私/source/投递故障检查。所有关联条目继续 Open，现行默认保持；没有要求负责人本轮提供信息，没有真实请求或新产品行为。docs:check exit 0，日志 decision-docs.log；未新增 Markdown，MANIFEST 不变。
+
+当前实施 Documentation Impact Assessment：Product/Requirements 无范围或必要程度变化；Architecture 沿既有 Pure Core/Application 边界并修复取消隔离；Data Model 无 Schema/迁移变化；API/Contracts 与 Security 同步时间 Context/错误脱敏/有界中止；UI/UX 尚待实际审查，当前只增加 testID；Development/Testing/Build 记录基准与部分 UI 入口；ADR 无新重大决策；AI Context 更新命令可用性路由；Implementation Plan 验收范围/依赖不变；Status 汇总实际证据和未完成项。DECISIONS 仅候选建议，未关闭决策。最终影响评估和完整门禁待 OPT-08。
+
 状态约定：NOT_STARTED、IN_PROGRESS、PARTIAL、DONE、BLOCKED。每次更新附变更文件、命令/退出码、环境/覆盖、证据、未解决问题和下一步；审查类任务无修改时仍需审查证据。BLOCKED/PARTIAL 不能计为 DONE；工作包状态不代替宿主 Goal 生命周期。
 
-当前动作：完成本地原生宿主准备，建立 OPT-03 的实际 UI runner、稳定选择器和旅程断言。候选文件扫描仅覆盖所列凭据模式，不宣称完整安全认证；工具版本/隔离路径记录于 .ai/evidence/optimization/environment.json，原始本地日志使用被忽略的 .artifacts/。bun run bench:scheduler 已可用；bun run test:ui 尚未建立，现有 test:e2e 仍是物理设备证据校验器。
+当前动作：继续 OPT-03 实际宿主准备与旅程验证；若宿主准备等待或失败，推进依赖已满足的 OPT-05/06/07 审查与实现，不把 UI 部分准备算作完成。候选文件扫描仅覆盖所列凭据模式，不宣称完整安全认证；工具版本/隔离路径记录于 .ai/evidence/optimization/environment.json，原始本地日志使用被忽略的 .artifacts/。bun run bench:scheduler 已可用；bun run test:ui 入口已建立但实际旅程未通过，现有 test:e2e 仍是物理设备证据校验器。
 
 本次规划的 Documentation Impact Assessment：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR 无生效规范或业务实现变化；AI Context 增加优化摘要与边界，Implementation Plan 增加九个包/验收/启动目标文本，Status 增加独立执行表及下一步。没有新增 Markdown 文件，MANIFEST 清单不变；必要的 Canonical/ADR 变更在对应工作包实施时完成。
 
@@ -506,6 +530,6 @@ Phase 10 技术实现与正式关闭项：
 
 ## Next Task
 
-可先启动[无需凭据优化计划 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)，执行 OPT-01 环境/安全预检和本地 Git 基线，再按工作包依赖推进；九个包当前尚未实施，状态见 Optimization Execution Status。
+继续已启动的[无需凭据优化计划 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)，当前优先恢复隔离 UI/Hermes 宿主并审查 OPT-07/09；逐包状态见 Optimization Execution Status。
 
 既有用户授权的 80/80 子集没有剩余非跳过项，这不表示产品没有后续代码实施。恢复正式 Phase Exit 时，先解除上述三个 Skip ID 中相应的决策/服务/设备/授权条件，再实施真实 Provider 与 Mobile Agent/凭据接线、生产 policy/特征刷新等对应范围，完成真实 Provider/设备验收、`bun run release:gate`、production build/submit，并更新真实发布结论。本轮优化完成也不解除这些外部门禁。

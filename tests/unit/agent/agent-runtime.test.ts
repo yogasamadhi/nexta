@@ -278,43 +278,312 @@ describe('AgentRuntime', () => {
     expect(result.error?.message).toContain('timed out');
   });
 
-  it('reuses a successful receipt after provider interruption', async () => {
+  it.each(['complete', 'stream'] as const)(
+    'reuses a successful receipt after %s provider interruption',
+    async (modelMode) => {
+      const execute = vi.fn(async (value: string) => value);
+      const call = {
+        id: 'stable-call',
+        name: 'test.echo',
+        argumentsJson: '{"value":"once"}',
+      } as const;
+      const interrupted = await runtime(
+        new FakeModelProvider([
+          { response: response([call]) },
+          {
+            error: Object.assign(new Error('offline'), { code: 'ENETUNREACH' }),
+          },
+        ]),
+        echoTool(execute),
+        { modelMode },
+      ).run({
+        runId: 'run-recovery',
+        trigger: 'user_input',
+        userMessage: '执行一次',
+      });
+      expect(interrupted.state.status).toBe('failed');
+      expect(interrupted.state.receipts['stable-call']).toBeDefined();
+
+      const resumed = await runtime(
+        new FakeModelProvider([
+          { response: response([call]) },
+          { response: response([], '已恢复') },
+        ]),
+        echoTool(execute),
+        { modelMode },
+      ).run({
+        runId: 'run-recovery',
+        trigger: 'user_input',
+        userMessage: '继续',
+        initialState: interrupted.state,
+      });
+
+      expect(resumed.state.status).toBe('completed');
+      expect(execute).toHaveBeenCalledOnce();
+      expect(resumed.state.toolCallCount).toBe(1);
+    },
+  );
+
+  it('returns at the timeout even when a provider ignores abort and fences its late reply', async () => {
+    vi.useFakeTimers();
+    try {
+      let resolveLate!: (value: ModelResponse) => void;
+      const execute = vi.fn(async (value: string) => value);
+      const provider: ModelProvider = {
+        complete: () =>
+          new Promise((resolve) => {
+            resolveLate = resolve;
+          }),
+        async *stream() {
+          yield { type: 'done', finishReason: 'stop' };
+        },
+      };
+      let settled = false;
+      const running = runtime(provider, echoTool(execute), {
+        runTimeoutMs: 5,
+      }).run({
+        runId: 'late-timeout',
+        trigger: 'user_input',
+        userMessage: '测试',
+      });
+      void running.then(() => {
+        settled = true;
+      });
+      await vi.advanceTimersByTimeAsync(6);
+      const settledAtDeadline = settled;
+      resolveLate(
+        response([
+          { id: 'late', name: 'test.echo', argumentsJson: '{"value":"late"}' },
+        ]),
+      );
+      const result = await running;
+      expect(settledAtDeadline).toBe(true);
+      expect(result.state.status).toBe('aborted');
+      expect(execute).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not accept a completed reply or late approval after caller cancellation', async () => {
+    const controller = new AbortController();
+    const complete = new FakeModelProvider([
+      {
+        before: async () => {
+          controller.abort();
+        },
+        response: response([], 'late reply'),
+      },
+    ]);
+    // A custom adapter deliberately ignores its signal.
+    const provider: ModelProvider = {
+      complete: async () => {
+        controller.abort();
+        return response([], 'late reply');
+      },
+      stream: complete.stream.bind(complete),
+    };
+    const result = await runtime(provider).run({
+      runId: 'late-complete',
+      trigger: 'user_input',
+      userMessage: '取消',
+      signal: controller.signal,
+    });
+    expect(result.state.status).toBe('aborted');
+    expect(result.text).toBe('');
+
+    const approvalController = new AbortController();
     const execute = vi.fn(async (value: string) => value);
-    const call = {
-      id: 'stable-call',
-      name: 'test.echo',
-      argumentsJson: '{"value":"once"}',
-    } as const;
-    const interrupted = await runtime(
+    const approved = await runtime(
       new FakeModelProvider([
-        { response: response([call]) },
-        { error: Object.assign(new Error('offline'), { code: 'ENETUNREACH' }) },
+        {
+          response: response([
+            {
+              id: 'write',
+              name: 'test.echo',
+              argumentsJson: '{"value":"write"}',
+            },
+          ]),
+        },
       ]),
-      echoTool(execute),
+      echoTool(execute, 'high_write'),
+      {
+        approval: async () => {
+          approvalController.abort();
+          return { approved: true, authorizationId: 'late-approval' };
+        },
+      },
     ).run({
-      runId: 'run-recovery',
+      runId: 'late-approval',
       trigger: 'user_input',
-      userMessage: '执行一次',
+      userMessage: '取消',
+      signal: approvalController.signal,
     });
-    expect(interrupted.state.status).toBe('failed');
-    expect(interrupted.state.receipts['stable-call']).toBeDefined();
+    expect(approved.state.status).toBe('aborted');
+    expect(execute).not.toHaveBeenCalled();
+  });
 
-    const resumed = await runtime(
+  it.each(['stream', 'approval', 'tool'] as const)(
+    'bounds an uncooperative %s and ignores its late output',
+    async (phase) => {
+      vi.useFakeTimers();
+      try {
+        let release!: () => void;
+        let entered!: () => void;
+        const started = new Promise<void>((resolve) => {
+          entered = resolve;
+        });
+        const pending = () =>
+          new Promise<void>((resolve) => {
+            release = resolve;
+            entered();
+          });
+        const emissions: unknown[] = [];
+        const execute = vi.fn(async (value: string) => {
+          if (phase === 'tool') await pending();
+          return value;
+        });
+        const scripted = new FakeModelProvider([
+          {
+            response: response([
+              {
+                id: 'pending-call',
+                name: 'test.echo',
+                argumentsJson: '{"value":"x"}',
+              },
+            ]),
+          },
+        ]);
+        const provider: ModelProvider =
+          phase === 'stream'
+            ? {
+                complete: scripted.complete.bind(scripted),
+                async *stream() {
+                  await pending();
+                  yield { type: 'text_delta', delta: 'late' };
+                  yield { type: 'done', finishReason: 'stop' };
+                },
+              }
+            : scripted;
+        const running = runtime(
+          provider,
+          echoTool(execute, phase === 'approval' ? 'high_write' : 'read'),
+          {
+            modelMode: phase === 'stream' ? 'stream' : 'complete',
+            runTimeoutMs: 5,
+            approval: async () => {
+              await pending();
+              return { approved: true, authorizationId: 'late' };
+            },
+          },
+        ).run({
+          runId: `timeout-${phase}`,
+          trigger: 'user_input',
+          userMessage: '测试',
+          onEvent: (event) => emissions.push(event),
+        });
+        await started;
+        await vi.advanceTimersByTimeAsync(6);
+        const result = await running;
+        expect(result.state.status).toBe('aborted');
+        const atFinish = JSON.stringify(emissions);
+        release();
+        await vi.advanceTimersByTimeAsync(0);
+        expect(JSON.stringify(emissions)).toBe(atFinish);
+        expect(result.state.receipts).toEqual({});
+        if (phase !== 'tool') expect(execute).not.toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
+    },
+  );
+
+  it('rejects unknown, invalid and external-sensitive calls before executing any tool', async () => {
+    const execute = vi.fn(async (value: string) => value);
+    const approval = vi.fn(async () => ({
+      approved: true,
+      authorizationId: 'approval',
+    }));
+    const provider = new FakeModelProvider([
+      {
+        response: response([
+          { id: 'unknown', name: 'missing', argumentsJson: '{}' },
+          { id: 'invalid', name: 'test.echo', argumentsJson: '{"value":7}' },
+          { id: 'external', name: 'test.echo', argumentsJson: '{"value":"x"}' },
+        ]),
+      },
+      { response: response([], 'review') },
+    ]);
+    const result = await runtime(
+      provider,
+      echoTool(execute, 'external_sensitive'),
+      { approval },
+    ).run({
+      runId: 'invalid-boundaries',
+      trigger: 'user_input',
+      userMessage: '测试',
+    });
+    expect(result.state.status).toBe('completed');
+    expect(execute).not.toHaveBeenCalled();
+    expect(approval).not.toHaveBeenCalled();
+    expect(
+      result.state.messages
+        .filter((m) => m.role === 'tool')
+        .map((m) => JSON.parse(m.content).error.code),
+    ).toEqual(['unknown_tool', 'validation_error', 'permission_required']);
+  });
+
+  it('keeps upstream error payloads out of tool messages and stream error events', async () => {
+    const provider = new FakeModelProvider([
+      {
+        response: response([
+          { id: 'failure', name: 'test.echo', argumentsJson: '{"value":"x"}' },
+        ]),
+      },
+      { response: response([], 'done') },
+    ]);
+    const result = await runtime(
+      provider,
+      echoTool(async () => {
+        throw Object.assign(new Error('credential=fixture-secret'), {
+          code: 'prompt=fixture-secret',
+          retryable: true,
+          body: 'fixture-secret',
+        });
+      }),
+    ).run({
+      runId: 'tool-privacy',
+      trigger: 'user_input',
+      userMessage: '测试',
+    });
+    expect(JSON.stringify(result)).not.toContain('fixture-secret');
+    expect(
+      result.state.messages.find((m) => m.role === 'tool')?.content,
+    ).toContain('tool_execution_error');
+    const emitted: unknown[] = [];
+    const streamed = await runtime(
       new FakeModelProvider([
-        { response: response([call]) },
-        { response: response([], '已恢复') },
+        {
+          events: [
+            {
+              type: 'error',
+              code: 'credential=fixture-secret',
+              message: 'body=fixture-secret',
+              retryable: false,
+            },
+          ],
+        },
       ]),
-      echoTool(execute),
+      undefined,
+      { modelMode: 'stream' },
     ).run({
-      runId: 'run-recovery',
+      runId: 'stream-privacy',
       trigger: 'user_input',
-      userMessage: '继续',
-      initialState: interrupted.state,
+      userMessage: '测试',
+      onEvent: (event) => emitted.push(event),
     });
-
-    expect(resumed.state.status).toBe('completed');
-    expect(execute).toHaveBeenCalledOnce();
-    expect(resumed.state.toolCallCount).toBe(1);
+    expect(streamed.state.status).toBe('failed');
+    expect(JSON.stringify(emitted)).not.toContain('fixture-secret');
   });
 
   it('bounds messages, content, and tool argument context', () => {

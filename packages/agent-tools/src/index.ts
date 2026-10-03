@@ -53,6 +53,7 @@ import {
   type WriteContext,
 } from '@workspace/application';
 import { z } from 'zod';
+import { parseInstant, parseTimeZoneId } from '@workspace/domain';
 
 const nonEmptyString = z.string().trim().min(1);
 const achievementListToolInputSchema = z
@@ -519,7 +520,8 @@ export type NaturalLanguageCapturePreview = Readonly<{
 }>;
 
 export class CapturePreviewError extends Error {
-  readonly code: 'aborted' | 'provider_error' | 'invalid_response';
+  readonly code:
+    'aborted' | 'provider_error' | 'invalid_response' | 'invalid_context';
   readonly retryable: boolean;
 
   constructor(
@@ -534,11 +536,50 @@ export class CapturePreviewError extends Error {
   }
 }
 
+const captureTimeContextSchema = z
+  .object({
+    referenceInstant: z.string().min(1).max(40),
+    timeZone: z
+      .string()
+      .min(1)
+      .max(100)
+      .regex(/^[A-Za-z][A-Za-z0-9_+-]*(?:\/[A-Za-z0-9_+-]+)*$/),
+    locale: z.string().min(1).max(64),
+  })
+  .strict();
+
+export type CaptureTimeContext = Readonly<
+  z.input<typeof captureTimeContextSchema>
+>;
+
+function validateCaptureTimeContext(
+  input: CaptureTimeContext,
+): CaptureTimeContext {
+  try {
+    const parsed = captureTimeContextSchema.parse(input);
+    const locale = Intl.getCanonicalLocales(parsed.locale)[0];
+    if (locale === undefined) throw new TypeError('A locale is required.');
+    return {
+      referenceInstant: parseInstant(parsed.referenceInstant),
+      timeZone: parseTimeZoneId(parsed.timeZone),
+      locale,
+    };
+  } catch {
+    throw new CapturePreviewError(
+      'invalid_context',
+      'Capture time context is invalid.',
+      false,
+    );
+  }
+}
+
 const captureSystemMessage = [
   'Convert only the explicit user text into one capture.preview tool call.',
   'Do not invent dates, times, durations, projects, or goals.',
   'List ambiguous or missing interpreted fields in uncertainFields.',
   'Do not complete tasks or commit schedules.',
+  'Use only the supplied capture time context for relative dates. Preserve ambiguous dates as uncertain.',
+  'A date-only deadline must stay a local date and time zone; never invent an exact deadline time.',
 ].join(' ');
 
 export class NaturalLanguageCapturePreviewer {
@@ -550,8 +591,10 @@ export class NaturalLanguageCapturePreviewer {
 
   async preview(
     text: string,
+    timeContext: CaptureTimeContext,
     signal: AgentAbortSignal,
   ): Promise<NaturalLanguageCapturePreview> {
+    const validatedContext = validateCaptureTimeContext(timeContext);
     const normalized = text.trim();
     if (normalized.length === 0 || normalized.length > 4_000) {
       throw new CapturePreviewError(
@@ -573,6 +616,11 @@ export class NaturalLanguageCapturePreviewer {
         {
           messages: [
             { role: 'system', content: captureSystemMessage },
+            {
+              role: 'system',
+              content:
+                'Capture time context: ' + JSON.stringify(validatedContext),
+            },
             { role: 'user', content: normalized },
           ],
           tools: [
@@ -605,6 +653,13 @@ export class NaturalLanguageCapturePreviewer {
         'provider_error',
         'The model provider could not create a capture preview.',
         retryable,
+      );
+    }
+    if (signal.aborted) {
+      throw new CapturePreviewError(
+        'aborted',
+        'Capture preview was aborted.',
+        true,
       );
     }
     if (

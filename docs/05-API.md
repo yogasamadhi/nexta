@@ -301,6 +301,10 @@ ModelEvent 至少包括 text_delta、tool_call_start/delta/end、usage、error�
 
 只有完整的工具参数通过 Runtime Schema 校验后才执行。流中断不能重放已完成写操作。Agent Core 只依赖通用 Model Contract，Provider SDK 留在 model-runtime。Provider 名单/凭据模式见 [DEC-005](DECISIONS.md#dec-005)。
 
+`createModelProvider` 的 complete/stream 和自定义 error mapper 均经过统一脱敏：只保留稳定 ProviderErrorCode、retryable 与允许的 category，不透传上游 message、body、cause 或任意 category/code。原生流中的 error event 同样只输出通用文案。取消后到达的 response/delta 不作为有效结果。
+
+AgentRuntime 的 run timeout/Abort 对 Provider、流、审批与 Tool 等待均有界，即使依赖忽略 signal 也结束本次运行；迟到回复不得启动工具，迟到审批不得启动写入，迟到 Tool 结果不得修改已结束运行或继续下一轮。这只停止等待，不能撤销已开始的事务或外部调用。成功收据保留；等待中写入的恢复使用宿主生成的稳定 operationId 和 Application 的 durable 幂等结果，不能把 Abort 当作“未提交”的证明。Tool 异常仅输出稳定允许错误码、retryable 与通用文案，未知异常统一为 tool_execution_error。
+
 ## 9. Agent Tool Contract
 
 ```ts
@@ -348,6 +352,10 @@ low_write 是否可自动执行必须满足 [Security](09-SECURITY.md#5-agent-to
 模型不能在 Tool Input 中提供 `WriteContext`；宿主使用 runId/toolCallId 生成稳定 operationId，并把针对该具体调用的 authorizationId 注入 Application authority。`task.update` 的展示字段可保持 low_write，任何已知排程影响字段保守升级；`scheduler.commit` 在 DEC-002 的完整 diff 风险策略交付前按 high_write 处理。`preference.update` 当前同样按 high_write 请求授权，Application 仍拒绝 Agent 修改直接用户专属的调度/Calendar scope 设置，包括 `notification.leadMinutes.v1`；Settings 的直接用户流程才可写入。
 
 自然语言 Capture 采用单独的非持久化 `capture.preview` Model Tool Schema，只输出 `CreateTaskInput` 白名单与 uncertainFields；完整校验后才展示结构化草稿。草稿本身不创建 Task，不构成完成或排程授权；确认后继续走 TaskService 与 ScheduleService。真实 Provider 与凭据方式仍见 DEC-005。
+
+Capture 的显式时间上下文 Contract 为 `preview(text, timeContext, signal)`。`timeContext` 严格只允许 `referenceInstant`（有效 ISO-8601 UTC Instant，须以 Z 结尾，规范化毫秒）、`timeZone`（宿主支持的 IANA 标识，可用 UTC，不接受数值 offset）和 `locale`（有效 BCP 47 locale，规范化大小写）。宿主在用户发起本次 Preview 时注入这些值；Previewer 不隐式读取当前时钟/设备设置。缺失、非法或额外字段在 Provider 调用前以 invalid_context 拒绝。
+
+请求包含固定 system 约束、单独的受控时间 Context system 消息、本次用户原文和 capture.preview Schema；不追加历史、Calendar 内容、Check-in 或 Secret。相对日期只能参考本次上下文，仍不把“周五/下周”等多义表达默认为已确定意图；模糊/缺失字段保留 uncertainFields。仅日期 Deadline 保留 localDate/timeZone，不能补造精确截止时刻或估时；草稿仍需直接用户确认。时间 Context 传递和脚本化输出校验不证明真实模型的中文日期解释准确率。
 
 ## 11. Error Contract
 

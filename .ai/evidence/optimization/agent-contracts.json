@@ -1,0 +1,86 @@
+{
+  "plan": "OPT-NC-20261003",
+  "package": "OPT-05",
+  "runtime": "host Vitest, no real provider",
+  "hermes": "not_executed",
+  "tests": {
+    "command": "bunx vitest run tests/unit/agent",
+    "exitCode": 0,
+    "files": 4,
+    "passed": 60
+  },
+  "coverage": [
+    {
+      "invariant": "complete/stream and fragmented tool JSON",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "executes complete streamed arguments exactly once",
+        "never executes incomplete streamed tool arguments"
+      ]
+    },
+    {
+      "invariant": "schema/unknown tool/external-sensitive floor",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "rejects unknown, invalid and external-sensitive calls before executing any tool",
+        "does not execute a write without explicit authorization"
+      ]
+    },
+    {
+      "invariant": "turn/attempted-tool/time budgets, Abort and late outputs",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "enforces turn and attempted-tool budgets",
+        "returns at the timeout even when a provider ignores abort and fences its late reply",
+        "bounds an uncooperative stream/approval/tool and ignores its late output",
+        "does not accept a completed reply or late approval after caller cancellation"
+      ]
+    },
+    {
+      "invariant": "successful tool receipts survive later complete/stream failure",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "reuses a successful receipt after complete/stream provider interruption"
+      ]
+    },
+    {
+      "invariant": "mapped/native-stream/custom-mapper privacy",
+      "file": "tests/unit/agent/model-runtime.test.ts",
+      "evidence": [
+        "sanitizes already mapped and custom mapped provider failures",
+        "sanitizes stream error events for both complete and stream callers",
+        "maps thrown native stream failures without retaining upstream fields",
+        "rejects late responses and deltas after cancellation even if the adapter ignores it"
+      ]
+    },
+    {
+      "invariant": "Tool error/code and stream error event privacy",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "keeps upstream error payloads out of tool messages and stream error events"
+      ]
+    },
+    {
+      "invariant": "host authority/operation identity, 15 Tool Matrix/risk",
+      "file": "tests/unit/agent/agent-tools.test.ts",
+      "evidence": [
+        "rejects model-supplied authority and derives write identity from the host context",
+        "registers the complete documented matrix with schemas and risk floors",
+        "upgrades scheduling-impacting Task patches conservatively"
+      ]
+    },
+    {
+      "invariant": "Context/history minimization",
+      "file": "tests/unit/agent/agent-runtime.test.ts",
+      "evidence": [
+        "does not send excluded history to the Provider context",
+        "bounds messages, content, and tool argument context"
+      ]
+    }
+  ],
+  "limits": [
+    "Abort stops waiting; already-started writes require stable Application operation identity and durable replay",
+    "Scripted fixtures do not verify real provider quality",
+    "No provider SDK, credentials, production Fake Capture or new permission selected"
+  ]
+}

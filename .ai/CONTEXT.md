@@ -96,7 +96,7 @@ Application 位于 `packages/application`；UI/Agent 共用用例，Composition 
 
 执行 OPT-NC-20261003 时不要求用户提供服务凭据；先做环境/敏感文件预检，再按 PLAN 依赖实施。允许本地测试工具和可追溯提交，不推送或发布；生产策略、Provider 选择、自动提交、备份/导出等 Open Decision 默认保持原样，相关工作只交付候选方案。
 
-完成证据必须包括实际基准、至少一个本地 Development Build 平台的 UI 旅程两次通过、完整仓库门禁与文档同步。拟新增 benchmark/UI 命令在实施前尚不存在；现有 test:e2e 继续校验物理设备证据。缺账号、runtime、身份或设备时记录具体未完成项并推进独立任务；Node/Fake 宿主测试或 bundle 不能冒充 Hermes 执行，模拟器不能冒充物理设备，Fake 不能证明真实模型质量，跳过不能计为完成，也不能据此关闭原正式 Phase。
+完成证据必须包括实际基准、至少一个本地 Development Build 平台的 UI 旅程两次通过、完整仓库门禁与文档同步。benchmark/UI 命令的当前可用性和实际执行结果见 STATUS；现有 test:e2e 继续校验物理设备证据。缺账号、runtime、身份或设备时记录具体未完成项并推进独立任务；Node/Fake 宿主测试或 bundle 不能冒充 Hermes 执行，模拟器不能冒充物理设备，Fake 不能证明真实模型质量，跳过不能计为完成，也不能据此关闭原正式 Phase。
 
 ## Verification
 
