@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "0.1.0",
+  "technicalGates": [
+    {
+      "id": "repository",
+      "command": "bun run check"
+    },
+    {
+      "id": "release-config",
+      "command": "bun run release:check"
+    },
+    {
+      "id": "device-e2e",
+      "command": "bun run test:e2e"
+    },
+    {
+      "id": "ios-build",
+      "command": "bun run build:ios"
+    },
+    {
+      "id": "android-build",
+      "command": "bun run build:android"
+    }
+  ],
+  "externalGates": [
+    {
+      "id": "product-decisions",
+      "status": "pending",
+      "evidence": null,
+      "reason": "DEC-001, DEC-005, DEC-006, DEC-007, DEC-008, DEC-009, DEC-011 and DEC-012 remain open."
+    },
+    {
+      "id": "eas-project-and-signing",
+      "status": "pending",
+      "evidence": null,
+      "reason": "Expo project ownership plus Apple and Google signing credentials require an authorized human account."
+    },
+    {
+      "id": "physical-device-e2e",
+      "status": "pending",
+      "evidence": null,
+      "reason": "Both physical iOS and Android evidence files must pass E2E-001 through E2E-005."
+    },
+    {
+      "id": "store-privacy-review",
+      "status": "pending",
+      "evidence": null,
+      "reason": "Store privacy copy, privacy policy URL and platform questionnaires require product and legal review."
+    },
+    {
+      "id": "store-identifiers",
+      "status": "pending",
+      "evidence": null,
+      "reason": "The neutral bundle/package identifiers must be confirmed available before the first signed store build."
+    }
+  ]
+}

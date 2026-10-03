@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/application",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@workspace/domain": "workspace:*",
+    "@workspace/scheduler-core": "workspace:*",
+    "@workspace/user-model": "workspace:*",
+    "zod": "4.6.2"
+  }
+}

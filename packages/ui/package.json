@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@workspace/application": "workspace:*",
+    "@workspace/domain": "workspace:*",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

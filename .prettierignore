@@ -1,0 +1,11 @@
+.ai/
+**/.expo/**
+**/.expo-export/**
+apps/mobile/android/**
+apps/mobile/assets/
+apps/mobile/expo-env.d.ts
+apps/mobile/ios/**
+docs/
+MANIFEST.md
+node_modules/
+bun.lock

@@ -1,0 +1,11 @@
+{
+  "name": "@workspace/notifications",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@workspace/application": "workspace:*",
+    "expo-notifications": "~57.0.18"
+  }
+}

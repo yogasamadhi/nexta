@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/agent-tools",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@workspace/agent-core": "workspace:*",
+    "@workspace/application": "workspace:*",
+    "@workspace/domain": "workspace:*",
+    "zod": "4.6.2"
+  }
+}

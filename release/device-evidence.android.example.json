@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "0.1.0",
+  "platform": "android",
+  "physicalDevice": true,
+  "deviceModel": "REPLACE_WITH_DEVICE_MODEL",
+  "osVersion": "REPLACE_WITH_OS_VERSION",
+  "buildProfile": "preview",
+  "buildIdentifier": "REPLACE_WITH_EAS_BUILD_ID_OR_ARTIFACT_HASH",
+  "observedAt": "REPLACE_WITH_ISO_8601_INSTANT",
+  "tester": "REPLACE_WITH_TESTER",
+  "cases": [
+    {
+      "id": "E2E-001",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "E2E-002",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "E2E-003",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "E2E-004",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "E2E-005",
+      "status": "pending",
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": []
+  },
+  "include": [
+    "packages/agent-core/src/**/*",
+    "packages/agent-tools/src/**/*",
+    "packages/application/src/**/*",
+    "packages/domain/src/**/*",
+    "packages/scheduler-core/src/**/*",
+    "packages/user-model/src/**/*"
+  ],
+  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/node_modules/**"]
+}

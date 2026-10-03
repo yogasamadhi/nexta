@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-10-03T06:01:29.909547+00:00",
+  "plan": "OPT-NC-20261003",
+  "tools": {
+    "bun": "1.4.0",
+    "node": "24.18.0",
+    "xcode": "27.0 (27A266a)",
+    "java": "Corretto 21.0.7"
+  },
+  "iosRuntimes": [
+    "18.3.1",
+    "27.0"
+  ],
+  "bootedSimulator": false,
+  "maestroInPath": false,
+  "adbInPath": false,
+  "gitIdentityConfigured": true,
+  "initialGitState": "main; unborn HEAD; 308 candidate files",
+  "credentialPatternScan": {
+    "candidateFiles": 308,
+    "findings": 0,
+    "categories": [
+      "private-key",
+      "provider-key",
+      "github-token",
+      "credential-file"
+    ],
+    "limitation": "Pattern-based candidate-file review; not a security certification"
+  },
+  "isolation": {
+    "rawArtifacts": ".artifacts/optimization/",
+    "structuredSyntheticEvidence": ".ai/evidence/optimization/",
+    "devicePolicy": "Use a dedicated simulator and synthetic task data; never erase an existing user sandbox"
+  }
+}
