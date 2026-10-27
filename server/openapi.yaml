@@ -1,0 +1,422 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+  title: Cloud API
+  version: 0.0.1
+paths:
+  /v1/auth/login:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.AuthRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Tokens'
+  /v1/auth/logout:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.Empty'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Empty'
+  /v1/auth/refresh:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Tokens'
+  /v1/auth/register:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.AuthRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Tokens'
+  /v1/devices:
+    get:
+      tags:
+        - Cloud
+      operationId: Cloud_ListDevices
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Devices'
+  /v1/devices/{id}:
+    delete:
+      tags:
+        - Cloud
+      operationId: Cloud_RevokeDevice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Empty'
+  /v1/me:
+    get:
+      tags:
+        - Cloud
+      operationId: Cloud_Me
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.User'
+  /v1/sync/bootstrap:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Bootstrap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.BootstrapRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.BootstrapResponse'
+  /v1/sync/conflicts:
+    get:
+      tags:
+        - Cloud
+      operationId: Cloud_ListConflicts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Conflicts'
+  /v1/sync/conflicts/{id}/resolve:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Resolve
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.ResolveRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.PushResponse'
+  /v1/sync/pull:
+    get:
+      tags:
+        - Cloud
+      operationId: Cloud_Pull
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.PullResponse'
+  /v1/sync/push:
+    post:
+      tags:
+        - Cloud
+      operationId: Cloud_Push
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cloud.v1.Batch'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.PushResponse'
+  /v1/sync/status:
+    get:
+      tags:
+        - Cloud
+      operationId: Cloud_SyncStatus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cloud.v1.Status'
+components:
+  schemas:
+    cloud.v1.AuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        installationId:
+          type: string
+        deviceName:
+          type: string
+    cloud.v1.Batch:
+      type: object
+      properties:
+        schemaVersion:
+          type: integer
+          format: uint32
+        batchId:
+          type: string
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+    cloud.v1.BootstrapRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+        page:
+          type: integer
+          format: int32
+        chunkCount:
+          type: integer
+          format: int32
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+        batchId:
+          type: string
+    cloud.v1.BootstrapResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        revision:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+        hasMore:
+          type: boolean
+        conflictId:
+          type: string
+    cloud.v1.Commit:
+      type: object
+      properties:
+        revision:
+          type: string
+        batchId:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+    cloud.v1.Conflict:
+      type: object
+      properties:
+        id:
+          type: string
+        batchId:
+          type: string
+        status:
+          type: string
+        local:
+          $ref: '#/components/schemas/cloud.v1.Batch'
+        remote:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+    cloud.v1.Conflicts:
+      type: object
+      properties:
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Conflict'
+    cloud.v1.Device:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        revoked:
+          type: boolean
+    cloud.v1.Devices:
+      type: object
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Device'
+    cloud.v1.Empty:
+      type: object
+      properties: {}
+    cloud.v1.Entity:
+      type: object
+      properties:
+        kind:
+          type: string
+        key:
+          type: string
+        version:
+          type: string
+        ownerDeviceId:
+          type: string
+        value:
+          type: object
+      description: All business documents are validated against contracts/entities.json before use.
+    cloud.v1.PullResponse:
+      type: object
+      properties:
+        cursor:
+          type: string
+        commits:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Commit'
+        hasMore:
+          type: boolean
+    cloud.v1.PushResponse:
+      type: object
+      properties:
+        revision:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/cloud.v1.Entity'
+        conflictId:
+          type: string
+    cloud.v1.RefreshRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    cloud.v1.ResolveRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        choice:
+          type: string
+        replacement:
+          $ref: '#/components/schemas/cloud.v1.Batch'
+    cloud.v1.Status:
+      type: object
+      properties:
+        revision:
+          type: string
+        schemaVersion:
+          type: integer
+          format: uint32
+    cloud.v1.Tokens:
+      type: object
+      properties:
+        userId:
+          type: string
+        deviceId:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+        email:
+          type: string
+    cloud.v1.User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+tags:
+  - name: Cloud

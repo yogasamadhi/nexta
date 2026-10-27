@@ -241,6 +241,8 @@ describe('Phase 3 durable external mutation intents', () => {
           '0006_phase6_agent_runs',
           '0007_phase7_user_model_features',
           '0008_phase8_wellbeing',
+          '0009_cloud_sync',
+          '0010_cloud_bootstrap',
         ],
         alreadyApplied: through0002.map((migration) => migration.id),
       },

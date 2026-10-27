@@ -1,0 +1,12 @@
+Use case: logo-brand
+Asset type: standalone mobile app icon, full square canvas
+Primary request: Create a fresh original logo for a mobile-first, local-first AI personal execution assistant whose philosophy is plan the future, focus on the present, and see real growth.
+Concept: the next step. A compact geometric abstract N made from two broad upright segments joined by a clean diagonal path, with a small detached mint point near the leading upper-right end representing the current action. Use an architectural, forward-moving silhouette with softly eased corners rather than a looping or serpentine route. Calm, confident, quietly optimistic.
+Style/medium: minimal flat vector-style graphic, precise edges, balanced negative space, strong small-size recognition, professional identity design
+Scene/backdrop: uniform deep emerald green (#064E3B), full bleed to all four square edges
+Subject: one warm ivory (#F2EEE6) geometric path mark and one mint (#A7F3D0) leading point
+Composition/framing: one centered symbol occupying approximately 58 percent of the canvas, generous balanced safe-area padding, clean front view, broad shapes and open gaps readable at 32 pixels
+Lighting/mood: flat colors, calm, focused, reassuring
+Text: no text or wordmark
+Constraints: one finished icon; full square background without pre-rounded outer corners; only the three specified flat colors; no presentation board or mockup
+Avoid: generic checkmark, calendar grid, clock, literal shoe or footprint, robot, brain, sparkle, flower, infinity loop, thin lines, intricate details, gradients, 3D, gloss, texture, shadows, border, watermark, captions

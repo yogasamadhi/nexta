@@ -1,0 +1,11 @@
+Use case: logo-brand
+Asset type: standalone mobile app icon and logo concept, square canvas
+Primary request: Create an original, polished logo for a personal execution assistant whose philosophy is "plan the future, focus on the present, see your growth". The concept is "the next step": a clear abstract capital N formed by a broad, continuous, rounded route, conveying calm forward movement and steady progress. A small detached circular point at the leading upper-right end represents the one action to focus on now.
+Style/medium: minimal flat vector-style graphic, precise smooth geometry, strong silhouette, balanced negative space, professional identity design
+Scene/backdrop: uniform deep emerald green (#064E3B) covering the entire square canvas edge to edge
+Subject: one warm ivory (#F2EEE6) route-like N symbol with a small mint (#A7F3D0) leading point; visually cohesive, recognizable at small app-icon sizes
+Composition/framing: single centered symbol, occupying approximately 58 percent of the canvas, with generous and balanced safe-area padding; clean front view
+Lighting/mood: flat graphic color, calm, focused, reassuring
+Text: no text, no wordmark, no letters other than the abstract N-shaped symbol
+Constraints: deliver one finished icon, no presentation board or mockup; full square background, no pre-rounded outer corners; broad strokes and clear gaps; visually distinct from existing productivity app logos
+Avoid: generic checkmark, calendar grid, clock face, literal shoe or footprint, robot, brain, sparkle, flower, infinity loop, intricate details, gradients, 3D, gloss, texture, shadows, border, watermark, captions

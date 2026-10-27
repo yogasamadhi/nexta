@@ -220,7 +220,7 @@ Calendar/Notification Provider 也必须有宿主注入的有界调用时间。�
 
 V1 SQLite 整体加密、系统备份与导出/恢复政策在发布前评审，统一跟踪 [DEC-009](DECISIONS.md#dec-009)。未验证前不宣称数据已加密或可恢复。
 
-`release/store-privacy.json` 只是与当前 `0.1.0` 二进制边界同步的双语商店文案草案，不是法律审查、公开 Privacy Policy 或平台问卷答案。当前草案必须明确：无生产远程模型、无云同步、无 production OTA、无应用层业务数据库加密、无用户导出/恢复；Calendar 仅在授权后读取有限 Busy 并维护 App-owned 对象。DEC-005/008/009/012 或签名二进制能力变化时必须重新审查，不得沿用旧声明。
+`release/store-privacy.json` 只是与当前 `0.1.0` 二进制边界同步的双语商店文案草案，不是法律审查、公开 Privacy Policy 或平台问卷答案。当前草案必须明确：无生产远程模型、内部账号登录后上传同步业务事实、无 production OTA、无应用层业务数据库加密、无用户导出/恢复；Calendar 仅在授权后读取有限 Busy 并维护 App-owned 对象。DEC-005/008/009/012 或签名二进制能力变化时必须重新审查，不得沿用旧声明。
 
 无论是否 DB encryption：
 
@@ -295,3 +295,11 @@ Full model response（默认）
 - External Calendar Write；
 - Export / Backup；
 - Cross-device identity。
+
+## 13. Internal Cloud Account Boundary
+
+[ADR-0010](ADR/0010-local-first-cloud-sync.md) 新增账号隔离的远端事实存储边界。登录前说明完整上传范围并由明确登录动作授权；其他应用、模型或外部文本不能开启同步。服务端从认证会话确定 user/device，每次请求核对撤销，SQL 引用携带 user_id。注册默认关闭，内部开发可显式启用；未验证邮箱、不提供找回密码的本轮交付不作为公开账号系统发布。
+
+密码只保存 Argon2id 摘要；刷新令牌只保存摘要并轮换，移动凭据按 origin/account 存 SecureStore。生产传输要求 HTTPS；本地开发允许显式 HTTP。没有端到端加密，不能暗示服务器无法读取已同步内容。源计划与操作来源仅是事实出处，不能提供 authority。
+
+退出/切账号停止旧网络代际；未采用同步分支保留受账号隔离保护的证据，不进入日志或模型。外部 Busy 内容、OS 标识/绑定/作业/意图、完整幂等收据及 Secret 不进入同步字段清单。原 DEC-009 的数据库加密、备份/导出及法律评审仍 Open，不因已有复制协议宣称备份 SLA 或正式数据恢复保证。

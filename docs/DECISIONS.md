@@ -65,7 +65,7 @@
 
 学习候选 A：只展示事实与置信度，不影响排程；候选 B：用户开启后，以充分样本的估时偏差或时段完成分布影响有界软评分，设置最大影响幅度和解释/关闭入口。Check-in 是单次主观软信号，可用作用户可关闭的低影响参考，不得生成诊断或强制降负荷。分类来源、样本阈值、窗口、置信度算法与权重都由 DEC-007 定稿；缺样本/关闭开关维持中性。
 
-验收：固定输入重跑确定性；锁定/开始/完成块保护；硬约束优先于软偏好；跨时区/DST 与空容量可解释；关掉学习后恢复中性输出，缺样本不改变权重。最小输入：词表/顺序、拆分默认、policy 语义、窗口硬/软取舍、容量提示阈值、统计窗口/置信度和最大影响幅度。不能用本地 Bun 时间测量推断手机 SLA。
+验收：固定输入重跑确定性；锁定/开始/完成块保护；硬约束优先于软偏好；跨时区/DST 与空容量可解释；关掉学习后恢复中性输出，缺样本不改变权重。最小输入：词表/顺序、拆分默认、policy 语义、窗口硬/软取舍、容量提示阈值、统计窗口/置信度和最大影响幅度。不能用本地 Node 时间测量推断手机 SLA。
 
 ### DEC-002 — Foreground coalescing and commit safety
 
@@ -107,11 +107,13 @@ Android source/account 候选：由权限后的实际只读来源列表供用户
 
 - 决策日期：2026-09-12。
 - 结论：采用 Expo `57.0.22`、React Native `0.86.3`、React `19.2.3`；UI 基线采用 gluestack core `5.0.15`、NativeWind `5.0.0-preview.4`、react-native-css `3.0.7`、Tailwind CSS `4.2.0`，并锁定 lightningcss `1.30.1`；Runtime Schema 采用 Zod `4.6.2`。
-- 包管理约束：Bun 使用 hoisted linker，精确解析结果保存在 `bun.lock`；NativeWind 仍是 preview 版本，因此升级前不得放宽其精确版本约束。
+- 包管理约束：pnpm 使用 hoisted node_modules 布局（`nodeLinker: hoisted`），精确解析结果保存在 `pnpm-lock.yaml`；NativeWind 仍是 preview 版本，因此升级前不得放宽其精确版本约束。
 - 验证依据：`expo install --check` 无版本偏差，`expo-doctor` 21/21 通过；iOS/Android Hermes Bundle 均成功；iOS Development Build 在模拟器完成编译、签名、安装和页面加载；Android arm64 Debug Development Build 成功生成 APK，另有默认四 ABI 构建通过记录。
-- 后续规则：任何影响该组合的升级必须重新运行 `bun run check`、`expo install --check`、`expo-doctor` 以及对应平台原生 Development Build；验证事实汇总于 [STATUS](../.ai/STATUS.md)。
+- 后续规则：任何影响该组合的升级必须重新运行 `pnpm run check`、`expo install --check`、`expo-doctor` 以及对应平台原生 Development Build；验证事实汇总于 [STATUS](../.ai/STATUS.md)。
 
 兼容维护（2026-10-03）：iOS 27 SDK 要求 Scene lifecycle，现有标准 Swift AppDelegate 通过 SDK 57 的 `expo-build-properties` / `ios.enableSceneSupport` 生成 Scene 配置，按 Expo SDK 57 检查对齐兼容 patch；不改变 RN、React、UI 或 Runtime Schema 组合。历史关闭记录保留，当前精确版本以 manifest / lockfile 为准，完整仓库门禁、Expo 版本检查/doctor 和两平台本地 Debug Build 的实际结果在 STATUS 汇总。此维护不选择新框架或产品策略，也不表示 UI/物理设备验收完成。依据：[Expo Scene lifecycle 说明](https://github.com/expo/fyi/blob/main/ios-scene-lifecycle.md)、[Apple Scene lifecycle 文档](https://developer.apple.com/documentation/uikit/transitioning-to-the-uikit-scene-based-life-cycle)。
+
+兼容维护（2026-10-23，主版本升级）：按“主版本升级需重新验证”的规则把 Expo 基线从 SDK 57 升到 SDK 58。新的机器事实源为 Expo `58.0.17`、React Native `0.88.0`、React `19.3.0`；NativeWind 升到 `5.0.0-rc.0`、react-native-css 升到 `3.1.0-rc.0`（仍是精确版本约束，不放宽为范围），gluestack core `5.0.15`、Tailwind CSS `4.2.0`、lightningcss `1.30.1` 与 Zod `4.6.2` 保持不变。SDK 58 默认启用 UIKit scene lifecycle，因此移除 `expo-build-properties` 的 `ios.enableSceneSupport` 配置与该依赖；同时按 react-native-screens 的要求把 `UIViewControllerBasedStatusBarAppearance` 设为 YES，状态栏样式改由 View Controller 决定。react-native-css 3.1 起拒绝 class-qualified `:root` 选择器，主题只保留 `:root` 与 `@media (prefers-color-scheme: dark)`。`expo-sqlite` 移除 libSQL 能力、`expo-router` 导航内核变化、RN 0.88 Strict TypeScript API 默认开启与被移除的 RN API 属于本次升级的兼容评估范围，评估结论与实际门禁、原生构建证据汇总于 STATUS。本次升级不改变产品范围、Runtime Schema 组合或发布策略，也不表示物理设备验收完成。
 
 ## Decision Record Template
 
@@ -124,3 +126,19 @@ ID / Status
 结论与验证依据
 规范 / ADR / 验收场景链接
 ```
+
+## <a id="dec-013"></a>DEC-013 — 内部账号与 Local-first 同步扩展
+
+**Status:** Closed (2026-10-25)。负责人：用户直接确认。采用 Kratos v3 / sqlc+pgx / PostgreSQL 18；保留 Local-first，同时接入移动端。完整业务事实登录后自动同步，冲突人工处理，活跃专注/放松仅发起设备可操作，每设备单独开启 OS 投影。邮箱密码仅注册/登录及会话，不含验证/找回；只验收本地联调。本条批准新增范围，不关闭 DEC-005/007/009/011/012，不表示实现完成或授权公网发布。架构与影响见 ADR-0010、REQ-AUTH-001、REQ-SYNC-001。
+
+## <a id="dec-014"></a>DEC-014 — 包管理与脚本运行时从 Bun 迁移到 pnpm + Node
+
+**Status:** Closed (2026-10-26)。负责人：用户直接要求“不再使用 bun，使用 pnpm 替代”。
+
+- 问题与选择：仓库原以 Bun 作为包管理器、脚本运行器和 TypeScript 脚本运行时（`bun run`、`bunx`、`bun run.ts`、`bun:sqlite`、`Bun.spawn`）。迁移到 pnpm 11 作为唯一包管理器与脚本入口，Node 24 作为仓库脚本运行时，TypeScript 脚本通过 `tsx` 执行。
+- 结论：`bun.lock` / `bunfig.toml` / `@types/bun` 全部移除，新增 `pnpm-workspace.yaml`（`packages: apps/*, packages/*`）与 `pnpm-lock.yaml`；`nodeLinker: hoisted` 保持与原 Bun hoisted 布局一致的扁平 `node_modules`，避免 Expo/Metro/CocoaPods/Gradle 的原生解析路径变化；`lightningcss` 锁定 `1.30.1` 的约束迁移为 pnpm `overrides`（否则 react-native-css 编译会与原生绑定版本不匹配而失败）。仓库脚本从 Bun API 迁移到 Node API：`Bun.spawn` → `node:child_process`、`Bun.file` → `node:fs`、`Bun.sleep` → `node:timers/promises`、`bun:sqlite` → `node:sqlite`、`import.meta.dir` → 由 `import.meta.url` 推导；跨脚本公共逻辑收敛到 `scripts/lib/runtime.ts`。
+- 影响的需求与实施阶段：不改变任何 Requirement、Acceptance Criteria、Phase Exit 或产品范围；影响的是开发工具链、CI 与文档命令表述。
+- 补充决定（2026-10-26，用户直接要求“仅仅根目录运行项目的脚本使用 python，其他地方应该使用 nodejs 脚本的不要变”）：根目录交互入口由 `run.ts` 改为 `run.py`（`python3 run.py [--port 8081]`），删除原 TypeScript 入口；`package.json` 的 pnpm 脚本面保持全部为 Node/pnpm 命令，根入口直接以 `python3 run.py` 调用，不加入 Python 别名；`scripts/` 下的仓库门禁、测试与工具脚本保持 TypeScript，由 `tsx` 在 Node 24 下执行，不做语言替换。根入口的 App identity 改由 `expo config --type public --json` 读取，端口探测改用 Python `socket`，其余行为（复用/启动 `--offline` dev-client Metro、校验 manifest 项目路径、打开 iOS 模拟器与 Development Build、Ctrl+C 结束本次启动的 Metro）与原实现一致。
+- 生效前默认行为：迁移完成前以 Bun 为准；迁移后所有命令以 pnpm 为准，不再保留 Bun 回退路径。
+- 结论与验证依据：`pnpm install --frozen-lockfile` 在 CI 可复现；`pnpm run check` 全量通过（format、lint、typecheck、unit、architecture、integration、docs、release、server check、双平台 production Hermes bundle export）；`expo install --check` 与 `expo-doctor` 20/20；iOS/Android 原生 Debug Build 与 iOS Simulator 实际启动证据见 STATUS。
+- 规范链接：ADR-0001（移动端基线）、DEC-004（依赖基线与升级规则）、[STATUS](../.ai/STATUS.md)。

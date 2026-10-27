@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-12",
+  "status": "candidate",
+  "mode": "imagegen CLI fallback",
+  "model": "gpt-image-2",
+  "requested": {
+    "size": "1024x1024",
+    "quality": "medium",
+    "n": 1,
+    "output_format": "png"
+  },
+  "generation_seconds": 44.2,
+  "prompt_file": "execution-agent-logo-v1.prompt.txt",
+  "command": "python3 /Users/h/.codex/skills/.system/imagegen/scripts/image_gen.py generate --model gpt-image-2 --prompt-file output/imagegen/execution-agent-logo-v1.prompt.txt --size 1024x1024 --quality medium --output-format png --out output/imagegen/execution-agent-logo-v1.png --no-augment",
+  "postprocessing": {
+    "library": "Pillow",
+    "source": "execution-agent-logo-v1-generated.png",
+    "steps": [
+      "Extract two source foreground masks using alpha >= 170 and green-red > 20 for the mint point.",
+      "Smooth each mask with Gaussian blur radius 4, threshold at 128, then Gaussian blur radius 0.7 for antialiasing.",
+      "Crop the combined masks and resize proportionally to a maximum foreground edge of 600 pixels using Lanczos.",
+      "Center the mark on a 1024x1024 transparent canvas and apply flat ivory/mint colors.",
+      "Composite onto a full emerald square for the RGB app-icon export.",
+      "Create rounded-corner presentation and 32/48/64/96-pixel inspection previews."
+    ],
+    "palette": {
+      "background": "#064E3B",
+      "path": "#F2EEE6",
+      "point": "#A7F3D0"
+    },
+    "origin": "Contours derived from the API-generated image; no substitute SVG or manually drawn symbol."
+  },
+  "assets": [
+    {
+      "file": "execution-agent-logo-v1-generated.png",
+      "size": [1254, 1254],
+      "mode": "RGBA",
+      "bytes": 661056,
+      "sha256": "64fd6d1b72ac2de8c6c08e886185dc801e1a130e25cd7e470e6bd8484b5cea37"
+    },
+    {
+      "file": "execution-agent-logo-v1.png",
+      "size": [1024, 1024],
+      "mode": "RGB",
+      "bytes": 34601,
+      "sha256": "71badba4c8f06867ab87bbc57ccbe207e566ebf6ad1798c87be842b7ea3f92eb"
+    },
+    {
+      "file": "execution-agent-mark-v1.png",
+      "size": [1024, 1024],
+      "mode": "RGBA",
+      "bytes": 27772,
+      "sha256": "346a328ad7c84f031e9942840216caff43f2edd810931062d155c7abda24eee2"
+    },
+    {
+      "file": "execution-agent-logo-v1-preview.png",
+      "size": [560, 560],
+      "mode": "RGB",
+      "bytes": 16835,
+      "sha256": "42e23e28bf7b89f368bbbc74c661123e6511f86d01deb77079493c5fd2acb1ae"
+    },
+    {
+      "file": "execution-agent-logo-v1-size-review.png",
+      "size": [760, 280],
+      "mode": "RGB",
+      "bytes": 17599,
+      "sha256": "6872a58d2288c7b34f3f2fc3769d571c7782d6d13a675d048c7a9debe57d7aa9"
+    }
+  ],
+  "limitations": [
+    "Candidate identity; final brand remains DEC-003.",
+    "Raster assets, not an editable vector master.",
+    "App configuration and installed launcher icon were not changed."
+  ]
+}

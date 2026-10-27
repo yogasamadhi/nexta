@@ -6,6 +6,6 @@
   "exports": "./src/index.ts",
   "dependencies": {
     "@workspace/application": "workspace:*",
-    "expo-calendar": "~57.0.3"
+    "expo-calendar": "~58.0.6"
   }
 }

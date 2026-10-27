@@ -17,7 +17,7 @@
 
 V1 采用：
 
-- Expo SDK 57
+- Expo SDK 58
 - React Native
 - Hermes
 - Expo Router

@@ -1,0 +1,43 @@
+syntax = "proto3";
+package cloud.v1;
+option go_package = "personal-execution/server/sync/v1;v1";
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+// All business documents are validated against contracts/entities.json before use.
+message Entity { string kind = 1; string key = 2; string version = 3; string owner_device_id = 4; google.protobuf.Struct value = 5; }
+message Batch { uint32 schema_version = 1; string batch_id = 2; repeated Entity changes = 3; }
+message AuthRequest { string email = 1; string password = 2; string installation_id = 3; string device_name = 4; }
+message Tokens { string user_id = 1; string device_id = 2; string access_token = 3; string refresh_token = 4; int32 expires_in = 5; string email = 6; }
+message RefreshRequest { string refresh_token = 1; }
+message Empty {}
+message User { string id = 1; string email = 2; }
+message Device { string id = 1; string name = 2; bool revoked = 3; }
+message Devices { repeated Device devices = 1; }
+message DeviceRequest { string id = 1; }
+message PushResponse { string revision = 1; repeated Entity entities = 2; string conflict_id = 3; }
+message PullRequest { string cursor = 1; int32 limit = 2; }
+message Commit { string revision = 1; string batch_id = 2; repeated Entity entities = 3; }
+message PullResponse { string cursor = 1; repeated Commit commits = 2; bool has_more = 3; }
+message Status { string revision = 1; uint32 schema_version = 2; }
+message BootstrapRequest { string id = 1; string action = 2; int32 page = 3; int32 chunk_count = 4; repeated Entity entities = 5; string batch_id = 6; }
+message BootstrapResponse { string id = 1; string revision = 2; repeated Entity entities = 3; bool has_more = 4; string conflict_id = 5; }
+message Conflict { string id = 1; string batch_id = 2; string status = 3; Batch local = 4; repeated Entity remote = 5; }
+message Conflicts { repeated Conflict conflicts = 1; }
+message ResolveRequest { string id = 1; string choice = 2; Batch replacement = 3; }
+
+service Cloud {
+ rpc Register(AuthRequest) returns (Tokens) { option (google.api.http) = {post:"/v1/auth/register" body:"*"}; }
+ rpc Login(AuthRequest) returns (Tokens) { option (google.api.http) = {post:"/v1/auth/login" body:"*"}; }
+ rpc Refresh(RefreshRequest) returns (Tokens) { option (google.api.http) = {post:"/v1/auth/refresh" body:"*"}; }
+ rpc Logout(Empty) returns (Empty) { option (google.api.http) = {post:"/v1/auth/logout" body:"*"}; }
+ rpc Me(Empty) returns (User) { option (google.api.http) = {get:"/v1/me"}; }
+ rpc ListDevices(Empty) returns (Devices) { option (google.api.http) = {get:"/v1/devices"}; }
+ rpc RevokeDevice(DeviceRequest) returns (Empty) { option (google.api.http) = {delete:"/v1/devices/{id}"}; }
+ rpc Push(Batch) returns (PushResponse) { option (google.api.http) = {post:"/v1/sync/push" body:"*"}; }
+ rpc Pull(PullRequest) returns (PullResponse) { option (google.api.http) = {get:"/v1/sync/pull"}; }
+ rpc SyncStatus(Empty) returns (Status) { option (google.api.http) = {get:"/v1/sync/status"}; }
+ rpc Bootstrap(BootstrapRequest) returns (BootstrapResponse) { option (google.api.http) = {post:"/v1/sync/bootstrap" body:"*"}; }
+ rpc ListConflicts(Empty) returns (Conflicts) { option (google.api.http) = {get:"/v1/sync/conflicts"}; }
+ rpc Resolve(ResolveRequest) returns (PushResponse) { option (google.api.http) = {post:"/v1/sync/conflicts/{id}/resolve" body:"*"}; }
+}

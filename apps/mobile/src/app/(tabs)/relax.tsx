@@ -70,6 +70,24 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   const [finished, setFinished] = useState<RelaxSession | null>(null);
   const [now, setNow] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [canControl, setCanControl] = useState(true);
+  useEffect(() => {
+    let live = true;
+    if (!session) {
+      void Promise.resolve().then(() => {
+        if (live) setCanControl(true);
+      });
+      return;
+    }
+    void runtime.cloudAccount
+      .canControl('relax_session', session.id)
+      .then((owned) => {
+        if (live) setCanControl(owned);
+      });
+    return () => {
+      live = false;
+    };
+  }, [runtime, session]);
   const [loading, setLoading] = useState(true);
   const [focused, setFocused] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -209,7 +227,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
         >
           <View>
             <Text className="text-center text-sm font-medium uppercase tracking-widest text-emerald-200">
-              短暂恢复
+              {canControl ? '短暂恢复' : '另一台设备的放松 · 只读'}
             </Text>
             <Text className="mt-8 text-center text-4xl font-semibold text-white">
               {options.find((option) => option.type === session.type)?.title ??
@@ -237,7 +255,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl bg-white py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void end('completed')}
             >
               <Text className="font-semibold text-emerald-950">结束放松</Text>
@@ -245,7 +263,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center py-3"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void end('abandoned')}
             >
               <Text className="font-medium text-emerald-300">现在离开</Text>
@@ -280,7 +298,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           <Pressable
             accessibilityRole="button"
             className="mt-4 items-center rounded-2xl bg-stone-950 py-4"
-            disabled={busy}
+            disabled={busy || !canControl}
             onPress={() => void returnToTask()}
           >
             <Text className="font-semibold text-white">
@@ -290,7 +308,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           <Pressable
             accessibilityRole="button"
             className="items-center rounded-2xl border border-stone-300 py-4"
-            disabled={busy}
+            disabled={busy || !canControl}
             onPress={() => void start(finished.type, finished.plannedMinutes)}
           >
             <Text className="font-semibold text-stone-900">再休息一会</Text>
@@ -298,7 +316,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
           <Pressable
             accessibilityRole="button"
             className="items-center rounded-2xl border border-stone-300 py-4"
-            disabled={busy}
+            disabled={busy || !canControl}
             onPress={() => void adjustToday()}
           >
             <Text className="font-semibold text-stone-900">调整今天</Text>
@@ -323,7 +341,7 @@ function RelaxContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             accessibilityRole="button"
             key={option.type}
             className="rounded-3xl border border-stone-200 bg-white p-5"
-            disabled={busy}
+            disabled={busy || !canControl}
             onPress={() => void start(option.type, option.minutes)}
           >
             <Text className="text-xl font-semibold text-stone-950">

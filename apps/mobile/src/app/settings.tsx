@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { RuntimeScreen } from '@/components/runtime-screen';
 import { shiftLocalDate, userFacingError } from '@/presentation/mobile-format';
 import {
@@ -418,6 +419,12 @@ function SettingsContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
       className="flex-1 bg-stone-100"
       contentContainerClassName="gap-6 px-5 pb-12 pt-5"
     >
+      <Link
+        href="/account"
+        className="mb-4 rounded-2xl bg-white p-4 text-lg text-emerald-800"
+      >
+        账号、云端同步与设备提醒
+      </Link>
       <View className="rounded-3xl bg-white p-5">
         <Text className="text-xl font-semibold text-stone-950">排程边界</Text>
         <Text className="mt-2 leading-6 text-stone-500">

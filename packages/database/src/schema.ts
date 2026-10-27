@@ -489,7 +489,68 @@ export const phase1CompletionRecords = sqliteTable(
   ],
 );
 
-export const completionRecords = sqliteTable(
+export const cloudPlanOrigins = sqliteTable('cloud_plan_origins', {
+  id: text('id').primaryKey(),
+  originDeviceId: text('origin_device_id').notNull(),
+  sourceRevision: integer('source_revision').notNull(),
+  committedAt: text('committed_at').notNull(),
+  schedulerVersion: text('scheduler_version').notNull(),
+  policyVersion: text('policy_version').notNull(),
+  timeZone: text('time_zone').notNull(),
+  reason: text('reason').notNull(),
+  affectedBlockIds: text('affected_block_ids', { mode: 'json' }).notNull(),
+});
+
+export const cloudProfileClaim = sqliteTable('cloud_profile_claim', {
+  sourceName: text('source_name').primaryKey(),
+  userId: text('user_id').notNull(),
+});
+
+export const operationProvenance = sqliteTable('operation_provenance', {
+  id: text('id').primaryKey(),
+  command: text('command').notNull(),
+  occurredAt: text('occurred_at').notNull(),
+  deviceId: text('device_id').notNull().default('legacy'),
+});
+
+export const cloudSyncState = sqliteTable('cloud_sync_state', {
+  id: integer('id').primaryKey(),
+  deviceId: text('device_id').notNull(),
+  userId: text('user_id'),
+  cursor: text('cursor').notNull().default('0'),
+  projectionEnabled: integer('projection_enabled', { mode: 'boolean' })
+    .notNull()
+    .default(false),
+});
+export const cloudSyncBootstrap = sqliteTable('cloud_sync_bootstrap', {
+  id: integer('id').primaryKey(),
+  remoteId: text('remote_id').notNull().default(''),
+  revision: text('revision').notNull().default('0'),
+  nextPage: integer('next_page').notNull().default(0),
+  entitiesJson: text('entities_json').notNull().default('[]'),
+  complete: integer('complete').notNull().default(0),
+});
+export const cloudSyncVersions = sqliteTable('cloud_sync_versions', {
+  entityKey: text('entity_key').primaryKey(),
+  version: text('version').notNull(),
+  ownerDeviceId: text('owner_device_id').notNull(),
+  valueJson: text('value_json').notNull(),
+});
+export const cloudSyncOutbox = sqliteTable('cloud_sync_outbox', {
+  sequence: integer('sequence').primaryKey({ autoIncrement: true }),
+  batchId: text('batch_id').notNull().unique(),
+  payloadJson: text('payload_json').notNull(),
+  status: text('status').notNull().default('pending'),
+  conflictId: text('conflict_id'),
+});
+export const cloudSyncConflicts = sqliteTable('cloud_sync_conflicts', {
+  id: text('id').primaryKey(),
+  localJson: text('local_json').notNull(),
+  remoteJson: text('remote_json').notNull(),
+  status: text('status').notNull().default('open'),
+});
+
+export const phase5CompletionRecords = sqliteTable(
   'completion_records',
   {
     id: text('id').primaryKey(),
@@ -509,6 +570,70 @@ export const completionRecords = sqliteTable(
     operationId: text('operation_id')
       .notNull()
       .references(() => operationRecords.operationId, {
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      }),
+    completedAt: text('completed_at').notNull(),
+    taskTitleSnapshot: text('task_title_snapshot').notNull(),
+    actualDurationSeconds: real('actual_duration_seconds'),
+    durationCoverage: text('duration_coverage', {
+      enum: durationCoverageValues,
+    }).notNull(),
+    achievementDisposition: text('achievement_disposition', {
+      enum: achievementDispositionValues,
+    }).notNull(),
+    source: text('source', { enum: completionSourceValues }).notNull(),
+  },
+  (table) => [
+    uniqueIndex('completion_records_task_id_unique').on(table.taskId),
+    uniqueIndex('completion_records_operation_id_unique').on(table.operationId),
+    check(
+      'completion_records_title_nonempty',
+      sql`length(trim(${table.taskTitleSnapshot})) > 0`,
+    ),
+    check(
+      'completion_records_duration_nonnegative',
+      sql`${table.actualDurationSeconds} is null or ${table.actualDurationSeconds} >= 0`,
+    ),
+    check(
+      'completion_records_coverage_has_duration',
+      sql`${table.durationCoverage} = 'unknown' or ${table.actualDurationSeconds} is not null`,
+    ),
+    check(
+      'completion_records_coverage_valid',
+      sql`${table.durationCoverage} in ('complete', 'partial', 'unknown')`,
+    ),
+    check(
+      'completion_records_disposition_valid',
+      sql`${table.achievementDisposition} in ('record', 'skip')`,
+    ),
+    check(
+      'completion_records_source_valid',
+      sql`${table.source} in ('user', 'agent_authorized')`,
+    ),
+  ],
+);
+
+export const completionRecords = sqliteTable(
+  'completion_records',
+  {
+    id: text('id').primaryKey(),
+    taskId: text('task_id')
+      .notNull()
+      .references(() => tasks.id, {
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      }),
+    sourceSessionId: text('source_session_id').references(
+      () => executionSessions.id,
+      {
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      },
+    ),
+    operationId: text('operation_id')
+      .notNull()
+      .references(() => operationProvenance.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
@@ -604,7 +729,7 @@ export const achievements = sqliteTable(
   ],
 );
 
-export const taskActivityEvents = sqliteTable(
+export const phase1TaskActivityEvents = sqliteTable(
   'task_activity_events',
   {
     id: text('id').primaryKey(),
@@ -623,6 +748,56 @@ export const taskActivityEvents = sqliteTable(
     operationId: text('operation_id')
       .notNull()
       .references(() => operationRecords.operationId, {
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      }),
+    beforeSummary: text('before_summary', { mode: 'json' }),
+    afterSummary: text('after_summary', { mode: 'json' }),
+  },
+  (table) => [
+    check(
+      'task_activity_events_type_nonempty',
+      sql`length(trim(${table.eventType})) > 0`,
+    ),
+    check(
+      'task_activity_events_actor_nonempty',
+      sql`length(trim(${table.actor})) > 0`,
+    ),
+    check(
+      'task_activity_events_local_date_nonempty',
+      sql`length(trim(${table.localDate})) > 0`,
+    ),
+    check(
+      'task_activity_events_time_zone_nonempty',
+      sql`length(trim(${table.timeZone})) > 0`,
+    ),
+    index('task_activity_events_task_occurred_idx').on(
+      table.taskId,
+      table.occurredAt,
+    ),
+    index('task_activity_events_operation_id_idx').on(table.operationId),
+  ],
+);
+
+export const taskActivityEvents = sqliteTable(
+  'task_activity_events',
+  {
+    id: text('id').primaryKey(),
+    taskId: text('task_id')
+      .notNull()
+      .references(() => tasks.id, {
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      }),
+    timeBlockId: text('time_block_id'),
+    eventType: text('event_type').notNull(),
+    actor: text('actor').notNull(),
+    occurredAt: text('occurred_at').notNull(),
+    localDate: text('local_date').notNull(),
+    timeZone: text('time_zone').notNull(),
+    operationId: text('operation_id')
+      .notNull()
+      .references(() => operationProvenance.id, {
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
@@ -1570,7 +1745,7 @@ export const phase1Schema = {
   tasks,
   operationRecords,
   completionRecords: phase1CompletionRecords,
-  taskActivityEvents,
+  taskActivityEvents: phase1TaskActivityEvents,
   scheduleState,
 } as const;
 
@@ -1614,7 +1789,19 @@ export const phase8Schema = {
   relaxSessions,
 } as const;
 
+export const phaseCloudSchema = {
+  cloudPlanOrigins,
+  cloudProfileClaim,
+  operationProvenance,
+  cloudSyncState,
+  cloudSyncBootstrap,
+  cloudSyncVersions,
+  cloudSyncOutbox,
+  cloudSyncConflicts,
+};
+
 export const databaseSchema = {
+  ...phaseCloudSchema,
   ...phase1Schema,
   ...phase2Schema,
   ...phase3Schema,
@@ -1623,4 +1810,6 @@ export const databaseSchema = {
   ...phase6Schema,
   ...phase7Schema,
   ...phase8Schema,
+  taskActivityEvents,
+  completionRecords,
 } as const;

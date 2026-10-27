@@ -32,10 +32,10 @@ V1：**Mobile Local-first Modular Architecture**
 
 ## 3. Technology Stack
 
-以下为 Phase 0 已验证的技术基线。精确解析版本以 manifest / `bun.lock` 为机器事实源，验证证据写入 STATUS，兼容组合与升级规则见已关闭的 [DEC-004](DECISIONS.md#dec-004)。文档中的主版本不替代 lockfile，也不表示尚未实现的产品能力可用。
+以下为 Phase 0 已验证的技术基线。精确解析版本以 manifest / `pnpm-lock.yaml` 为机器事实源，验证证据写入 STATUS，兼容组合与升级规则见已关闭的 [DEC-004](DECISIONS.md#dec-004)。文档中的主版本不替代 lockfile，也不表示尚未实现的产品能力可用。
 
 ```text
-Expo SDK 57
+Expo SDK 58
 React Native
 TypeScript
 Hermes
@@ -53,7 +53,8 @@ expo-calendar
 expo-notifications
 expo-background-task / task-manager
 
-Bun
+pnpm
+Node（仓库脚本运行时）
 Vitest
 React Native Testing Library（按 UI Phase 接入）
 Maestro（按 Phase 接入）
@@ -561,3 +562,13 @@ Cloud Sync Adapter
 Native Local LLM Adapter
 Desktop Host
 ```
+
+## 18. Account and Sync Server
+
+[ADR-0010](ADR/0010-local-first-cloud-sync.md) 扩展内部账号与同步范围。`server/` 是独立 Go module：Kratos HTTP/gRPC → Service DTO → Biz → sqlc/pgx → PostgreSQL 18。服务端 SQL migrations 是 PostgreSQL 机器事实源，移动端 Drizzle 仍是 SQLite 机器事实源。Go 不导入或重写 TypeScript Scheduler。
+
+移动端 Application 声明 CloudAPI/SecretStore/LocalStore Ports 与前台 CloudSyncService，宿主实现 HTTP、SecureStore、资料切换和 SQLite Adapter。Repository 写入在同一 UnitOfWork 捕获 Outbox；远端复制通过独立受校验的事务入口导入，不重放用户用例，不生成第二套完成事实。来源计划元数据仅用于核对，不作为排程或写权限。
+
+账号资料目录使用独立非秘密 SQLite catalog，记录服务端 origin、账号和本地数据库名；Token 与安装身份继续由 SecureStore 隔离保存。Keychain 不可用时本地模式仍能启动，认证前先验证安全凭据存储。首次下载的固定快照页保存在独立暂存表，完成运行时与完整引用图校验后，事实、云端版本、游标和初始化完成标记一起提交；中断或进程重开只继续暂存，不发布半套事实。
+
+两个副本之间没有分布式原子事务：本地成功、上传待处理、冲突和 OS 投影分别可见；网络失败不回滚本地完成。正式上线与原 Phase Exit 继续分别验收。

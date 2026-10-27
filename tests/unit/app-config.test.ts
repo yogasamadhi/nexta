@@ -39,13 +39,17 @@ describe('resolveAppVariant', () => {
         version: APP_VERSION,
         extra: { environment: variant },
         updates: { enabled: false },
-        ios: { buildNumber: IOS_BUILD_NUMBER },
+        ios: {
+          buildNumber: IOS_BUILD_NUMBER,
+          infoPlist: { UIViewControllerBasedStatusBarAppearance: true },
+        },
         android: { versionCode: ANDROID_VERSION_CODE },
       });
-      expect(config.plugins).toContainEqual([
-        'expo-build-properties',
-        { ios: { enableSceneSupport: true } },
-      ]);
+      // Expo SDK 58 ships the UIKit scene life cycle by default, so the
+      // deprecated `ios.enableSceneSupport` build property must stay absent.
+      expect(JSON.stringify(config.plugins ?? [])).not.toContain(
+        'enableSceneSupport',
+      );
     },
   );
 

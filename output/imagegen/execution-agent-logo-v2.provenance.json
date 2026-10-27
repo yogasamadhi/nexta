@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-12",
+  "status": "candidate",
+  "mode": "gpt-image-2 skill CLI via configured gateway",
+  "model": "gpt-image-2",
+  "requested": {
+    "size": "1024x1024",
+    "quality": "medium",
+    "n": 1,
+    "output_format": "png"
+  },
+  "generation_seconds": 34.5,
+  "prompt_file": "execution-agent-logo-v2.prompt.txt",
+  "command": "node /Users/h/.codex/skills/gpt-image-2/scripts/image_gen.ts generate --model gpt-image-2 --prompt-file output/imagegen/execution-agent-logo-v2.prompt.txt --size 1024x1024 --quality medium --output-format png --out output/imagegen/execution-agent-logo-v2-generated.png --no-augment",
+  "postprocessing": {
+    "library": "Pillow",
+    "source": "execution-agent-logo-v2-generated.png",
+    "steps": [
+      "Separate ivory path and mint point by alpha and source colors.",
+      "Smooth masks; retain the largest connected component of each to remove edge specks; antialias.",
+      "Crop generated contours together, resize proportionally to a maximum 600-pixel foreground edge, center on 1024x1024 canvas.",
+      "Apply flat ivory and mint colors, composite over emerald for the RGB app icon.",
+      "Export transparent mark, rounded presentation preview, and small-size review."
+    ],
+    "palette": {
+      "background": "#064E3B",
+      "path": "#F2EEE6",
+      "point": "#A7F3D0"
+    },
+    "origin": "Contours derived from the generated image; no hand-drawn substitute."
+  },
+  "assets": [
+    {
+      "file": "execution-agent-logo-v2-generated.png",
+      "size": [1254, 1254],
+      "mode": "RGBA",
+      "bytes": 305917,
+      "sha256": "49523051c156c028cc5bb4fd0df8c1f7147f576c8260e6d39c2a59d0a3977a6b"
+    },
+    {
+      "file": "execution-agent-logo-v2.png",
+      "size": [1024, 1024],
+      "mode": "RGB",
+      "bytes": 27801,
+      "sha256": "b98bf98a353afca792c9eeeb4e59e4280db89dd0db07f6fa59198122ecefbc88"
+    },
+    {
+      "file": "execution-agent-mark-v2.png",
+      "size": [1024, 1024],
+      "mode": "RGBA",
+      "bytes": 22247,
+      "sha256": "71a5bf2fe1fcefe9b4c2a8cc4940248483ff2e178b9e508800dcdbc7aa00bda4"
+    },
+    {
+      "file": "execution-agent-logo-v2-preview.png",
+      "size": [560, 560],
+      "mode": "RGB",
+      "bytes": 13729,
+      "sha256": "c75904c398cf211fb20edecc605a6fdcdae1717c7f3215f8ae9fcf0592d41288"
+    },
+    {
+      "file": "execution-agent-logo-v2-size-review.png",
+      "size": [760, 280],
+      "mode": "RGB",
+      "bytes": 10301,
+      "sha256": "e3ba756dea29443dcb933d92a960677f5a1e2b3748193aa5ea1718142fc81423"
+    }
+  ],
+  "limitations": [
+    "Gateway returned 1254x1254 RGBA despite requested 1024x1024; original retained.",
+    "Candidate identity; final brand remains DEC-003.",
+    "Raster assets, no editable vector master.",
+    "Mobile configuration and installed launcher icon were not changed."
+  ]
+}

@@ -297,7 +297,7 @@ V1 不做：
 - 自动修改用户原有第三方日历事件
 - 通用 Coding Agent
 - Agent 自主执行高风险外部操作
-- 全功能 Cloud Sync（可预留架构）
+- 面向公众的 Cloud Sync 运营与发布（内部账号与事实同步扩展见 ADR-0010）
 
 ---
 
@@ -351,3 +351,7 @@ V1 不做：
 - 更丰富的个人执行模型
 - 可解释的 Scheduling Policy
 - Personal Execution OS
+
+## 16. 内部账号与 Local-first 同步扩展
+
+2026-10-25 用户明确批准在既有 V1 本地闭环之外新增内部账号与完整业务事实同步，依据 [ADR-0010](ADR/0010-local-first-cloud-sync.md)。SQLite 保留离线事实与 Scheduler；PostgreSQL 保存账号隔离的副本。登录前说明上传范围，登录后自动同步；用户可退出账号继续使用独立游客资料。首期只验收本地联调，无邮箱验证/找回、AI 网关、公网运营或跨设备计时接管。实际实现/证据以 STATUS 为准。

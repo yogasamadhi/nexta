@@ -1,7 +1,9 @@
 import { join } from 'node:path';
 import { readdir, readFile } from 'node:fs/promises';
 
-const mobileRoot = join(import.meta.dir, '..', 'apps', 'mobile');
+import { runInherit, scriptsDir } from './lib/runtime';
+
+const mobileRoot = join(scriptsDir, '..', 'apps', 'mobile');
 
 async function sourceMaps(directory: string): Promise<string[]> {
   const files: string[] = [];
@@ -42,16 +44,14 @@ async function verifyProductionModules(platform: string) {
 
 for (const variant of ['development', 'preview', 'production'] as const) {
   console.log(`[build:check] resolving ${variant} Expo config`);
-  const child = Bun.spawn(
-    ['bunx', 'expo', 'config', '--type', 'public', '--json'],
+  const exitCode = await runInherit(
+    'pnpm',
+    ['exec', 'expo', 'config', '--type', 'public', '--json'],
     {
       cwd: mobileRoot,
       env: { ...process.env, APP_VARIANT: variant, CI: '1' },
-      stderr: 'inherit',
-      stdout: 'ignore',
     },
   );
-  const exitCode = await child.exited;
   if (exitCode !== 0) {
     console.error(
       `[build:check] ${variant} config failed with exit code ${exitCode}`,
@@ -62,9 +62,10 @@ for (const variant of ['development', 'preview', 'production'] as const) {
 
 for (const platform of ['ios', 'android'] as const) {
   console.log(`[build:check] exporting ${platform} bundle`);
-  const child = Bun.spawn(
+  const exitCode = await runInherit(
+    'pnpm',
     [
-      'bunx',
+      'exec',
       'expo',
       'export',
       '--platform',
@@ -77,11 +78,8 @@ for (const platform of ['ios', 'android'] as const) {
     {
       cwd: mobileRoot,
       env: { ...process.env, APP_VARIANT: 'production', CI: '1' },
-      stderr: 'inherit',
-      stdout: 'inherit',
     },
   );
-  const exitCode = await child.exited;
 
   if (exitCode !== 0) {
     console.error(

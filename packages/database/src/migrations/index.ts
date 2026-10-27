@@ -1,3 +1,5 @@
+import { cloudBootstrapSql } from './0010-cloud-bootstrap';
+import { cloudSyncSql } from './0009-cloud-sync';
 import { phase1FoundationSql } from './0000-phase1-foundation';
 import { phase2ScheduleCommitSql } from './0001-phase2-schedule-commit';
 import { phase3CalendarNotificationsSql } from './0002-phase3-calendar-notifications';
@@ -80,6 +82,20 @@ export const phase8WellbeingMigration = {
   sql: phase8WellbeingSql,
 } as const satisfies SqliteMigration;
 
+export const cloudSyncMigration = {
+  id: '0009_cloud_sync',
+  checksum:
+    'sha256:09a287468a3e6ec8ac5bc9ac9c1206c5f13b7d89a8dbd9cce9d4c5f9db4febd2',
+  sql: cloudSyncSql,
+} as const satisfies SqliteMigration;
+
+export const cloudBootstrapMigration = {
+  id: '0010_cloud_bootstrap',
+  checksum:
+    'sha256:47d5c6ba2d82946e114b7c28ccf570414d10e295a85e4e348f786044e25e5e4f',
+  sql: cloudBootstrapSql,
+} as const satisfies SqliteMigration;
+
 /** Ordered migration manifest bundled with the app. */
 export const databaseMigrations = [
   phase1FoundationMigration,
@@ -91,9 +107,13 @@ export const databaseMigrations = [
   phase6AgentRunsMigration,
   phase7UserModelFeaturesMigration,
   phase8WellbeingMigration,
+  cloudSyncMigration,
+  cloudBootstrapMigration,
 ] as const;
 
 export {
+  cloudBootstrapSql,
+  cloudSyncSql,
   phase1FoundationSql,
   phase2ScheduleCommitSql,
   phase3CalendarNotificationsSql,

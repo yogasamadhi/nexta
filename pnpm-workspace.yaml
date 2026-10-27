@@ -1,0 +1,20 @@
+packages:
+  - apps/*
+  - packages/*
+
+# 与此前 bun overrides 保持一致：lightningcss 必须锁定到验证过的版本，
+# 否则 react-native-css 的编译调用会与原生绑定版本不匹配。
+overrides:
+  lightningcss: 1.30.1
+
+allowBuilds:
+  # esbuild 的平台二进制由可选依赖提供，install 脚本仅做校验。
+  esbuild: true
+  # 仅用于可选的原生调试探针，不需要执行安装脚本。
+  dtrace-provider: false
+  # protobufjs 的 CLI 包装脚本与本仓库无关。
+  protobufjs: false
+
+# 保持与此前 bun（linker = "hoisted"）一致的扁平 node_modules 布局：
+# Expo / Metro / CocoaPods / Gradle 的原生模块解析依赖根级可解析路径。
+nodeLinker: hoisted

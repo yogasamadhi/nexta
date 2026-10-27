@@ -3,7 +3,8 @@ import { builtinModules } from 'node:module';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import ts from 'typescript';
 
-const workspaceRoot = join(import.meta.dir, '..');
+import { workspaceRoot } from './lib/runtime';
+
 const packagesRoot = join(workspaceRoot, 'packages');
 const purePackages = new Set([
   'agent-core',
@@ -81,9 +82,6 @@ function isNodeRuntimeImport(specifier: string): boolean {
 function isForbiddenPureRuntimeImport(specifier: string): boolean {
   return (
     isNodeRuntimeImport(specifier) ||
-    specifier === 'bun' ||
-    specifier.startsWith('bun:') ||
-    specifier === '@types/bun' ||
     specifier === '@types/node' ||
     specifier === 'expo' ||
     specifier.startsWith('expo-') ||
@@ -176,7 +174,6 @@ function collectForbiddenPlatformGlobals(
   );
   const forbiddenNames = new Set([
     'Buffer',
-    'Bun',
     'Deno',
     '__dirname',
     '__filename',

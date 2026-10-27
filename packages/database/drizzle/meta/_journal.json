@@ -64,6 +64,20 @@
       "when": 1789142400008,
       "tag": "0008_phase8_wellbeing",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1792886400000,
+      "tag": "0009_cloud_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1792972800000,
+      "tag": "0010_cloud_bootstrap",
+      "breakpoints": true
     }
   ]
 }

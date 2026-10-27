@@ -92,7 +92,11 @@ describe('Phase 8 wellbeing SQLite', () => {
         now: () => T1,
       }),
     ).resolves.toEqual({
-      applied: ['0008_phase8_wellbeing'],
+      applied: [
+        '0008_phase8_wellbeing',
+        '0009_cloud_sync',
+        '0010_cloud_bootstrap',
+      ],
       alreadyApplied: through0007.map(({ id }) => id),
     });
   });

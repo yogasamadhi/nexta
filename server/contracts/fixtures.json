@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "batchId": "fixture_complete_graph_v1",
+  "changes": [
+    {
+      "kind": "operation_provenance",
+      "key": "op_complete",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "op_complete",
+        "command": "execution.complete",
+        "occurredAt": "2026-10-25T10:20:00.000Z"
+      }
+    },
+    {
+      "kind": "goal",
+      "key": "goal_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "goal_1",
+        "title": "Recorded task",
+        "description": "",
+        "status": "active",
+        "targetDate": null,
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z",
+        "archivedAt": null
+      }
+    },
+    {
+      "kind": "project",
+      "key": "project_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "project_1",
+        "goalId": "goal_1",
+        "title": "Recorded task",
+        "description": "",
+        "status": "active",
+        "deadline": null,
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z",
+        "archivedAt": null
+      }
+    },
+    {
+      "kind": "task",
+      "key": "task_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "task_1",
+        "projectId": "project_1",
+        "goalId": "goal_1",
+        "parentTaskId": null,
+        "title": "Recorded task",
+        "description": null,
+        "status": "completed",
+        "priority": "normal",
+        "estimatedDurationMinutes": 30,
+        "baselineEstimatedDurationMinutes": null,
+        "actualDurationMinutes": 20,
+        "remainingDurationMinutes": null,
+        "categoryKey": null,
+        "earliestStartAt": null,
+        "deadlineAt": null,
+        "deadlineLocalDate": null,
+        "deadlineTimeZone": null,
+        "splittable": false,
+        "minBlockMinutes": null,
+        "maxBlockMinutes": null,
+        "energyDemand": null,
+        "schedulingPolicy": "flexible",
+        "source": "manual",
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z",
+        "completedAt": "2026-10-25T10:20:00.000Z",
+        "canceledAt": null
+      }
+    },
+    {
+      "kind": "time_block",
+      "key": "block_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "block_1",
+        "taskId": "task_1",
+        "type": "task",
+        "startAt": "2026-10-25T10:00:00.000Z",
+        "endAt": "2026-10-25T10:20:00.000Z",
+        "status": "completed",
+        "source": "scheduler",
+        "locked": false,
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "execution_session",
+      "key": "session_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "session_1",
+        "taskId": "task_1",
+        "timeBlockId": "block_1",
+        "startedAt": "2026-10-25T10:00:00.000Z",
+        "endedAt": "2026-10-25T10:20:00.000Z",
+        "pausedDurationSeconds": 0,
+        "activeIntervalStartedAt": null,
+        "pausedAt": null,
+        "status": "completed",
+        "completionType": "complete_task",
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "execution_interval",
+      "key": "interval_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "interval_1",
+        "sessionId": "session_1",
+        "kind": "work",
+        "startAt": "2026-10-25T10:00:00.000Z",
+        "endAt": "2026-10-25T10:20:00.000Z",
+        "timingQuality": "trusted"
+      }
+    },
+    {
+      "kind": "completion_record",
+      "key": "completion_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "completion_1",
+        "taskId": "task_1",
+        "sourceSessionId": "session_1",
+        "operationId": "op_complete",
+        "completedAt": "2026-10-25T10:20:00.000Z",
+        "taskTitleSnapshot": "Recorded task",
+        "actualDurationSeconds": 1200,
+        "durationCoverage": "complete",
+        "achievementDisposition": "record",
+        "source": "user"
+      }
+    },
+    {
+      "kind": "achievement",
+      "key": "achievement_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "achievement_1",
+        "sourceCompletionRecordId": "completion_1",
+        "sourceTaskId": "task_1",
+        "sourceExecutionSessionId": "session_1",
+        "title": "Recorded task",
+        "summary": null,
+        "evidenceType": "completion_record",
+        "occurredAt": "2026-10-25T10:20:00.000Z",
+        "userEdited": false,
+        "hidden": false,
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "task_activity",
+      "key": "activity_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "activity_1",
+        "taskId": "task_1",
+        "timeBlockId": "block_1",
+        "eventType": "complete_task",
+        "actor": "user",
+        "occurredAt": "2026-10-25T10:20:00.000Z",
+        "localDate": "2026-10-25",
+        "timeZone": "Asia/Singapore",
+        "operationId": "op_complete",
+        "beforeSummary": {
+          "status": "in_progress"
+        },
+        "afterSummary": {
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "kind": "reflection",
+      "key": "2026-10-25@Asia/Singapore",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "reflection_1",
+        "localDate": "2026-10-25",
+        "timeZone": "Asia/Singapore",
+        "summary": "One task completed.",
+        "wins": [
+          {
+            "completionRecordId": "completion_1",
+            "taskId": "task_1",
+            "title": "Recorded task",
+            "completedAt": "2026-10-25T10:20:00.000Z"
+          }
+        ],
+        "adjustmentSuggestion": null,
+        "userNote": null,
+        "generatedBy": "local_facts",
+        "createdAt": "2026-10-25T10:00:00.000Z",
+        "updatedAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "energy_check_in",
+      "key": "energy_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "energy_1",
+        "localDate": "2026-10-25",
+        "timeZone": "Asia/Singapore",
+        "level": 3,
+        "note": null,
+        "createdAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "relax_session",
+      "key": "relax_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "relax_1",
+        "type": "breathing",
+        "plannedMinutes": 1,
+        "actualSeconds": 60,
+        "startedAt": "2026-10-25T10:00:00.000Z",
+        "endedAt": "2026-10-25T10:20:00.000Z",
+        "source": "relax_tab",
+        "status": "completed",
+        "timingQuality": "trusted",
+        "createdAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "preference",
+      "key": "notification.leadMinutes.v1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "preference_1",
+        "key": "notification.leadMinutes.v1",
+        "valueJson": {
+          "leadMinutes": 15
+        },
+        "updatedAt": "2026-10-25T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "plan_origin",
+      "key": "plan_1",
+      "version": "0",
+      "ownerDeviceId": "",
+      "value": {
+        "id": "plan_1",
+        "originDeviceId": "fixture_device",
+        "sourceRevision": 1,
+        "committedAt": "2026-10-25T10:00:00.000Z",
+        "schedulerVersion": "fixture-v1",
+        "policyVersion": "neutral-v1",
+        "timeZone": "Asia/Singapore",
+        "reason": "manual_replan",
+        "affectedBlockIds": ["block_1"]
+      }
+    }
+  ]
+}

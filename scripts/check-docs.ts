@@ -8,7 +8,8 @@ import {
   resolve,
 } from 'node:path';
 
-const workspaceRoot = join(import.meta.dir, '..');
+import { workspaceRoot } from './lib/runtime';
+
 const ignoredDirectories = new Set([
   '.artifacts',
   '.expo',
@@ -188,7 +189,7 @@ if (plan.includes('Phase 0 工程基线已建立')) {
     }
   }
 
-  for (const evidence of ['bun run check', 'iOS', 'Android']) {
+  for (const evidence of ['pnpm run check', 'iOS', 'Android']) {
     if (!status.includes(evidence)) {
       failures.push(
         `.ai/STATUS.md: Phase 0 completion evidence is missing ${evidence}`,
@@ -218,14 +219,14 @@ for (const acceptance of acceptanceIds) {
     failures.push(`Testing matrix: missing ${acceptance}`);
 }
 
-if (requirementIds.size !== 24 || acceptanceIds.size !== 24) {
+if (requirementIds.size !== 26 || acceptanceIds.size !== 26) {
   failures.push(
-    `Requirements coverage: expected 24 REQ and 24 AC, found ${requirementIds.size} REQ and ${acceptanceIds.size} AC`,
+    `Requirements coverage: expected 26 REQ and 26 AC, found ${requirementIds.size} REQ and ${acceptanceIds.size} AC`,
   );
 }
-if (caseIds.size !== 27 || e2eIds.size !== 5 || decisionIds.size !== 12) {
+if (caseIds.size !== 29 || e2eIds.size !== 5 || decisionIds.size !== 14) {
   failures.push(
-    `Reference definitions: expected 27 CASE, 5 E2E and 12 DEC; found ${caseIds.size} CASE, ${e2eIds.size} E2E and ${decisionIds.size} DEC`,
+    `Reference definitions: expected 29 CASE, 5 E2E and 14 DEC; found ${caseIds.size} CASE, ${e2eIds.size} E2E and ${decisionIds.size} DEC`,
   );
 }
 

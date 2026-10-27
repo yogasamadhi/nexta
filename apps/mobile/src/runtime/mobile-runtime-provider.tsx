@@ -8,7 +8,14 @@ import {
   useState,
 } from 'react';
 import { setNotificationHandler } from 'expo-notifications';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState } from 'react-native';
+
+import {
+  activeCloudProfile,
+  guestDatabaseName,
+  activateCloudProfile,
+  deactivateCloudProfile,
+} from './cloud-profiles';
 
 import { createMobileRuntimeOptions } from './mobile-runtime-config';
 import { createMobileRuntime, type MobileRuntime } from './mobile-runtime';
@@ -38,7 +45,7 @@ setNotificationHandler({
     }),
 });
 
-function isActive(state: AppStateStatus): boolean {
+function isActive(state: string | null | undefined): boolean {
   return state === 'active';
 }
 
@@ -57,29 +64,68 @@ export function MobileRuntimeProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     let disposed = false;
     let runtime: MobileRuntime | null = null;
+    let cloudSubscription: (() => void) | null = null;
     let appStateSubscription: ReturnType<
       typeof AppState.addEventListener
     > | null = null;
 
-    void createMobileRuntime(options)
+    const open = async () => {
+      const profile = await activeCloudProfile();
+      const guestName = await guestDatabaseName();
+      const baseURL =
+        profile?.baseURL ??
+        process.env.EXPO_PUBLIC_CLOUD_API_URL ??
+        (__DEV__ ? 'http://127.0.0.1:8000' : 'https://cloud.invalid');
+      const switchAndReopen = async (action: () => Promise<void>) => {
+        if (disposed) throw new Error('Runtime is no longer active.');
+        setState({ status: 'initializing', runtime: null });
+        try {
+          if (runtime) await runtime.close();
+          await action();
+          setAttempt((current) => current + 1);
+        } catch {
+          setState({
+            status: 'failed',
+            runtime: null,
+            errorCode: 'runtime_initialization_failed',
+            retry,
+          });
+        }
+      };
+      return createMobileRuntime({
+        ...options,
+        databaseName: profile?.databaseName ?? guestName,
+        cloud: {
+          baseURL,
+          profile,
+          switchProfile: (tokens) =>
+            switchAndReopen(() =>
+              activateCloudProfile(baseURL, tokens, guestName),
+            ),
+          signOut: () => switchAndReopen(deactivateCloudProfile),
+        },
+      });
+    };
+    void open()
       .then(async (created) => {
         if (disposed) {
           await created.close();
           return;
         }
         runtime = created;
+        cloudSubscription = created.cloudAccount.sync.subscribe(() => {
+          if (!disposed) setState({ status: 'ready', runtime: { ...created } });
+        });
         appStateSubscription = AppState.addEventListener('change', (next) => {
-          void created.integrations.setActive(isActive(next)).catch(() => {
+          void created.setActive(isActive(next)).catch(() => {
             // Durable jobs remain pending and the next foreground transition
             // retries them. UI reads detailed channel state from Application.
           });
         });
         setState({ status: 'ready', runtime: created });
-        void created.integrations
-          .setActive(isActive(AppState.currentState))
-          .catch(() => {
-            // The next foreground event retries the durable queue.
-          });
+        void created.setActive(isActive(AppState.currentState)).catch(() => {
+          // The next foreground event retries the durable queue.
+        });
       })
       .catch(() => {
         if (!disposed) {
@@ -95,11 +141,9 @@ export function MobileRuntimeProvider({ children }: PropsWithChildren) {
     return () => {
       disposed = true;
       appStateSubscription?.remove();
+      cloudSubscription?.();
       if (runtime !== null) {
-        void runtime.integrations
-          .setActive(false)
-          .then(() => runtime?.close())
-          .catch(() => runtime?.close());
+        void runtime.close();
       }
     };
   }, [attempt, options, retry]);

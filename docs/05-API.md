@@ -380,6 +380,14 @@ Phase 1 已有代码调用方、持久化 Schema 与 migration，但尚无已发
 
 Tool Name / Input / Output / 风险与授权语义均属于 Contract，不得静默改变。Preview 必须绑定 schedulerVersion 与 policyVersion，升级后旧 Preview 失效。既有操作结果保留其原版本解释。
 
-## 13. Future Sync API
+## 13. Internal Cloud Sync API
 
-V1 不实现完整 Cloud Sync。device identity、变更日志、冲突、删除与 Schema 演进需独立设计；不得提前添加临时同步 API 绑定领域模型。
+用户已批准 [ADR-0010](ADR/0010-local-first-cloud-sync.md) 的内部账号与同步扩展。机器契约见 `server/api/sync/v1/cloud.proto` / `server/openapi.yaml`，实体字段清单见 `server/contracts/entities.json`；HTTP 与 gRPC 共用认证及应用授权。HTTP 使用严格 protobuf JSON，不接受未知外层字段；Struct 内容仍逐实体严格校验。
+
+账号提供 register/login/refresh/logout、me、设备列表/撤销。同步提供 bootstrap、push、pull、status、conflicts 与 resolve；schemaVersion=1，batchId 稳定，实体 version / cursor 用十进制字符串。kind 只允许显式业务事实与最小来源，不提供任意表 API。错误仅返回稳定 reason/message，不反射底层数据。
+
+Push 的 version 表示预期云端实体版本，成功返回推进后的版本与租户提交 revision；相同 batchId 同内容复用收据。版本或业务事实冲突返回 conflictId（RPC 成功但批次未提交），实体为空，revision 不推进。外层 Schema/认证/授权错误分别返回 400/401/403，批次身份复用不同内容返回 409。
+
+Bootstrap 上传每片最多 250 个事实；提供原 batchId 时，暂存身份按认证 user/device/batchId 稳定生成，重试不能改片内容，commit 才原子发布。初次上传/普通批次当前最多 20,000 事实，HTTP/gRPC 请求上限 16 MiB；超过限制明确失败，不发布部分业务图。下载 Bootstrap 固定快照；Pull 按游标返回完整事务，客户端原子导入及推进游标。
+
+Resolve 的 local 选择使用新批次身份和最新预期版本重新校验，不能改变原冲突实体集合或扩大授权；cloud 选择共享云端主线，并在设备保留被归档的本地分支。OperationRecord 完整收据只留原设备，远端来源不成为该设备用例的伪造成功收据。

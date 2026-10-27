@@ -38,3 +38,5 @@ Supersedes ADR-XXXX
 - [0007 — Non-clinical Psychology & Mindfulness Boundary](0007-non-clinical-psychology-mindfulness.md)
 - [0008 — Remote Inference First, Local Agent Runtime](0008-remote-inference-local-agent.md)
 - [0009 — Application Services, Commit and Recovery](0009-application-commit-and-recovery.md)
+
+- [ADR-0010 — Account-scoped Local-first Cloud Sync](0010-local-first-cloud-sync.md)：用户接受内部账号与完整业务事实同步边界；实际状态见 STATUS。

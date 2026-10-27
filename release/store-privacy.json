@@ -5,15 +5,16 @@
   "tracking": false,
   "currentBuild": {
     "remoteModelProviderConfigured": false,
-    "cloudSyncEnabled": false,
+    "cloudSyncEnabled": true,
     "productionOtaEnabled": false,
     "businessDatabaseEncryptedByApp": false,
-    "userExportOrRestoreAvailable": false
+    "userExportOrRestoreAvailable": false,
+    "cloudSyncRequiresAccountLogin": true
   },
   "dataPractices": [
     {
       "category": "Tasks, plans, execution records, achievements and wellbeing entries",
-      "handling": "Stored in the app's local SQLite database; not sent to a model provider in the current build."
+      "handling": "Local SQLite by default; after an explicit login action, portable business facts including notes are uploaded to the configured internal account-scoped sync service. No model provider receives them."
     },
     {
       "category": "Calendar busy intervals",
@@ -29,8 +30,8 @@
     }
   ],
   "storeCopy": {
-    "zh-CN": "任务、计划、执行记录、成就、复盘、精力记录与放松记录默认保存在设备本地。经你授权后，应用只读取所选日历的忙闲时间，并仅维护本应用创建的日历事件与提醒。当前版本未启用云同步、远程模型、生产 OTA、应用层数据库加密或用户导出/恢复，因此不会对这些能力作出承诺。",
-    "en-US": "Tasks, plans, execution records, achievements, reflections, energy check-ins, and relax sessions are stored locally on the device by default. With permission, the app reads bounded busy times from selected calendars and maintains only calendar events and reminders created by this app. This build does not enable cloud sync, a remote model provider, production OTA, app-layer database encryption, or user export and restore, and makes no promise that those capabilities are available."
+    "zh-CN": "任务、计划、执行记录、成就、复盘（包括备注）、精力和放松记录默认保存在设备本地。内部测试账号登录后会自动将这些业务事实及可移植偏好上传到配置的服务端，并与同账号设备同步。密钥、完整本地操作收据、系统日历缓存及 OS 绑定不上传。云端同步没有端到端加密，账号暂无邮箱验证或密码找回。本构建未启用真实远程模型、生产 OTA、应用层数据库加密或用户导出/恢复，不承诺公开发布或备份恢复 SLA。",
+    "en-US": "Business facts remain local by default. Signing in to an internal test account automatically uploads tasks, plans, execution and completion records, achievements, reflections including notes, energy check-ins, relax sessions and portable preferences to the configured server for account-scoped sync. Secrets, full local operation receipts, system calendar caches and OS bindings are not uploaded. Sync is not end-to-end encrypted. Email verification and password recovery are unavailable. No production model provider, production OTA, app-layer database encryption, user export/restore, public deployment or backup SLA is claimed."
   },
   "requiredBeforeSubmission": [
     "Product and legal approval of both locale texts",

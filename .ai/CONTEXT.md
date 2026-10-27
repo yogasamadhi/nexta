@@ -16,7 +16,9 @@ Nexta / 步迹（暂定）是 Mobile-first、Local-first 的 AI Personal Executi
 - 2026-10-03 已建立并按用户目标执行[无需凭据优化轨道 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)：Git 基线、排程基准、本地 UI 自动化、可用性、模型契约、Capture 时间上下文、恢复覆盖、架构文档与待决策方案。九个包独立跟踪，不改写原 80/80 子集；实际状态见 [Optimization Execution Status](STATUS.md#optimization-execution-status)。
 - 技术目标和兼容验证：[Architecture](../docs/03-ARCHITECTURE.md)。此摘要不复制易变版本。
 
-V1 不包含团队协同、正式 Cloud Sync、Desktop/Web 客户端、心理医疗、本地 LLM 推理、修改第三方日历、常驻后台 Agent。
+V1 不包含团队协同、面向公众的 Cloud Sync 发布、Desktop/Web 客户端、心理医疗、本地 LLM 推理、修改第三方日历、常驻后台 Agent。
+
+2026-10-25 用户批准内部账号与完整业务事实同步扩展，依据 [ADR-0010](../docs/ADR/0010-local-first-cloud-sync.md)。服务端使用 Kratos v3 / sqlc / pgx / PostgreSQL 18；SQLite 保持离线事实源。登录后自动同步，活跃计时仅原设备操作，OS 投影按设备开启；当前实施/证据见 STATUS，不把计划或 Accepted 写成已交付。
 
 ## Core System Model
 

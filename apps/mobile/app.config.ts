@@ -51,6 +51,7 @@ export function createAppConfig(
       infoPlist: {
         NSCalendarsFullAccessUsageDescription:
           'Read busy times and maintain events created by this app after you grant access.',
+        UIViewControllerBasedStatusBarAppearance: true,
       },
     },
     android: {
@@ -67,7 +68,6 @@ export function createAppConfig(
     plugins: [
       'expo-router',
       'expo-dev-client',
-      ['expo-build-properties', { ios: { enableSceneSupport: true } }],
       'expo-sqlite',
       'expo-secure-store',
       'expo-notifications',

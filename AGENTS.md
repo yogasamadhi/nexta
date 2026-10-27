@@ -283,29 +283,31 @@ AI 不得为了完成当前任务：
 
 ## 9. Verification Protocol
 
+仓库工具链：pnpm 11（包管理、脚本入口，hoisted node_modules 布局）+ Node 24（仓库脚本运行时，通过 tsx 执行 TypeScript 脚本）。不再使用 Bun。
+
 目标命令：
 
 ```bash
-bun run format:check
-bun run lint
-bun run typecheck
-bun run test
-bun run test:architecture
-bun run test:integration
-bun run docs:check
-bun run build:check
+pnpm run format:check
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run test:architecture
+pnpm run test:integration
+pnpm run docs:check
+pnpm run build:check
 ```
 
 仓库统一入口：
 
 ```bash
-bun run check
+pnpm run check
 ```
 
 移动端关键能力进入对应 Phase 后增加：
 
 ```bash
-bun run test:e2e
+pnpm run test:e2e
 ```
 
 任何不存在的命令应在 Phase 0 中建立，不得伪造“已通过”。

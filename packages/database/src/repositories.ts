@@ -1,3 +1,4 @@
+import { captureCloudTransaction } from './cloud-sync-store';
 import {
   ApplicationError,
   type AgentRunRepository,
@@ -2440,6 +2441,16 @@ class SqliteOperationRecordRepository implements OperationRecordRepository {
 
   async insert(record: OperationRecord): Promise<void> {
     assertValidOperationRecord(record);
+    if (
+      await this.database.get(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='operation_provenance'",
+      )
+    ) {
+      await this.database.run(
+        'INSERT OR IGNORE INTO operation_provenance(id,command,occurred_at) VALUES(?,?,?)',
+        [record.operationId, record.command, record.occurredAt],
+      );
+    }
     await this.database.run(
       `INSERT INTO operation_records (
         operation_id, command_name, parameter_hash, result_json,
@@ -3415,14 +3426,26 @@ export function createSqliteApplicationTransaction(
  */
 export function createSqliteApplicationUnitOfWork(
   database: SqliteDatabase,
+  onWrite?: () => void,
 ): ApplicationUnitOfWork {
   return {
     transaction: async <TResult>(
       work: (transaction: ApplicationTransaction) => Promise<TResult>,
-    ): Promise<TResult> =>
-      database.transaction((transaction) =>
-        work(createSqliteApplicationTransaction(transaction)),
-      ),
+    ): Promise<TResult> => {
+      let changed = false;
+      const result = await database.transaction(async (transaction) => {
+        const cloud = await transaction.get<{ name: string }>(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='cloud_sync_state'",
+        );
+        return cloud
+          ? captureCloudTransaction(transaction, work, () => {
+              changed = true;
+            })
+          : work(createSqliteApplicationTransaction(transaction));
+      });
+      if (changed) onWrite?.();
+      return result;
+    },
   };
 }
 

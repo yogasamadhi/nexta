@@ -4,23 +4,23 @@
   "technicalGates": [
     {
       "id": "repository",
-      "command": "bun run check"
+      "command": "pnpm run check"
     },
     {
       "id": "release-config",
-      "command": "bun run release:check"
+      "command": "pnpm run release:check"
     },
     {
       "id": "device-e2e",
-      "command": "bun run test:e2e"
+      "command": "pnpm run test:e2e"
     },
     {
       "id": "ios-build",
-      "command": "bun run build:ios"
+      "command": "pnpm run build:ios"
     },
     {
       "id": "android-build",
-      "command": "bun run build:android"
+      "command": "pnpm run build:android"
     }
   ],
   "externalGates": [
@@ -53,6 +53,12 @@
       "status": "pending",
       "evidence": null,
       "reason": "The neutral bundle/package identifiers must be confirmed available before the first signed store build."
+    },
+    {
+      "id": "public-cloud-account-release",
+      "status": "pending",
+      "evidence": null,
+      "reason": "The new account/sync implementation is internal only; email verification/recovery, public service operations and cloud privacy/deletion/retention require a separately authorized release review."
     }
   ]
 }

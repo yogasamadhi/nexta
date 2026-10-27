@@ -1,0 +1,17 @@
+name: personal-execution-cloud
+services:
+  postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_USER: execution_dev
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: execution_dev
+    ports: ['127.0.0.1:5548:5432']
+    volumes: ['postgres-data:/var/lib/postgresql']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U execution_dev -d execution_dev']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  postgres-data:

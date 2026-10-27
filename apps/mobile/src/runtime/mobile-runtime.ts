@@ -1,5 +1,7 @@
 import {
   AchievementService,
+  CloudSyncService,
+  CloudAccountService,
   CalendarService,
   createTimeoutCalendarProvider,
   createTimeoutNotificationProvider,
@@ -27,6 +29,7 @@ import {
   type IntegrationJobRetryPolicy,
   type IntegrationProjectionPolicy,
   type WriteContext,
+  type CloudTokens,
 } from '@workspace/application';
 import {
   createExpoCalendarAdapter,
@@ -37,6 +40,8 @@ import {
   createExpoSqliteDatabase,
   initializeSqliteApplicationUnitOfWork,
   SqliteSchedulingSnapshotPort,
+  SqliteCloudLocalStore,
+  createSqliteApplicationUnitOfWork,
 } from '@workspace/database';
 import { parseInstant } from '@workspace/domain';
 import {
@@ -45,6 +50,15 @@ import {
   type ExpoNotificationsAdapterOptions,
 } from '@workspace/notifications';
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
+
+import { HttpCloudAPI } from './cloud-api';
+import {
+  profileSecrets,
+  guestCloudSecrets,
+  installationId,
+  prepareCloudSecretStorage,
+  type CloudProfile,
+} from './cloud-profiles';
 
 import { ForegroundIntegrationCoordinator } from './integration-coordinator';
 import { IntlTemporalAdapter } from './intl-temporal-adapter';
@@ -59,6 +73,12 @@ import { IntlUtcWorkingWindowPort } from './working-window-port';
 
 export type MobileRuntimeOptions = Readonly<{
   databaseName: string;
+  cloud?: Readonly<{
+    baseURL: string;
+    profile: CloudProfile | null;
+    switchProfile: (tokens: CloudTokens) => Promise<void>;
+    signOut: () => Promise<void>;
+  }>;
   calendar: Omit<ExpoCalendarAdapterOptions, 'clock'>;
   notifications: ExpoNotificationsAdapterOptions;
   projectionPolicy: IntegrationProjectionPolicy;
@@ -75,6 +95,8 @@ export type MobileRuntimeOptions = Readonly<{
 
 export type MobileRuntime = Readonly<{
   nativeDatabase: SQLiteDatabase;
+  cloudAccount: CloudAccountService;
+  setActive(active: boolean): Promise<void>;
   unitOfWork: ApplicationUnitOfWork;
   calendarAdapter: ExpoCalendarAdapter;
   notificationsAdapter: ExpoNotificationsAdapter;
@@ -229,9 +251,60 @@ export async function createMobileRuntime(
   const clock = new SystemClock();
   const nativeDatabase = await openDatabaseAsync(options.databaseName);
   try {
-    const unitOfWork = await initializeSqliteApplicationUnitOfWork(
+    await initializeSqliteApplicationUnitOfWork(
       createExpoSqliteDatabase(nativeDatabase),
     );
+    let cloudSync: CloudSyncService | null = null;
+    const database = createExpoSqliteDatabase(nativeDatabase);
+    const unitOfWork = createSqliteApplicationUnitOfWork(database, () => {
+      void cloudSync?.wake();
+    });
+    let integrationsRef: ForegroundIntegrationCoordinator | null = null;
+    const localSync = new SqliteCloudLocalStore(database, () => {
+      void integrationsRef?.wake();
+    });
+    const cloudOptions = options.cloud;
+    const cloudAPI = new HttpCloudAPI(
+      cloudOptions?.baseURL ?? 'https://cloud.invalid',
+    );
+    const secrets = cloudOptions?.profile
+      ? profileSecrets(cloudOptions.profile)
+      : guestCloudSecrets();
+    cloudSync = new CloudSyncService({
+      api: cloudAPI,
+      secrets,
+      local: localSync,
+      onImported: () => {
+        void integrationsRef?.wake();
+      },
+    });
+    const savedTokens = await secrets.read().catch(() => null);
+    if (savedTokens) await cloudSync.connect(savedTokens);
+    const projectionState = await localSync.state();
+    let projectionEnabled =
+      projectionState.userId === null || projectionState.projectionEnabled;
+    const cloudAccount = new CloudAccountService(cloudSync, localSync, {
+      api: cloudAPI,
+      installationId,
+      prepareCredentialStorage: prepareCloudSecretStorage,
+      projectionChanged: (enabled) => {
+        projectionEnabled = enabled;
+        void integrationsRef?.wake();
+      },
+      switchProfile:
+        cloudOptions?.switchProfile ??
+        (() => Promise.reject(new Error('Cloud profile host unavailable.'))),
+      signOut: cloudOptions?.signOut ?? (() => Promise.resolve()),
+    });
+    const explicitProjection = options.projectionPolicy;
+    const projectionPolicy: IntegrationProjectionPolicy = {
+      calendarProvisioning: (provider) =>
+        explicitProjection.calendarProvisioning(provider),
+      calendarEvent: (context) =>
+        projectionEnabled ? explicitProjection.calendarEvent(context) : null,
+      notification: (context) =>
+        projectionEnabled ? explicitProjection.notification(context) : null,
+    };
     const [calendarAdapter, notificationsAdapter] = await Promise.all([
       createExpoCalendarAdapter({ ...options.calendar, clock }),
       createExpoNotificationsAdapter(options.notifications),
@@ -258,7 +331,7 @@ export async function createMobileRuntime(
       unitOfWork,
       calendar: calendarProvider,
       notifications: notificationsProvider,
-      projectionPolicy: options.projectionPolicy,
+      projectionPolicy,
       inventoryPolicy: inventoryPolicy(
         options.calendarInventoryLookbackMs,
         options.calendarInventoryLookaheadMs,
@@ -280,6 +353,7 @@ export async function createMobileRuntime(
     const integrations = new ForegroundIntegrationCoordinator({
       worker: integrationService,
     });
+    integrationsRef = integrations;
     const temporal = new IntlTemporalAdapter();
     const snapshots = new SqliteSchedulingSnapshotPort({
       unitOfWork,
@@ -388,7 +462,15 @@ export async function createMobileRuntime(
       integrations: integrationService,
     });
     const operationIds = new RuntimeIdGenerator('user_operation');
+    let closed = false;
     return {
+      cloudAccount,
+      async setActive(active) {
+        await Promise.all([
+          integrations.setActive(active),
+          cloudSync!.setActive(active),
+        ]);
+      },
       nativeDatabase,
       unitOfWork,
       calendarAdapter,
@@ -419,7 +501,13 @@ export async function createMobileRuntime(
           authority: { kind: 'user' },
         };
       },
-      close: () => nativeDatabase.closeAsync(),
+      async close() {
+        if (closed) return;
+        closed = true;
+        await cloudSync!.setActive(false);
+        await integrations.setActive(false);
+        await nativeDatabase.closeAsync();
+      },
     };
   } catch (error) {
     await nativeDatabase.closeAsync();

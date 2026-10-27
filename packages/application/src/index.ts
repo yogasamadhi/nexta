@@ -48,3 +48,7 @@ export type RuntimeConfig = z.infer<typeof runtimeConfigSchema>;
 export function parseRuntimeConfig(input: unknown): RuntimeConfig {
   return runtimeConfigSchema.parse(input);
 }
+
+export * from './cloud-sync';
+
+export { syncEntityFields } from './sync-entity-fields';

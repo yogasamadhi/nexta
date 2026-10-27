@@ -9,6 +9,10 @@ export {
 } from './migrator';
 export {
   databaseMigrations,
+  cloudSyncMigration,
+  cloudBootstrapMigration,
+  cloudBootstrapSql,
+  cloudSyncSql,
   phase1FoundationMigration,
   phase1FoundationSql,
   phase2ScheduleCommitMigration,
@@ -104,3 +108,6 @@ export type {
   SqliteParameters,
   SqliteRunResult,
 } from './sqlite';
+
+export * from './cloud-sync-store';
+export * from './cloud-profile-catalog';

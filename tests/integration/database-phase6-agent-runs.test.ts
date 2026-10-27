@@ -101,7 +101,12 @@ describe('Phase 6 AgentRun SQLite', () => {
 
     await expect(migrateDatabase(database, { now: () => T1 })).resolves.toEqual(
       {
-        applied: ['0007_phase7_user_model_features', '0008_phase8_wellbeing'],
+        applied: [
+          '0007_phase7_user_model_features',
+          '0008_phase8_wellbeing',
+          '0009_cloud_sync',
+          '0010_cloud_bootstrap',
+        ],
         alreadyApplied: databaseMigrations.slice(0, 7).map(({ id }) => id),
       },
     );

@@ -66,6 +66,18 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
   const [details, setDetails] = useState<ExecutionDetails | null>(null);
   const [now, setNow] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [canControl, setCanControl] = useState(false);
+  useEffect(() => {
+    let live = true;
+    void runtime.cloudAccount
+      .canControl('execution_session', sessionId)
+      .then((owned) => {
+        if (live) setCanControl(owned);
+      });
+    return () => {
+      live = false;
+    };
+  }, [runtime, sessionId]);
   const [allEffortRecorded, setAllEffortRecorded] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [transitionEndsAtMs, setTransitionEndsAtMs] = useState<number | null>(
@@ -373,13 +385,18 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
       </View>
 
       <View className="mt-14 gap-3">
+        {!canControl ? (
+          <Text className="rounded-2xl bg-amber-950 p-4 text-amber-100">
+            此专注由另一台设备发起。这里仅显示同步状态，请回到原设备暂停、结束或完成。
+          </Text>
+        ) : null}
         {active ? (
           <>
             <Pressable
               accessibilityRole="checkbox"
               accessibilityState={{ checked: allEffortRecorded }}
               className={`rounded-2xl border px-4 py-3 ${allEffortRecorded ? 'border-emerald-400 bg-emerald-950' : 'border-stone-600'}`}
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => setAllEffortRecorded((current) => !current)}
             >
               <Text className="font-medium text-stone-100">
@@ -392,7 +409,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl bg-white py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void switchPause()}
               testID="focus-toggle-pause"
             >
@@ -403,7 +420,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl bg-emerald-600 py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void completeTask(true)}
               testID="focus-complete-with-win"
             >
@@ -414,7 +431,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl border border-emerald-700 py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void openRelax()}
             >
               <Text className="font-semibold text-emerald-200">
@@ -424,7 +441,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl border border-stone-600 py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void finishSession(false)}
             >
               <Text className="font-semibold text-stone-200">
@@ -434,7 +451,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center rounded-2xl border border-stone-600 py-4"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void finishSession(true)}
             >
               <Text className="font-semibold text-stone-200">
@@ -444,7 +461,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center py-3"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void completeTask(false)}
             >
               <Text className="font-medium text-stone-400">
@@ -454,7 +471,7 @@ function FocusContent({ runtime }: Readonly<{ runtime: MobileRuntime }>) {
             <Pressable
               accessibilityRole="button"
               className="items-center py-3"
-              disabled={busy}
+              disabled={busy || !canControl}
               onPress={() => void abandon()}
             >
               <Text className="font-medium text-stone-500">暂时无法继续</Text>

@@ -60,7 +60,7 @@ Architecture
 
 建议增加随机化 invariant test。
 
-Scheduler 固定负载基准由 `bun run bench:scheduler` 执行，覆盖 50/200/500 Task、7/30 天范围、两种 Busy 密度及显式示例稳定性 policy。每次测量独立核对受保护事实、硬约束、工作量守恒、集合排列稳定性与输入不变；移动统计按既有块身份匹配，新增/删除不算移动。耗时在预热后采样，正确性检查不计入测量；经验 p95 必须附样本数和环境，不作为既定性能 SLA。Bun/Node 与 Hermes 结果单独报告，不设置会在普通 CI 中抖动的墙钟阈值。
+Scheduler 固定负载基准由 `pnpm run bench:scheduler` 执行，覆盖 50/200/500 Task、7/30 天范围、两种 Busy 密度及显式示例稳定性 policy。每次测量独立核对受保护事实、硬约束、工作量守恒、集合排列稳定性与输入不变；移动统计按既有块身份匹配，新增/删除不算移动。耗时在预热后采样，正确性检查不计入测量；经验 p95 必须附样本数和环境，不作为既定性能 SLA。Node 与 Hermes 结果单独报告，不设置会在普通 CI 中抖动的墙钟阈值。
 
 ---
 
@@ -167,7 +167,7 @@ Provider complete/原生 stream/自定义错误 mapper 使用合成敏感文本�
 - Empty；
 - Error。
 
-`bun run test:ui` 与 `test:e2e` 分开：前者用本地 Maestro 驱动 Development Build，后者保留物理设备证据门禁。手工旅程包含缺估时收件箱、拒绝 Preview 不改变计划、Task/Preview/Commit/Calendar/Focus/暂停/进程重启/继续/明确完成/成就来源，并用隔离 SQLite 只读断言核对唯一事实与暂停计时不增长。每次从重装测试 App 的干净沙盒开始；至少两次连续通过才满足对应重复性要求。网络禁用必须有实际平台证据，iOS 上无效果的飞行模式命令不能记为离线通过；未执行离线时结果必须明确标记 partial。当前实现/平台限制与实跑结果只记入 STATUS。
+`pnpm run test:ui` 与 `test:e2e` 分开：前者用本地 Maestro 驱动 Development Build，后者保留物理设备证据门禁。手工旅程包含缺估时收件箱、拒绝 Preview 不改变计划、Task/Preview/Commit/Calendar/Focus/暂停/进程重启/继续/明确完成/成就来源，并用隔离 SQLite 只读断言核对唯一事实与暂停计时不增长。每次从重装测试 App 的干净沙盒开始；至少两次连续通过才满足对应重复性要求。网络禁用必须有实际平台证据，iOS 上无效果的飞行模式命令不能记为离线通过；未执行离线时结果必须明确标记 partial。当前实现/平台限制与实跑结果只记入 STATUS。
 
 ---
 
@@ -280,6 +280,8 @@ Simulator 冒烟可以验证页面接线、Expo SQLite 写读和迁移兼容路�
 
 | Requirement | Priority | AC 组 | Phase | 关键场景 / 验证方式 |
 | --- | --- | --- | --- | --- |
+| REQ-AUTH-001 | MUST | AC-AUTH-001 | Account/Sync Track | CASE-AUTH-01；Go/HTTP/资料隔离/凭据 |
+| REQ-SYNC-001 | MUST | AC-SYNC-001 | Account/Sync Track | CASE-SYNC-01；PostgreSQL/SQLite/故障/界面 |
 | REQ-CAPTURE-001 | MUST | AC-CAPTURE-001 | 6；手工入口 4 | CASE-CAPTURE-01、E2E-001；Schema/模型失败/UI |
 | REQ-TASK-001 | MUST | AC-TASK-001 | 1、4、5 | CASE-TASK-01、CASE-EXEC-01；状态机/事务 |
 | REQ-GOAL-001 | SHOULD | AC-GOAL-001 | 1；集成回顾 5 | CASE-GOAL-01；关系/汇总/归档 |
@@ -344,6 +346,17 @@ SHOULD 若未交付，Beta 范围评审需明确列出，不删除 Requirement �
 ## 15. 文档与阶段门禁
 
 - 文档检查包括相对链接及锚点、Requirement/AC/Phase/CASE/E2E 引用、ADR 索引、Manifest、待决策项与 STATUS 的一致性。
-- Phase 0 建立 `bun run docs:check` 并纳入 `bun run check`。尚无工程脚本时可执行一次性本地检查，结果写 STATUS，不伪称 bun 检查通过。
+- Phase 0 建立 `pnpm run docs:check` 并纳入 `pnpm run check`。尚无工程脚本时可执行一次性本地检查，结果写 STATUS，不伪称仓库检查通过。
 - 代码/Integration/设备验证分开记录。Fake Adapter 通过不代表 OS 行为已验证；bundler 检查不代表真机 Development Build 通过。
 - 任何缺失的当前阶段必需测试必须报告为未覆盖；不能用空测试套件的零退出码作为功能已验收证据。
+
+## 15. Internal Account and Sync Acceptance
+
+| Case | 场景 | 验收 |
+| --- | --- | --- |
+| CASE-AUTH-01 | 注册/登录、错误密码、刷新轮换、退出/设备撤销、账号切换 | 内部注册默认关闭；未知字段拒绝；密码与 Token 不进入日志/普通 SQLite；租户隔离，撤销后认证失败，游客认领保留原资料 |
+| CASE-SYNC-01 | 两设备离线修改、完成/成就、原设备计时、初始化中断、重复提交、版本冲突、选择主线与 reload | 原子批次/游标、幂等重放、无回声、唯一完成证据、活跃计时只读归属、未采用分支保留、旧 Preview 失效；Fake/主机/模拟器证据不冒充物理设备 |
+
+共享契约样例同时通过 Go 与 TypeScript；真实数据库集成要求 PostgreSQL 18，不能只用内存 Fake。新增迁移必须覆盖既有 Completion/Achievement 数据和失败回滚。生成结果再生成应无差异。
+
+初始化下载需覆盖：固定快照跨页、下载期间发生新提交、暂存数据库关闭重开、完整事实与游标同事务发布、非法关联回滚；冲突需覆盖并发活跃会话、完成与取消、依赖完成分支进入只读档案和无关待上传修改保持。Keychain 不可用的开发构建不能阻断本地启动；账号资料目录与 Token 的不同存储边界分别验证。

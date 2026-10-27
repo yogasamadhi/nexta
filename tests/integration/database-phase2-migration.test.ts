@@ -187,6 +187,8 @@ describe('Phase 2 SQLite migration', () => {
       '0006_phase6_agent_runs',
       '0007_phase7_user_model_features',
       '0008_phase8_wellbeing',
+      '0009_cloud_sync',
+      '0010_cloud_bootstrap',
     ]);
   });
 
@@ -217,6 +219,8 @@ describe('Phase 2 SQLite migration', () => {
         '0006_phase6_agent_runs',
         '0007_phase7_user_model_features',
         '0008_phase8_wellbeing',
+        '0009_cloud_sync',
+        '0010_cloud_bootstrap',
       ],
       alreadyApplied: ['0000_phase1_foundation'],
     });

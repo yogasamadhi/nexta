@@ -9,6 +9,8 @@ coverage/
 dist/
 node_modules/
 *.tsbuildinfo
+__pycache__/
+*.pyc
 .artifacts/
 apps/mobile/android/
 apps/mobile/ios/

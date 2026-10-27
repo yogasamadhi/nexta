@@ -45,26 +45,29 @@ Phase 0 已建立以下入口。实际通过记录只写入 STATUS；后续阶�
 
 | 命令 | 职责 |
 | --- | --- |
-| `bun run dev` | 启动开发服务 |
-| `bun run ios` / `bun run android` | 启动对应 Development Build 工作流 |
-| `bun run format` / `bun run format:check` | 格式修复 / 只读格式检查 |
-| `bun run lint` | 静态规则 |
-| `bun run typecheck` | 所有已建立工作区类型检查 |
-| `bun run test` | Pure TS 与适用的组件/单元测试 |
-| `bun run test:architecture` | forbidden import 与跨包依赖方向 |
-| `bun run test:integration` | 当前阶段的 Repository/Application/Fake Adapter 集成 |
-| `bun run docs:check` | 文档链接、引用、覆盖矩阵与清单 |
-| `bun run release:check` | 校验版本、三套 Expo/EAS variant、OTA 默认、发布清单与隐私草案；只证明静态配置，不证明账号/签名/商店可用 |
-| `bun run build:check` | App 配置与双平台 production export/module inventory 检查，排除本地测试宿主/工具；不等于原生签名/真机验证 |
-| `bun run check` | 顺序聚合 format:check、lint、typecheck、test、test:architecture、test:integration、docs:check、release:check、build:check |
-| `bun run test:e2e` | 读取经审核的物理 iOS/Android 证据并要求 E2E-001…005 全部通过；缺文件、模拟器或 pending 项均失败 |
-| `bun run bench:scheduler` | 本地固定负载与计划移动测量，独立检查约束/确定性；不进入普通 check 的墙钟性能门禁，不证明 Hermes 或真机性能 |
-| `bun run test:ui` | 本地 Development Build UI 驱动与隔离测试库断言；不进入普通 check，不替代物理设备或真实模型证据 |
-| `bun run test:hermes` | 专用 Android Development Build 的隔离 Hermes/Fake Agent/排程基准执行；需另启测试 Metro，不进入普通 check，不替代真实模型/物理设备证据 |
-| `bun run build:preview:ios` / `build:preview:android` | 创建可内部安装的 EAS preview build |
-| `bun run build:ios` / `build:android` | 创建 production store build；需要已授权 EAS 项目与签名 |
-| `bun run submit:ios` / `submit:android` | 用 production submit profile 提交；Android 默认 internal track + draft，最终推广仍需人工审核 |
-| `bun run release:gate` | 先执行完整仓库门禁，再验证两平台物理设备 E2E 证据；不自动构建或提交商店 |
+| `pnpm run dev` | 启动开发服务 |
+| `python3 run.py` | macOS 本地交互试运行：复用当前项目 Metro 或启动开发服务，并打开已安装 Development Build 的 iOS 模拟器；可用 `--port 8082` 指定端口，不执行自动化测试 |
+| `pnpm run ios` / `pnpm run android` | 启动对应 Development Build 工作流 |
+| `pnpm run format` / `pnpm run format:check` | 格式修复 / 只读格式检查 |
+| `pnpm run lint` | 静态规则 |
+| `pnpm run typecheck` | 所有已建立工作区类型检查 |
+| `pnpm run test` | Pure TS 与适用的组件/单元测试 |
+| `pnpm run test:architecture` | forbidden import 与跨包依赖方向 |
+| `pnpm run test:integration` | 当前阶段的 Repository/Application/Fake Adapter 集成 |
+| `pnpm run docs:check` | 文档链接、引用、覆盖矩阵与清单 |
+| `pnpm run release:check` | 校验版本、三套 Expo/EAS variant、OTA 默认、发布清单与隐私草案；只证明静态配置，不证明账号/签名/商店可用 |
+| `pnpm run build:check` | App 配置与双平台 production export/module inventory 检查，排除本地测试宿主/工具；不等于原生签名/真机验证 |
+| `pnpm run check` | 顺序聚合 format:check、lint、typecheck、test、test:architecture、test:integration、docs:check、release:check、build:check |
+| `pnpm run test:e2e` | 读取经审核的物理 iOS/Android 证据并要求 E2E-001…005 全部通过；缺文件、模拟器或 pending 项均失败 |
+| `pnpm run bench:scheduler` | 本地固定负载与计划移动测量，独立检查约束/确定性；不进入普通 check 的墙钟性能门禁，不证明 Hermes 或真机性能 |
+| `pnpm run test:ui` | 本地 Development Build UI 驱动与隔离测试库断言；不进入普通 check，不替代物理设备或真实模型证据 |
+| `pnpm run test:hermes` | 专用 Android Development Build 的隔离 Hermes/Fake Agent/排程基准执行；需另启测试 Metro，不进入普通 check，不替代真实模型/物理设备证据 |
+| `pnpm run build:preview:ios` / `build:preview:android` | 创建可内部安装的 EAS preview build |
+| `pnpm run build:ios` / `build:android` | 创建 production store build；需要已授权 EAS 项目与签名 |
+| `pnpm run submit:ios` / `submit:android` | 用 production submit profile 提交；Android 默认 internal track + draft，最终推广仍需人工审核 |
+| `pnpm run release:gate` | 先执行完整仓库门禁，再验证两平台物理设备 E2E 证据；不自动构建或提交商店 |
+
+`python3 run.py` 要求 macOS、可用的 iOS Simulator runtime 和已安装的 development App（首次安装运行 `pnpm run ios`）。它优先选择已启动的 iOS 模拟器，核对 Metro manifest 的项目路径，再打开 Device Hub（旧 Xcode 使用 Simulator）。缺少服务时启动带 `--offline` 的 Expo dev-client Metro，保持终端运行，Ctrl+C 停止此次启动的服务；复用已有 Metro 时脚本打开 App 后退出，服务继续运行。它不清理应用数据、不重装旧制品，也不替代 `test:ui` 或 `test:e2e` 验收。根目录交互入口是唯一的 Python 脚本；`scripts/` 下的仓库门禁、测试与工具脚本仍为 TypeScript，由 `tsx` 在 Node 24 下执行。
 
 `test:e2e` 要求设置 `NEXTA_IOS_DEVICE_EVIDENCE` 与 `NEXTA_ANDROID_DEVICE_EVIDENCE`，指向根据 `release/device-evidence.*.example.json` 复制并填写的审阅结果。每个平台必须是 physicalDevice，记录设备、OS、build identifier、测试者、时间，并为 E2E-001 至 E2E-005 每项提供至少一条证据引用。该命令验证证据完整性，不替代实际按第 11 节和 Testing 文档执行旅程。
 
@@ -74,11 +77,11 @@ Phase 0 已建立以下入口。实际通过记录只写入 STATUS；后续阶�
 
 `build:check` 在被忽略的 `.expo-export/` 生成本地 source map，并检查模块清单；缺少 map/inventory 或包含独立 Hermes entry、排程 benchmark、UI/Hermes 驱动、下载工具时退出失败。这些 map 仅服务本地验证，不作为发布产物上传。原生 Scene lifecycle 的 SDK 兼容维护按 [DEC-004](DECISIONS.md#dec-004) 复测，不能用 export 代替实际原生构建。
 
-本地 UI 测试需先准备无需账号的 Maestro CLI、Java 17+ 与对应原生宿主；不调用 Maestro Cloud 或 AI analysis。iOS 使用 `bun run test:ui --platform ios --app <Debug .app> --runs 2`；Android 使用 `bun run test:ui --platform android --device <owned emulator serial> --app <Debug .apk> --runs 2`。Metro 另用 `bun run dev --port 8087 --offline` 启动；Expo 的 `--offline` 只禁用开发工具网络查询，不表示 App/设备已断网，且不能与 `--localhost` 同时传入。根目录转发脚本使用 `bun run --cwd apps/mobile <script>`。
+本地 UI 测试需先准备无需账号的 Maestro CLI、Java 17+ 与对应原生宿主；不调用 Maestro Cloud 或 AI analysis。iOS 使用 `pnpm run test:ui --platform ios --app <Debug .app> --runs 2`；Android 使用 `pnpm run test:ui --platform android --device <owned emulator serial> --app <Debug .apk> --runs 2`。Metro 另用 `pnpm run dev --port 8087 --offline` 启动；Expo 的 `--offline` 只禁用开发工具网络查询，不表示 App/设备已断网，且不能与 `--localhost` 同时传入。根目录转发脚本使用 `pnpm --filter /mobile run <script>`。
 
 iOS 默认创建并登记专用 Simulator，或传 ownership receipt 中已记录的 `--device`；`--runtime` 用于新设备。Android 工具放在 `.artifacts/tools/android-sdk`，先用该 SDK 创建 `.artifacts/tools/android-avd/` 中的专用 AVD，启动后将 owner=OPT-NC-20261003、platform=android、实际 serial/name/runtime/path 写入 `.artifacts/optimization/ui-devices.json`，禁止登记已有用户 AVD。Runner 核对 adb 返回的真实 AVD 名称后才允许重装 App。`--maestro` 可指定本地 CLI，`--port` 必须与 Metro 一致。配置错误退出 2，命令/旅程/业务断言失败退出 1；成功退出 0 只证明报告中实际执行的本地旅程。Android 飞行模式、Wi-Fi、移动数据及默认网络在离线旅程前后核对；驱动有界等待连接服务实际断开，结束后恢复专用设备网络；127.0.0.1 的 ADB/Metro bridge 保留为开发包加载例外。iOS 尚未实现网络禁用，报告不得标成通过；offline/planAcceptance 字段须单独核对。
 
-隔离 Hermes 宿主启动命令为 `EXPO_NO_TELEMETRY=1 CI=1 bunx expo start apps/mobile/testing --dev-client --offline --port 8089`，随后执行 `bun run test:hermes --device <owned Android emulator> --port 8089`。测试脚本核对专用 AVD、已安装 development App 和 manifest 中的独立 entry，重启该 App，并读取其唯一 PID 的合成日志；它不重装/清库。报告保存在 `.ai/evidence/optimization/hermes-runtime.json`，原始 markers 在 `.artifacts/optimization/hermes-runs/`。UI 与 Hermes 会重启同一个测试 App，必须顺序执行。所有脚本/测试源码、独立入口与对应依赖不应进入 production Router/export。
+隔离 Hermes 宿主启动命令为 `EXPO_NO_TELEMETRY=1 CI=1 pnpm exec expo start apps/mobile/testing --dev-client --offline --port 8089`，随后执行 `pnpm run test:hermes --device <owned Android emulator> --port 8089`。测试脚本核对专用 AVD、已安装 development App 和 manifest 中的独立 entry，重启该 App，并读取其唯一 PID 的合成日志；它不重装/清库。报告保存在 `.ai/evidence/optimization/hermes-runtime.json`，原始 markers 在 `.artifacts/optimization/hermes-runs/`。UI 与 Hermes 会重启同一个测试 App，必须顺序执行。所有脚本/测试源码、独立入口与对应依赖不应进入 production Router/export。
 
 Calendar/Notification 的 Application、SQLite、Expo Adapter 代码、注入 native facade 测试或仅前台 Mobile Runtime 组合通过，均不等于系统权限、真实投递或端到端产品路径通过。Phase 3 必须另外记录平台、OS 版本、账户/source、权限初始状态、前后台/终止场景及实际 readback。
 
@@ -206,8 +209,8 @@ critical E2E
 
 1. 产品、隐私和算法负责人先按 [DECISIONS 的 Resolution Input Packet](DECISIONS.md#resolution-input-packet) 关闭影响首发的条目，并更新对应 Canonical Docs / ADR。
 2. 授权发布者在本机登录 EAS，确认 Expo owner/projectId 与 iOS/Android identifier 的可用性；签名和商店 service account 只通过对应平台的 Secret / Credentials 流程配置。
-3. 使用经授权的 preview build，在各一台物理 iOS、Android 设备上执行 E2E-001…005 和本章的 Calendar / Notification 清单；从 `release/device-evidence.*.example.json` 建立经审核的证据文件，再执行 `bun run test:e2e`。
-4. 基于最终签名二进制审核 Privacy Policy URL、Apple App Privacy 与 Google Data safety；全部外部门禁具备可追溯依据后，才运行 production build、submit 与最终 `bun run release:gate`。
+3. 使用经授权的 preview build，在各一台物理 iOS、Android 设备上执行 E2E-001…005 和本章的 Calendar / Notification 清单；从 `release/device-evidence.*.example.json` 建立经审核的证据文件，再执行 `pnpm run test:e2e`。
+4. 基于最终签名二进制审核 Privacy Policy URL、Apple App Privacy 与 Google Data safety；全部外部门禁具备可追溯依据后，才运行 production build、submit 与最终 `pnpm run release:gate`。
 
 ### Phase 3 Device Evidence
 
@@ -234,3 +237,9 @@ Phase 3 正式关闭还必须证明 production SchedulingSnapshot 与 ScheduleSe
 每次验证记录日期、命令/手工步骤、平台与环境、覆盖范围、结果和失败原因。依赖组合由 DEC-004 跟踪；文档中的设计版本不构成兼容证据。离线、Calendar、Notification 与计时恢复必须保留真实设备验证记录。
 
 仅文档修改时执行文档检查并在 STATUS 标明代码检查不适用/尚不可运行，不能运行不存在的脚本后省略失败或改写为通过。
+
+## 13. Internal Server and Sync Verification
+
+服务端配置、固定版本、本地数据库和启动命令见 [server README](../server/README.md)。新增 `server:dev`、`server:check`、`server:generate`、`server:codegen:check`、`server:test:integration` 与 `server:test:sync`。统一 `check` 增加不依赖运行中数据库的 Go 静态/单元/构建检查。数据库集成需要真实 PostgreSQL 18 的 TEST_DATABASE_URL；两客户端联调需要运行中的 CLOUD_TEST_URL，缺配置必须失败，不以 skip 冒充通过。
+
+CI 安装固定 Go/pnpm、使用 PostgreSQL 18 service，独立执行迁移、Go 集成、代码生成一致性与两 SQLite 客户端联调。模拟器 UI、本地 HTTP/SQLite 证据与物理设备 E2E 分别记录；本轮不执行公网部署、签名或商店提交。新同步能力需要重新审查商店隐私草案，旧的“无云同步”表述不适用于登录后的内部构建。

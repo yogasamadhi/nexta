@@ -757,3 +757,13 @@ Phase 3 已实现 Snapshot/Coverage、verified Calendar container/event 与 Noti
 Worker 在外部调用前后检查 desiredRevision；旧计划作业标为 superseded，未知外部结果即使版本已变也保留 reconciliation_required。Notification worker 还在领取事务中读取经过 Schema 校验的提醒提前量和 stateVersion；若 Provider 调用期间本地输入变化，已核验的 binding/intent 结果仍先安全 checkpoint，再将准确 claim 释放为 pending 进行下一轮收敛。外部 API 调用不位于 SQLite 事务内；每次有副作用的调用前先提交 ExternalMutationIntent，完成阶段再以 claim/revision fence checkpoint verified binding 并删除 intent，最终 Job 状态另以 claim CAS 落盘。启动/领取时还会先扫描通道内最旧 intent，通过单项 reconcile 或 owned-marker inventory 恢复缺失 binding；`partial`/`unknown` inventory 不能推断外部对象不存在。作业状态变化不反向改写已经成立的本地计划。该本地协议、Node SQLite 故障注入和 injected native facade 已有测试，真实 Expo/OS 进程终止、权限和回读行为仍须设备验收。
 
 `stateVersion` 与 `planRevision` 的变化规则、事务和恢复流程以 [Contracts](05-API.md#commit-contract) 为准。当前实现不保存 mutation 参数原文，只保存稳定 SHA-256 摘要；为在实体后来变化后仍能精确重放首次提交响应，`resultJson` 会保存完整返回 DTO，必要 `diffJson` 还会保存计划变更前后快照。它们可能包含 Task/Goal/Project 标题、描述、完成事实或计划事实，属于本地业务 SQLite 中的敏感业务数据，不是日志、LLM Context 或无关 Tool Result 的数据源；保留/清理必须同时维护幂等与证据约束，并遵守 [Security](09-SECURITY.md#6-llm-data-exposure) 和 DEC-009。除这些明确的结果/恢复快照外，OperationRecord 不成为保存用户原始输入、聊天、日历描述或模型响应的旁路。Undo 超期或事实变化时返回明确不可撤销/需新 Preview，不恢复历史执行事实。
+
+## 28. Cloud Sync Persistence
+
+内部扩展依据 [ADR-0010](ADR/0010-local-first-cloud-sync.md)。SQLite 追加 `0009_cloud_sync`，历史 `0000–0008` SQL/checksum 不变。新表包括最小 `operation_provenance`、来源计划 `cloud_plan_origins`、状态/实体版本、Outbox、冲突档案及游客认领记录。Completion/Activity FK 改为必要操作来源；OperationRecord 完整本地收据保持原样。升级同时重建依赖完成表的 Achievement FK，不能清库或丢弃既有证据。
+
+云端实体保留业务 ID，唯一性/外键带 user_id；版本和游标是十进制字符串，不能经 JavaScript 浮点数换算。偏好按 key、复盘按 localDate/timeZone 标识。共享字段清单为 `server/contracts/entities.json`；TimeBlock 的本地 planRevision/externalCalendarEventId 不上传，来源计划另存设备来源、原版本、算法/策略与关联块信息。
+
+选择云端主线时，未采用的本地事务及依赖分支保留为只读冲突档案，不计入正常完成汇总；不能从两个冲突分支各生成一次成就。移动端数据库按服务端 origin 和账号隔离，首次游客认领保留原库及认领证据。
+
+追加 `0010_cloud_bootstrap` 保存服务端快照身份、固定 revision、下一页、暂存事实与完成标记；暂存不参与业务查询。`0000–0009` 已发布 SQL/checksum 不变。独立 `execution-cloud-catalog.sqlite` 只保存非秘密资料目录，由 Drizzle `cloudProfileCatalog` 描述，不存 Token。下载导入先验证字段、完成证据/任务/成就/区间/复盘之间的完整关系，再同事务发布事实和游标。云端主线选择只归档冲突及依赖分支，其他本地待提交修改保持可见；依赖档案也可在冲突页只读查看。

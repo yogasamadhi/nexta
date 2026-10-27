@@ -9,7 +9,7 @@
 
 ## 项目现状
 
-Phase 0–10 的可自主实现工程与核心业务技术基线已经建立：仓库采用 Bun Monorepo，包含 Expo Development Build 移动端、11 个职责包、统一质量检查与 CI，并已实现手工任务、确定性排程、执行/成就、受控 Agent 边界、默认关闭的行为特征缓存、离线 Reflection/Energy Check-in/Relax、文件型 SQLite 进程恢复、有界 Provider 调用，以及版本化 EAS/隐私/发布门禁骨架。真实 Provider、OS/物理设备证据、开放产品决策、签名账号和商店审核仍未完成，因此当前不能称为完整发布版。实际任务、阻塞和验证证据以 [.ai/STATUS.md](.ai/STATUS.md) 为准；实施顺序见 [.ai/PLAN.md](.ai/PLAN.md)。
+Phase 0–10 的可自主实现工程与核心业务技术基线已经建立：仓库采用 pnpm Monorepo，包含 Expo Development Build 移动端、11 个职责包、统一质量检查与 CI，并已实现手工任务、确定性排程、执行/成就、受控 Agent 边界、默认关闭的行为特征缓存、离线 Reflection/Energy Check-in/Relax、文件型 SQLite 进程恢复、有界 Provider 调用，以及版本化 EAS/隐私/发布门禁骨架。真实 Provider、OS/物理设备证据、开放产品决策、签名账号和商店审核仍未完成，因此当前不能称为完整发布版。实际任务、阻塞和验证证据以 [.ai/STATUS.md](.ai/STATUS.md) 为准；实施顺序见 [.ai/PLAN.md](.ai/PLAN.md)。
 
 ## 核心设计
 
@@ -25,7 +25,7 @@ V1 完整范围与 MUST/SHOULD 见 [产品](docs/01-PRODUCT.md) / [需求](docs/
 
 ## 技术与目录
 
-技术选型、版本基线和包职责统一维护在 [Architecture](docs/03-ARCHITECTURE.md)，实际解析版本以 manifest 与 `bun.lock` 为准。依赖变更后必须重新执行双平台 Bundle 检查；涉及原生依赖时还要重新执行对应 Development Build。
+技术选型、版本基线和包职责统一维护在 [Architecture](docs/03-ARCHITECTURE.md)，实际解析版本以 manifest 与 `pnpm-lock.yaml` 为准。依赖变更后必须重新执行双平台 Bundle 检查；涉及原生依赖时还要重新执行对应 Development Build。
 
 当前目录：
 
@@ -52,11 +52,12 @@ docs/
 常用命令：
 
 ```bash
-bun install
-bun run dev
-bun run ios
-bun run android
-bun run check
+pnpm install
+python3 run.py
+pnpm run dev
+pnpm run ios
+pnpm run android
+pnpm run check
 ```
 
 完整脚本职责、原生构建与发布门禁见 [Build & Release](docs/10-BUILD-RELEASE.md)。AI 编码会话先读 [AGENTS.md](AGENTS.md)。
@@ -80,3 +81,7 @@ bun run check
 | AI 稳定摘要 / 阶段计划 / 实际状态 | [CONTEXT](.ai/CONTEXT.md) / [PLAN](.ai/PLAN.md) / [STATUS](.ai/STATUS.md) |
 
 [MANIFEST](MANIFEST.md) 只记录当前 Markdown 文件清单，不维护另一套产品或实施状态。
+
+## 内部账号与同步开发
+
+新增服务端位于 [server](server/README.md)，按 [ADR-0010](docs/ADR/0010-local-first-cloud-sync.md) 保留 SQLite 离线闭环，提供内部邮箱密码账号、设备会话和业务事实同步。启动 PostgreSQL 18、执行迁移并运行 Kratos 后，在移动端 Settings 的账号入口联调。无邮箱验证/找回或公网部署；实际验证和限制见 STATUS。

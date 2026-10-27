@@ -29,7 +29,7 @@ Phase 0 工程基线已建立，后续从 Phase 1 开始实现产品能力；实
 ### Exit
 
 ```text
-bun run check
+pnpm run check
 ```
 
 可稳定通过，并分别记录 iOS/Android 最小 Development Build 的实际结果。脚本职责见 10-BUILD-RELEASE；未覆盖业务测试不得伪装为业务通过。
@@ -417,7 +417,7 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 ### OPT-01 — Environment and Git baseline
 
 1. 重读 AGENTS、Context、Status、相关 Canonical Docs；检查工作树、已有修改、Git 历史与身份。先确认现有实现和测试，避免把已有能力重新列为待实现。
-2. 检查 Bun/Node、Xcode/simctl、可用 Simulator runtime、Android SDK/adb/emulator、Java 与候选 UI 驱动。只记录工具版本、是否可用和失败类别，不输出凭据、环境变量全集或用户身份内容。2026-10-03 预检只证明 simctl 可调用；没有 booted device，Maestro/adb 不在 PATH，不能据此声称任一平台已可执行。
+2. 检查 pnpm/Node、Xcode/simctl、可用 Simulator runtime、Android SDK/adb/emulator、Java 与候选 UI 驱动。只记录工具版本、是否可用和失败类别，不输出凭据、环境变量全集或用户身份内容。2026-10-03 预检只证明 simctl 可调用；没有 booted device，Maestro/adb 不在 PATH，不能据此声称任一平台已可执行。
 3. 审查将入库的文件、Secret 与生成物忽略规则；保留用户工作，不运行 destructive reset 或清理真实数据库。需要新增工具或下载运行环境时先查官方安装/兼容说明，再完成无需账号的合理准备。
 4. 使用已配置的 Git 身份建立本地基线提交，记录 commit SHA；后续优化使用 codex/ 分支或复用适合当前任务的分支。若已有提交，不重新初始化或覆盖历史；不配置远端、不推送。
 
@@ -429,7 +429,7 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 
 1. 使用固定 seed、显式 now/时区/policy，构造 50/200/500 Task、7/30 天 horizon，以及低/高 Busy 密度、locked/started/completed 保护块、可拆分/不可拆分、截止紧张等有代表性的组合。限制矩阵规模，记录每个实际运行的组合。
 2. 测量 schedule/replan 的预热后耗时分布、移动块数/总偏移分钟、未排程剩余工作量与关键不变量。变化量采用稳定身份与明确匹配规则，无法匹配的新增/删除单列，不能伪装成移动。
-3. 建立独立脚本入口和结构化结果，记录 fixture/seed、样本数、运行时、设备/主机类别、代码与 policy 版本。Node/Bun 结果与 Hermes 结果分开；Hermes 可运行时采集，缺环境时标明未测量。
+3. 建立独立脚本入口和结构化结果，记录 fixture/seed、样本数、运行时、设备/主机类别、代码与 policy 版本。Node 结果与 Hermes 结果分开；Hermes 可运行时采集，缺环境时标明未测量。
 4. 仅对证据显示的热点作保持公共行为的局部优化；同输入输出、硬约束、保护块、版本与确定性不能退化。不在本任务调整生产权重或创造未经接受的性能 SLA。
 
 验收：所有规定负载维度有可重复测量记录；固定输入输出稳定、保护与约束检查通过；输出含未优化基线。若修热点，附同环境/同输入前后对比。该包完成不要求人为制造性能改善。
@@ -507,15 +507,15 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 
 | 拟新增入口 | 职责 | 通过证据 |
 | --- | --- | --- |
-| bun run bench:scheduler | OPT-02 的固定负载基准；默认不进入普通正确性 CI 的时间阈值门禁 | 实际结果、seed/版本/运行时与约束检查 |
-| bun run test:ui | OPT-03 的本地 UI 驱动；平台通过显式参数/配置选择 | Development Build 旅程断言、两次运行结果 |
-| bun run test:hermes | OPT-02/05 的隔离 Hermes 测试宿主；与 UI 顺序执行 | 实际 Hermes runtime、有限 Fake Agent 与固定排程场景结果 |
+| pnpm run bench:scheduler | OPT-02 的固定负载基准；默认不进入普通正确性 CI 的时间阈值门禁 | 实际结果、seed/版本/运行时与约束检查 |
+| pnpm run test:ui | OPT-03 的本地 UI 驱动；平台通过显式参数/配置选择 | Development Build 旅程断言、两次运行结果 |
+| pnpm run test:hermes | OPT-02/05 的隔离 Hermes 测试宿主；与 UI 顺序执行 | 实际 Hermes runtime、有限 Fake Agent 与固定排程场景结果 |
 
-既有 bun run test:e2e 保持双物理设备证据门禁，bun run check 不因本轮优化自动要求未配置的 native runtime。UI runner 的 CI 接入如需本地 runner/原生宿主，按真实可用环境单独配置，不把未运行 job 描述为远端 CI 已通过。
+既有 pnpm run test:e2e 保持双物理设备证据门禁，pnpm run check 不因本轮优化自动要求未配置的 native runtime。UI runner 的 CI 接入如需本地 runner/原生宿主，按真实可用环境单独配置，不把未运行 job 描述为远端 CI 已通过。
 
 每个工作包记录：状态、变更文件、命令与退出码、环境/覆盖、证据引用、未解决问题、下一步。结构化合成数据结果可放入 .ai/evidence/optimization/；较大的截图、原始构建/驱动日志放入被忽略的本地目录，STATUS 保留结果摘要和位置，不入库用户数据或凭据。禁止只填“已运行”而不保留可核对结果。
 
-每次修改先运行相关检查。阶段收口执行 bun run check；全部工作完成且没有新变更后不重复无意义的全量测试。仅文档修改运行 format:check/docs:check 和链接/引用/映射/语义核查；没有业务修改时实现与代码测试标“不适用”，不伪造代码验证。
+每次修改先运行相关检查。阶段收口执行 pnpm run check；全部工作完成且没有新变更后不重复无意义的全量测试。仅文档修改运行 format:check/docs:check 和链接/引用/映射/语义核查；没有业务修改时实现与代码测试标“不适用”，不伪造代码验证。
 
 ### Goal lifecycle and completion
 
@@ -529,7 +529,7 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 
 - OPT-01 至 OPT-09 全部有实际验收证据并标记 DONE；允许审查类任务以“已审查，无需修改”完成，不能用跳过替代环境依赖任务。
 - 本地 Git 基线和优化提交可追溯；benchmark 与 UI runner 是真实可用命令，至少一个本地 Development Build 平台的规定旅程连续两次通过。
-- 所有本轮实现与相关测试完成，bun run check 通过；涉及 native 依赖的改动有对应实际 Development Build 证据。
+- 所有本轮实现与相关测试完成，pnpm run check 通过；涉及 native 依赖的改动有对应实际 Development Build 证据。
 - Canonical Docs、必要 ADR、CONTEXT、PLAN、STATUS 和 MANIFEST 按实际影响同步；无未处理的本轮高优先级已知缺陷。
 - 真实 Provider、另一未执行平台/Hermes、物理设备、未决产品参数和发布条件逐项保留真实边界；本目标完成只表示本轮本地优化完成，不表示 V1 或原正式 Phase Exit 完成。
 
@@ -539,6 +539,19 @@ Phase 10 发布工程技术骨架已经建立：App 使用 `0.1.0` / iOS build `
 
 ```text
 完成 /Volumes/A/code/project/nexta/.ai/PLAN.md 中 OPT-NC-20261003（No-Credential Optimization Plan）的 OPT-01 至 OPT-09。先读 AGENTS.md、CONTEXT、STATUS 和对应 Canonical Docs，按依赖逐包实施，不要求我填写 Token、API Key 或发布账号。允许准备必要的无需账号本地测试工具、创建本地 Git 提交与 codex/ 分支；不推送或发布，不选择未接受的 Provider，不关闭 Open Decision，不改生产权重/个性化/自动提交/备份默认。
-完成以工作包实际验收证据、可重复排程基准、至少一个本地 Development Build 平台两次通过 UI 旅程、完整 bun run check 以及文档同步为准。每轮更新 STATUS 的 Optimization Execution Status，继续未完成且依赖满足的任务。不能将 Fake Provider、bundle 或模拟器结果当作真实模型/物理设备证据，不能把跳过项记为 DONE。
+完成以工作包实际验收证据、可重复排程基准、至少一个本地 Development Build 平台两次通过 UI 旅程、完整 pnpm run check 以及文档同步为准。每轮更新 STATUS 的 Optimization Execution Status，继续未完成且依赖满足的任务。不能将 Fake Provider、bundle 或模拟器结果当作真实模型/物理设备证据，不能把跳过项记为 DONE。
 遇到外部条件缺失先记录并推进其他独立工作；没有可行路径时按宿主目标规则报告阻塞、保留未完成项和最小解除条件。全部验收满足后报告代码提交、测试/测量结果、文档影响与剩余外部门禁，结束目标。
 ```
+
+## Account and Sync Implementation Track
+
+2026-10-25 用户批准的独立扩展，依据 ADR-0010；不改写原 80/101 或 80/80 清单。相关需求：REQ-AUTH-001 / AC-AUTH-001、REQ-SYNC-001 / AC-SYNC-001；验证 CASE-AUTH-01、CASE-SYNC-01。
+
+1. 确定内部账号/完整事实/冲突/设备归属契约，保留 Local-first。
+2. Kratos v3、PostgreSQL 18、sqlc/pgx、迁移、账号与设备隔离。
+3. 原子批次、租户游标、初始化暂存、冲突与精确重放。
+4. SQLite 追加迁移、必要操作来源、Outbox 与无回声导入。
+5. 移动端资料隔离、SecureStore、登录/同步/冲突与独立 OS 投影。
+6. 真实 PostgreSQL、两 SQLite 客户端、共享契约与 UI/仓库检查；原有发布门禁独立保留。
+
+实际实现、命令、失败及限制只记入 STATUS；本轮无邮件验证/找回、AI 网关、公网部署或跨设备计时接管。

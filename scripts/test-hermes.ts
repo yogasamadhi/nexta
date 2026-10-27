@@ -3,14 +3,16 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 
-const root = resolve(import.meta.dir, '..');
+import { run, sleep, workspaceRoot } from './lib/runtime';
+
+const root = workspaceRoot;
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
   console.log(
-    'Start: EXPO_NO_TELEMETRY=1 CI=1 bunx expo start apps/mobile/testing --dev-client --offline --port 8089',
+    'Start: EXPO_NO_TELEMETRY=1 CI=1 pnpm exec expo start apps/mobile/testing --dev-client --offline --port 8089',
   );
   console.log(
-    'Then: bun run test:hermes --device <owned Android emulator> [--port 8089]',
+    'Then: pnpm run test:hermes --device <owned Android emulator> [--port 8089]',
   );
   console.log(
     'Requires the installed development app. Restarts only that app; does not reset business data.',
@@ -55,20 +57,13 @@ const artifacts = join(
 await mkdir(artifacts, { recursive: true });
 const commands: { argv: string[]; exitCode: number }[] = [];
 async function command(argv: string[]) {
-  const child = Bun.spawn(argv, { cwd: root, stdout: 'pipe', stderr: 'pipe' });
-  const timer = setTimeout(() => child.kill(), 30_000);
-  try {
-    const [exitCode, stdout] = await Promise.all([
-      child.exited,
-      new Response(child.stdout).text(),
-      new Response(child.stderr).text(),
-    ]);
-    commands.push({ argv, exitCode });
-    assert.equal(exitCode, 0, 'Host command failed');
-    return stdout.trim();
-  } finally {
-    clearTimeout(timer);
-  }
+  const { exitCode, stdout } = await run(argv[0]!, argv.slice(1), {
+    cwd: root,
+    timeoutMs: 30_000,
+  });
+  commands.push({ argv, exitCode });
+  assert.equal(exitCode, 0, 'Host command failed');
+  return stdout.trim();
 }
 function sourceHash() {
   return Promise.all(
@@ -84,7 +79,7 @@ function sourceHash() {
       'packages/scheduler-core/src/errors.ts',
       'packages/agent-core/src/index.ts',
       'packages/model-runtime/src/index.ts',
-      'bun.lock',
+      'pnpm-lock.yaml',
     ].map(async (path) => [path, await readFile(join(root, path))] as const),
   ).then((rows) => {
     const hash = createHash('sha256');
@@ -221,7 +216,7 @@ try {
       markers.includes('[OPT-HERMES-FAIL]')
     )
       break;
-    await Bun.sleep(1000);
+    await sleep(1000);
   }
   await writeFile(join(artifacts, 'markers.log'), markers);
   const records = markers.split('\n').flatMap((line) => {
@@ -276,7 +271,7 @@ try {
     limitations: [
       'Synthetic Fake Provider; no real model request or production Capture.',
       'Android emulator Debug host; not physical-device performance or native OS provider acceptance.',
-      'Bun and Hermes timing results must be compared separately.',
+      'Node and Hermes timing results must be compared separately.',
     ],
   };
 } catch {

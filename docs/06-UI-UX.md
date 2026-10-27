@@ -402,3 +402,30 @@ SQLITE_CONSTRAINT / provider 500
 ## 17. 交互验收关联
 
 Capture/Offline 见 CASE-OFFLINE-01；Focus 与完成语义见 CASE-EXEC-01/02；Preview/Undo 见 CASE-COMMIT-01/03；部分同步失败见 CASE-COMMIT-02。完整映射保存在 [Testing](08-TESTING-ACCEPTANCE.md#requirement-matrix)，本文件只维护用户可见行为。
+
+---
+
+## 18. Logo 候选资产
+
+「向前的一步」候选将连续路径形的抽象 N 与一个代表当前行动的圆点结合，沿用现有界面的翡翠绿方向。图标使用深绿背景、米白路径与薄荷绿圆点；以宽笔画和留白保持移动端小尺寸可辨识。
+
+- [App 图标 PNG](../output/imagegen/execution-agent-logo-v1.png)：1024×1024、不透明、完整正方形，外轮廓由平台裁切。
+- [透明 Logo PNG](../output/imagegen/execution-agent-mark-v1.png)：1024×1024，便于后续组合与视觉评审。
+- [图标预览](../output/imagegen/execution-agent-logo-v1-preview.png)与[小尺寸评审图](../output/imagegen/execution-agent-logo-v1-size-review.png)。
+- [生成 Prompt](../output/imagegen/execution-agent-logo-v1.prompt.txt)与[生成及整理记录](../output/imagegen/execution-agent-logo-v1.provenance.json)。
+
+第二版保留路径与当前行动圆点的语义，改用更几何的竖向笔画和直线对角连接。第一版保留供对比；第二版同样属于候选。
+
+- [第二版 App 图标](../output/imagegen/execution-agent-logo-v2.png)与[透明 Logo](../output/imagegen/execution-agent-mark-v2.png)：均为 1024×1024。
+- [第二版预览](../output/imagegen/execution-agent-logo-v2-preview.png)与[小尺寸评审图](../output/imagegen/execution-agent-logo-v2-size-review.png)。
+- [第二版生成 Prompt](../output/imagegen/execution-agent-logo-v2.prompt.txt)、[原始生成图](../output/imagegen/execution-agent-logo-v2-generated.png)与[生成及整理记录](../output/imagegen/execution-agent-logo-v2.provenance.json)。
+
+该资产属于可评审候选，最终品牌仍按 [DEC-003](DECISIONS.md#dec-003) 决策。当前请求交付视觉文件；正式接入原生图标、启动画面与品牌规范属于后续范围。实际生成与验证证据见 [STATUS](../.ai/STATUS.md#logo-candidate-delivery)。
+
+## 19. 内部账号与同步
+
+Settings 提供账号与同步入口。登录界面必须先说明目标、项目、任务、计划、执行/完成/成就、含用户备注的复盘、精力、放松及可移植偏好会在登录后自动上传；系统日历缓存、OS 身份、密钥及完整本地收据不上传。标明内部注册暂无邮箱验证与密码找回，不宣称端到端加密。
+
+状态区分本地、同步中、待上传、断网、认证失效、冲突与重试。冲突页展示本地变化与云端事实，二次明确选择云端主线或按新版本提交本地修改；不允许强制覆盖完成证据。未采用分支可读且不计正常完成。其他设备活跃的 Focus/Relax 显示只读来源，不能用禁用按钮代替应用层授权约束。
+
+本设备的系统日历/通知投影独立开启，新账号资料默认关闭；开启多台设备可能各自提醒。退出后保留账号资料并回到独立游客空间，不把其他账号内容混入。

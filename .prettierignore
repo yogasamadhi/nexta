@@ -9,4 +9,5 @@ apps/mobile/ios/**
 docs/
 MANIFEST.md
 node_modules/
-bun.lock
+pnpm-lock.yaml
+pnpm-workspace.yaml

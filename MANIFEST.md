@@ -1,10 +1,10 @@
 # Project Document Manifest
 
-Updated: 2026-09-12
+Updated: 2026-10-26
 
 Scope: all Markdown files in this documentation workspace, including this manifest.
 
-Total files: 27
+Total files: 29
 
 - `.ai/CONTEXT.md`
 - `.ai/PLAN.md`
@@ -31,5 +31,7 @@ Total files: 27
 - `docs/ADR/0007-non-clinical-psychology-mindfulness.md`
 - `docs/ADR/0008-remote-inference-local-agent.md`
 - `docs/ADR/0009-application-commit-and-recovery.md`
+- `docs/ADR/0010-local-first-cloud-sync.md`
 - `docs/ADR/README.md`
 - `docs/DECISIONS.md`
+- `server/README.md`

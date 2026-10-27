@@ -1,0 +1,924 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-26T06:37:04.203Z",
+  "revision": "d1a26353c9bd2e18b1dba84800e26130bb10db87",
+  "workingTreeDirty": true,
+  "sourceHashes": {
+    "packages/scheduler-core/src/scheduler.ts": "9281adbb82fb65876fe9022de0877ebbcacda728fb6dc08df709574db7a4cac3",
+    "packages/scheduler-core/src/time.ts": "26e57e182a82ec41e7cf81e9307a2911a6a4156fbffbb45785b3e929bf129621",
+    "packages/scheduler-core/src/types.ts": "80d9bdf6195823b7fb823f955600a01ae9226412b5a4142c83e6eb6342813de8",
+    "packages/scheduler-core/src/validation.ts": "52bd6ec51706157714244e35bb647b7caadea30aa3f2ffdfe293c21a61b6751c",
+    "tests/benchmarks/scheduler/scenarios.ts": "4ab91ee3bad1f753a3fae30f15050e15f8f3f4b0ab972d60c0086ea84dc6828f",
+    "tests/benchmarks/scheduler/analysis.ts": "ffc245829f4f6e981bd60a6929c63bb39b7cc9ba8dff00476ad9f8e63f967f87",
+    "scripts/benchmark-scheduler.ts": "1264d442b7fbbf7e0427e01150cb46058e7deaacbaf8e162eb7cc27c0ca83da0"
+  },
+  "runtime": "Node 24.18.0",
+  "environment": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4"
+  },
+  "samples": 5,
+  "warmup": 1,
+  "timingMethod": "Empirical nearest-rank p95; correctness checks outside timed interval.",
+  "scope": "Synthetic UTC-expanded working windows; neutral and explicitly labelled example policy. No production policy change; no Hermes claim.",
+  "cases": [
+    {
+      "id": "50-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.059,
+          "medianMs": 2.108,
+          "p95Ms": 2.147,
+          "maxMs": 2.147
+        },
+        "changes": {
+          "added": 39,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 29,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2850,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2010,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 3
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.058,
+          "medianMs": 2.409,
+          "p95Ms": 4.354,
+          "maxMs": 4.354
+        },
+        "changes": {
+          "added": 3,
+          "removed": 1,
+          "moved": 12,
+          "resized": 5,
+          "unchanged": 27,
+          "totalStartOffsetMinutes": 4245
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 41,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2040,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "50-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 1.489,
+          "medianMs": 1.571,
+          "p95Ms": 1.637,
+          "maxMs": 1.637
+        },
+        "changes": {
+          "added": 36,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 15,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 36,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1725,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 3135,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 1.511,
+          "medianMs": 1.576,
+          "p95Ms": 1.644,
+          "maxMs": 1.644
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 37,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1695,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 3165,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 8
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "50-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 12.846,
+          "medianMs": 12.984,
+          "p95Ms": 13.158,
+          "maxMs": 13.158
+        },
+        "changes": {
+          "added": 69,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 49,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 69,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4860,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 0,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 13.639,
+          "medianMs": 13.883,
+          "p95Ms": 15.237,
+          "maxMs": 15.237
+        },
+        "changes": {
+          "added": 1,
+          "removed": 0,
+          "moved": 2,
+          "resized": 3,
+          "unchanged": 68,
+          "totalStartOffsetMinutes": 120
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 49,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 70,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4860,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 0,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "50-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 15.807,
+          "medianMs": 16.149,
+          "p95Ms": 17.5,
+          "maxMs": 17.5
+        },
+        "changes": {
+          "added": 91,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 48,
+          "partiallyScheduledTaskCount": 0,
+          "generatedBlockCount": 91,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4770,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 90,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 2
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 16.266,
+          "medianMs": 16.522,
+          "p95Ms": 16.683,
+          "maxMs": 16.683
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 92,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 47,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 90,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 4740,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 120,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "200-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.291,
+          "medianMs": 2.348,
+          "p95Ms": 2.489,
+          "maxMs": 2.489
+        },
+        "changes": {
+          "added": 41,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 41,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2880,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 14625,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 21
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.375,
+          "medianMs": 2.378,
+          "p95Ms": 2.493,
+          "maxMs": 2.493
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 3,
+          "unchanged": 40,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 27,
+          "partiallyScheduledTaskCount": 4,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 14685,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 24
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "200-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.302,
+          "medianMs": 2.337,
+          "p95Ms": 2.487,
+          "maxMs": 2.487
+        },
+        "changes": {
+          "added": 35,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 3,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1740,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 15765,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 31
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 2.402,
+          "medianMs": 2.51,
+          "p95Ms": 2.553,
+          "maxMs": 2.553
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 36,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 13,
+          "partiallyScheduledTaskCount": 4,
+          "generatedBlockCount": 34,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1710,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 15795,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 34
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "200-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 23.382,
+          "medianMs": 24.135,
+          "p95Ms": 27.069,
+          "maxMs": 27.069
+        },
+        "changes": {
+          "added": 199,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 142,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 199,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12705,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 4800,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 8
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 24.176,
+          "medianMs": 24.213,
+          "p95Ms": 24.517,
+          "maxMs": 24.517
+        },
+        "changes": {
+          "added": 1,
+          "removed": 1,
+          "moved": 12,
+          "resized": 6,
+          "unchanged": 186,
+          "totalStartOffsetMinutes": 4245
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 141,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 199,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12645,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 4860,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 9
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "200-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 200,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 17.607,
+          "medianMs": 17.861,
+          "p95Ms": 18.175,
+          "maxMs": 18.175
+        },
+        "changes": {
+          "added": 153,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 81,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 153,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7800,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 9705,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 15
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 18.225,
+          "medianMs": 18.697,
+          "p95Ms": 18.819,
+          "maxMs": 18.819
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 154,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 200,
+          "fullyScheduledTaskCount": 80,
+          "partiallyScheduledTaskCount": 7,
+          "generatedBlockCount": 152,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7770,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 9735,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 18
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "500-7-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 4.389,
+          "medianMs": 4.455,
+          "p95Ms": 4.554,
+          "maxMs": 4.554
+        },
+        "changes": {
+          "added": 40,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 27,
+          "partiallyScheduledTaskCount": 5,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2880,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 41820,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 80
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 4.506,
+          "medianMs": 4.755,
+          "p95Ms": 4.831,
+          "maxMs": 4.831
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 3,
+          "unchanged": 39,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 26,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2820,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 41880,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 83
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "500-7-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 7,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 4.708,
+          "medianMs": 4.808,
+          "p95Ms": 4.919,
+          "maxMs": 4.919
+        },
+        "changes": {
+          "added": 35,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 14,
+          "partiallyScheduledTaskCount": 5,
+          "generatedBlockCount": 35,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1755,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 42945,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 93
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 4.926,
+          "medianMs": 5.108,
+          "p95Ms": 5.215,
+          "maxMs": 5.215
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 36,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 13,
+          "partiallyScheduledTaskCount": 6,
+          "generatedBlockCount": 34,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 1725,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 42975,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 96
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "500-30-sparse-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 30,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 20.607,
+          "medianMs": 20.949,
+          "p95Ms": 22.823,
+          "maxMs": 22.823
+        },
+        "changes": {
+          "added": 190,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 139,
+          "partiallyScheduledTaskCount": 10,
+          "generatedBlockCount": 190,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12645,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 32055,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 49
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 21.307,
+          "medianMs": 21.428,
+          "p95Ms": 21.687,
+          "maxMs": 21.687
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 1,
+          "resized": 2,
+          "unchanged": 189,
+          "totalStartOffsetMinutes": 60
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 139,
+          "partiallyScheduledTaskCount": 9,
+          "generatedBlockCount": 189,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 12570,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 32130,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 49
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "500-30-dense-neutral",
+      "seed": 20261003,
+      "taskCount": 500,
+      "horizonDays": 30,
+      "busyDensity": "dense",
+      "policyVersion": "benchmark-neutral/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 21.394,
+          "medianMs": 21.442,
+          "p95Ms": 23.328,
+          "maxMs": 23.328
+        },
+        "changes": {
+          "added": 152,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 80,
+          "partiallyScheduledTaskCount": 9,
+          "generatedBlockCount": 152,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7785,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 36915,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 72
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 21.817,
+          "medianMs": 22.05,
+          "p95Ms": 22.106,
+          "maxMs": 22.106
+        },
+        "changes": {
+          "added": 0,
+          "removed": 1,
+          "moved": 0,
+          "resized": 1,
+          "unchanged": 153,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 500,
+          "fullyScheduledTaskCount": 79,
+          "partiallyScheduledTaskCount": 10,
+          "generatedBlockCount": 151,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 7755,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 36945,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 75
+        }
+      },
+      "invariants": "passed"
+    },
+    {
+      "id": "50-7-sparse-stability-example",
+      "seed": 20261003,
+      "taskCount": 50,
+      "horizonDays": 7,
+      "busyDensity": "sparse",
+      "policyVersion": "benchmark-stability-example/1",
+      "preview": {
+        "timing": {
+          "samples": 5,
+          "minMs": 1.444,
+          "medianMs": 1.46,
+          "p95Ms": 1.49,
+          "maxMs": 1.49
+        },
+        "changes": {
+          "added": 39,
+          "removed": 0,
+          "moved": 0,
+          "resized": 0,
+          "unchanged": 3,
+          "totalStartOffsetMinutes": 0
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 29,
+          "partiallyScheduledTaskCount": 1,
+          "generatedBlockCount": 39,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2850,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2010,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 3
+        }
+      },
+      "replan": {
+        "timing": {
+          "samples": 5,
+          "minMs": 1.653,
+          "medianMs": 1.659,
+          "p95Ms": 1.697,
+          "maxMs": 1.697
+        },
+        "changes": {
+          "added": 2,
+          "removed": 1,
+          "moved": 11,
+          "resized": 3,
+          "unchanged": 28,
+          "totalStartOffsetMinutes": 3045
+        },
+        "metrics": {
+          "taskCount": 50,
+          "fullyScheduledTaskCount": 28,
+          "partiallyScheduledTaskCount": 2,
+          "generatedBlockCount": 40,
+          "preservedBlockCount": 3,
+          "generatedMinutes": 2805,
+          "protectedCommittedMinutes": 75,
+          "knownUnscheduledMinutes": 2055,
+          "unknownUnscheduledTaskCount": 0,
+          "conflictedTaskCount": 1,
+          "warningCount": 5
+        }
+      },
+      "invariants": "passed"
+    }
+  ]
+}

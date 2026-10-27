@@ -7,8 +7,7 @@ import {
   IOS_BUILD_NUMBER,
   createAppConfig,
 } from '../apps/mobile/app.config';
-
-const workspaceRoot = join(import.meta.dir, '..');
+import { workspaceRoot } from './lib/runtime';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`[release:check] ${message}`);
@@ -164,12 +163,12 @@ for (const gate of array(checklist.technicalGates, 'technicalGates')) {
   const item = object(gate, 'technical gate');
   const command = string(item.command, 'technical gate command');
   assert(
-    Object.values(rootScripts).includes(command.replace('bun run ', '')) ||
-      command === 'bun run check' ||
-      command === 'bun run release:check' ||
-      command === 'bun run test:e2e' ||
-      command === 'bun run build:ios' ||
-      command === 'bun run build:android',
+    Object.values(rootScripts).includes(command.replace('pnpm run ', '')) ||
+      command === 'pnpm run check' ||
+      command === 'pnpm run release:check' ||
+      command === 'pnpm run test:e2e' ||
+      command === 'pnpm run build:ios' ||
+      command === 'pnpm run build:android',
     `unknown technical gate command ${command}.`,
   );
 }

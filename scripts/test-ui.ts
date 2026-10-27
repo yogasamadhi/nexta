@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, isAbsolute, join, relative, resolve } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 
-import { Database } from 'bun:sqlite';
+import { run, sleep, workspaceRoot } from './lib/runtime';
 
-const root = resolve(import.meta.dir, '..');
+const root = workspaceRoot;
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
   console.log(
-    'bun run test:ui --platform ios|android --app <Debug .app|.apk> [--device <owned UDID|emulator serial>] [--runtime <simctl runtime>] [--maestro <CLI>] [--port 8087] [--runs 2]',
+    'pnpm run test:ui --platform ios|android --app <Debug .app|.apk> [--device <owned UDID|emulator serial>] [--runtime <simctl runtime>] [--maestro <CLI>] [--port 8087] [--runs 2]',
   );
   console.log(
     'Uses a newly created, recorded test simulator; never accepts an arbitrary device. Android/offline acceptance is reported separately.',
@@ -91,10 +93,9 @@ const commands: {
   exitCode: number;
 }[] = [];
 async function command(argv: string[], logName?: string, allowFailure = false) {
-  const child = Bun.spawn(argv, {
+  const { exitCode, stdout, stderr } = await run(argv[0]!, argv.slice(1), {
     cwd: root,
-    stdout: 'pipe',
-    stderr: 'pipe',
+    timeoutMs: basename(argv[0] ?? '') === 'maestro' ? 900_000 : 60_000,
     env: {
       ...process.env,
       MAESTRO_CLI_NO_ANALYTICS: '1',
@@ -103,16 +104,6 @@ async function command(argv: string[], logName?: string, allowFailure = false) {
       ANDROID_SDK_ROOT: sdk,
     },
   });
-  const timeout = setTimeout(
-    () => child.kill(),
-    basename(argv[0] ?? '') === 'maestro' ? 900_000 : 60_000,
-  );
-  const [exitCode, stdout, stderr] = await Promise.all([
-    child.exited,
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  clearTimeout(timeout);
   commands.push({
     executable: basename(argv[0] ?? ''),
     arguments: argv.slice(1),
@@ -243,9 +234,9 @@ async function ownedDevice(): Promise<DeviceReceipt> {
   return receipt;
 }
 function snapshot(path: string): Facts {
-  const db = new Database(path, { readonly: true });
+  const db = new DatabaseSync(path, { readOnly: true });
   try {
-    const rows = (query: string) => db.query<Row, []>(query).all();
+    const rows = (query: string) => db.prepare(query).all() as Row[];
     return {
       state: rows(
         'SELECT state_version, plan_revision FROM schedule_state',
@@ -426,7 +417,7 @@ async function androidNetwork(id: string, offline: boolean, label: string) {
   const deadline = Date.now() + 15_000;
   let attempt = 0;
   while (offline && !isAndroidOffline(observation) && Date.now() < deadline) {
-    await Bun.sleep(250);
+    await sleep(250);
     observation = await observeAndroidNetwork(id, label + '-wait-' + ++attempt);
   }
   if (offline) assertAndroidOffline(observation);
@@ -543,7 +534,7 @@ try {
       ? app
       : join(app, await infoValue('CFBundleExecutable'));
   const binaryHash = createHash('sha256');
-  for await (const bytes of Bun.file(binary).stream()) binaryHash.update(bytes);
+  for await (const bytes of createReadStream(binary)) binaryHash.update(bytes);
   const sources = (
     await command(['rg', '--files', 'apps/mobile/src', 'packages', 'tests/ui'])
   ).stdout
@@ -555,7 +546,7 @@ try {
     ...sources,
     'scripts/test-ui.ts',
     'apps/mobile/app.config.ts',
-    'bun.lock',
+    'pnpm-lock.yaml',
   ])
     sourceHash
       .update(path)

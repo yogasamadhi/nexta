@@ -1,15 +1,16 @@
+import { runInherit } from './lib/runtime';
+
 const projects = ['tsconfig.json', 'tsconfig.pure.json'] as const;
 
 for (const project of projects) {
   console.log(`[typecheck] ${project}`);
-  const child = Bun.spawn(
-    ['tsc', '--noEmit', '--project', project, '--pretty', 'false'],
-    {
-      stderr: 'inherit',
-      stdout: 'inherit',
-    },
-  );
-  const exitCode = await child.exited;
+  const exitCode = await runInherit('tsc', [
+    '--noEmit',
+    '--project',
+    project,
+    '--pretty',
+    'false',
+  ]);
 
   if (exitCode !== 0) {
     console.error(`[typecheck] ${project} failed with exit code ${exitCode}`);

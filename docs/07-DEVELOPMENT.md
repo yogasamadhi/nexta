@@ -11,9 +11,9 @@ docs
 .ai
 ```
 
-Bun 作为包管理与脚本入口。
+pnpm 作为包管理与脚本入口，Node 24 作为脚本运行时。
 
-Hermes 是 Mobile JS Runtime；Bun 不作为 App Runtime。
+Hermes 是 Mobile JS Runtime；Node 只作为仓库脚本运行时，不作为 App Runtime。
 
 ---
 
@@ -202,6 +202,8 @@ docs(agent): clarify tool risk levels
 - 不盲目使用 `latest`；
 - 升级必须跑 iOS + Android Regression；
 - Design Token 尽量统一定义，避免 Screen 内硬编码。
+- react-native-css 在 native 端会拒绝 class-qualified `:root` 选择器（如 `:root.dark`），暗色只使用 `@media (prefers-color-scheme: dark)`，由 `Appearance.getColorScheme()` 决定；
+- react-native-css 的 Metro resolver 会把 `react-native` 导入重写到 `react-native-css/components`，因此其组件再导出必须覆盖 RN 当前版本的公开 API（RN 0.88 的 `NativeComponentRegistry` 即由 `react-native-css` 3.1 补齐）；升级 RN 或 react-native-css 时必须实际启动 Development Build 验证。
 
 ---
 
@@ -248,13 +250,13 @@ Scheduler 变更必须：
 - 记录 algorithm version；
 - 不破坏已提交 Plan 的审计解释。
 
-固定负载测量使用 `bun run bench:scheduler`。Fixture 与独立后置不变量位于 `tests/benchmarks/scheduler`，计时、Git/主机信息与结果文件写入仅位于 `scripts/benchmark-scheduler.ts`，不向 Pure Core 引入 Node、时钟或文件副作用。测试目录中的显式 policy 仅用于测量，不构成生产权重决定。
+固定负载测量使用 `pnpm run bench:scheduler`。Fixture 与独立后置不变量位于 `tests/benchmarks/scheduler`，计时、Git/主机信息与结果文件写入仅位于 `scripts/benchmark-scheduler.ts`，不向 Pure Core 引入 Node、时钟或文件副作用。测试目录中的显式 policy 仅用于测量，不构成生产权重决定。
 
-本地 UI 驱动使用 `bun run test:ui`，流程源位于 `tests/ui/flows`，平台控制与只读测试库断言位于 `scripts/test-ui.ts`。稳定 testID 只标识现有控件，不作为业务 authority；合成 fixture 经真实 UI/Application Service 写入，禁止生产清库、任意写表或伪造成就的测试入口。Runner 只允许 ownership receipt 与实际名称/UDID/AVD 对齐的专用设备重装 development App；已有用户设备不能被自动接管。两平台新安装的测试沙盒仅调整 Expo 开发菜单的首启、引导和悬浮按钮偏好，避免诊断控件遮挡业务按钮，不写业务数据库。Android 只读事实经 run-as/sqlite3 -readonly 获取；短暂 ADB transport loss 可以有界等待重连后重新读取，但数据库错误和业务断言不能重试隐藏，任务创建和提交不自动重试。网络禁用与本地开发 bridge 分别记录。原始构建/驱动日志与截图位于忽略的 `.artifacts/`，结构化结果另存 `.ai/evidence/optimization/`。
+本地 UI 驱动使用 `pnpm run test:ui`，流程源位于 `tests/ui/flows`，平台控制与只读测试库断言位于 `scripts/test-ui.ts`。稳定 testID 只标识现有控件，不作为业务 authority；合成 fixture 经真实 UI/Application Service 写入，禁止生产清库、任意写表或伪造成就的测试入口。Runner 只允许 ownership receipt 与实际名称/UDID/AVD 对齐的专用设备重装 development App；已有用户设备不能被自动接管。两平台新安装的测试沙盒仅调整 Expo 开发菜单的首启、引导和悬浮按钮偏好，避免诊断控件遮挡业务按钮，不写业务数据库。Android 只读事实经 run-as/sqlite3 -readonly 获取；短暂 ADB transport loss 可以有界等待重连后重新读取，但数据库错误和业务断言不能重试隐藏，任务创建和提交不自动重试。网络禁用与本地开发 bridge 分别记录。原始构建/驱动日志与截图位于忽略的 `.artifacts/`，结构化结果另存 `.ai/evidence/optimization/`。
 
 第三方组件不能仅凭 TypeScript 接受 `className` 就假设 NativeWind 已适配。当前 `react-native-safe-area-context` 的 SafeAreaView 使用原生 `style` 提供必要 flex、背景与居中布局；文字和原生滚动组件仍沿用现有样式体系。主动 Relax 内容须可滚动，窄屏/大字体下结束与离开动作保持可达。UI 驱动在每阶段前重建专用 Android 的 ADB localhost 转发，以应对连接恢复后映射丢失；该开发通道不启用业务网络。
 
-实际 Hermes 验证使用独立 `apps/mobile/testing` Expo 宿主及 `bun run test:hermes`。该入口不属于生产 Router，不访问业务 SQLite/真实 Provider；执行有限 Fake Agent、纯排程场景，以及仅在独立合成数据库上的 Native Preference 诊断。宿主计时允许使用 performance.now，不能将测试计时或文件/ADB 控制移入 Pure Core。脚本只重启已核对归属的 development App，记录 Hermes runtime properties、代码摘要、原生 App 版本、断言与样本；没有模拟器/宿主时单列未执行。
+实际 Hermes 验证使用独立 `apps/mobile/testing` Expo 宿主及 `pnpm run test:hermes`。该入口不属于生产 Router，不访问业务 SQLite/真实 Provider；执行有限 Fake Agent、纯排程场景，以及仅在独立合成数据库上的 Native Preference 诊断。宿主计时允许使用 performance.now，不能将测试计时或文件/ADB 控制移入 Pure Core。脚本只重启已核对归属的 development App，记录 Hermes runtime properties、代码摘要、原生 App 版本、断言与样本；没有模拟器/宿主时单列未执行。
 
 本地构建、UI 驱动与 profiler 的大型生成物使用 `.artifacts/`，该目录由 Git、格式、lint 与文档清单检查排除。可入库的合成结果摘要位于 `.ai/evidence/optimization/`，实际验证结论统一记录在 STATUS；禁止保存真实用户内容或凭据。
 
@@ -300,3 +302,11 @@ Scheduler 变更必须：
 - README 维护概览和入口，CONTEXT 维护稳定摘要，STATUS 维护实际状态与验证证据；避免复制易变版本列表。
 - 代码任务更新相关 Canonical Docs、映射与 STATUS；纯文档任务记录链接/引用/结构和语义检查，不把代码检查标为通过。
 - ADR 保存决定及原因；实现细节放在规范文档。历史 ADR 保留，补充决策明确与既有 ADR 的关系。
+
+## 19. Go Server and Portable Contracts
+
+服务端固定版本、命令与配置见 [server README](../server/README.md)。使用独立 Go module、显式构造注入、Go formatting/vet/test；不引入 ORM、隐式启动迁移或依赖框架模板默认数据库。业务 SQL 经 sqlc 生成 pgx/v5 查询，Goose 独立执行迁移。
+
+Proto、sqlc Go、OpenAPI 与 TypeScript 字段清单由固定版本工具生成，生成结果入库，`server:codegen:check` 检查再生成一致性。共享契约样例必须同时通过 Go/TypeScript 校验；跨语言版本、空值、时间与引用不能靠类型断言绕过。旧 Phase 的 Schema 验证保留历史表定义，默认升级测试则随追加迁移推进。
+
+内部账号在 iOS Simulator 上需要支持 Keychain 的 Development Build。若普通未签名构建返回缺少 entitlement，必须保持离线模式可启动，并在发出认证请求前说明凭据存储不可用；不能用 SQLite 或明文文件代替 SecureStore。可在独立模拟器使用本地 ad hoc 开发签名与测试 entitlement 验证；不修改用户的签名团队或依赖物理设备证据。

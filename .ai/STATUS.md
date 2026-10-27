@@ -2,7 +2,22 @@
 
 ## Updated
 
-2026-10-03
+2026-10-27
+
+## Integrate Local Changes into Main — 2026-10-27
+
+- 按用户授权将当前全部业务代码、测试、配置、文档、合成 benchmark 摘要及候选图片资源统一纳入 `main`，推送目标为 `origin/main`。Fetch 后确认本地与远端原基线均为 `d1a2635`，仅有一个本地工作树及 `main` 分支，无其他待合并分支。
+- 新增 Python 缓存忽略规则，缓存、环境文件、原生构建与 `.artifacts/` 日志不入库；修正 ADR-0010 的行尾空白。凭据扫描匹配项均为合成测试样例，没有将本地环境凭据纳入提交。
+- `pnpm run check` **PASS**：格式、lint、两组类型检查、55 个单元文件 / 462 tests、20 个集成文件 / 88 tests、11 包架构边界、文档映射、静态 release、Go format/vet/test/build、iOS/Android production Hermes export。日志 `.artifacts/main-push-check.log`。
+- `pnpm run server:codegen:check`、真实 PostgreSQL 18 的 `server:test:integration`（race）与 `server:test:sync`（7 条 HTTP/双 SQLite 旅程）均 **PASS**；日志分别为 `.artifacts/main-push-codegen.log`、`main-push-postgres.log`、`main-push-sync.log`。
+- 本次同步复验发现 Node 子进程可能在日志 WriteStream 文件描述符打开前启动；脚本现先等待两个 `open` 事件。修正后重跑同步旅程、脚本 lint 和完整类型检查均通过，类型日志 `.artifacts/main-push-typecheck.log`。
+- 文档影响逐项评估：既有 Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 改动随本次归档；本次 Git 交付及测试脚本修正不增加产品或架构范围，Status 追加验证记录。物理设备 E2E、开放决策与 6 个发布外部门禁保持原状态，未执行签名或商店发布。最终提交哈希与远端一致性在交付回复记录。
+
+## Git Remote Setup — 2026-10-27
+
+- 按用户授权将 `origin` 配置为 `https://github.com/yogasamadhi/nexta.git`，当前分支重命名为 `main`，并成功执行 `git push -u origin main`。
+- 核验本地 `HEAD` 与 `origin/main` 均为 `d1a26353c9bd2e18b1dba84800e26130bb10db87`，上游为 `origin/main`。既有未提交修改及未跟踪文件保留本地，尚未上传。
+- 文档影响评估：本次只改变 Git 远程、分支与跟踪配置；Product、Requirements、Architecture、Data Model、API、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 无需调整，Status 记录操作证据。业务实现与业务测试不适用，未执行代码构建或设备验收。
 
 ## Current Phase
 
@@ -23,18 +38,123 @@
 
 ## Current Task
 
-`TASK-OPT-NC-20261003` — 按已交付计划执行无需凭据的九个优化工作包。
+`TASK-SERVER-SYNC-20261025` — 实施用户批准的 Kratos v3 / sqlc / pgx / PostgreSQL 18 服务端与移动端 Local-first 同步。
 
-**Status: COMPLETE — OPT-01 至 OPT-09 全部验收通过**
+**Status: LOCAL IMPLEMENTATION VERIFIED / DEVICE ACCEPTANCE IN PROGRESS** — 服务端、SQLite 同步与移动端账号流程已实现并完成本地 PostgreSQL/HTTP/SQLite 和 iOS Simulator 联调；物理设备、Android 同步 UI 与远端 CI 运行证据未完成，不能把整个新增范围标记 DONE。既有 SDK 58 与其他未提交改动保留。
 
-既有 `TASK-TECHNICAL-PLAN-001` 保持 COMPLETE WITH USER-AUTHORIZED EXTERNAL SKIPS：原本地子集 80/80 已完成，正式决策、真实 Provider/设备与发布授权仍开放。新增优化工作包独立验收，不改写原 Engineering Readiness 或正式 Phase Exit。
+验收目标为本地完整联调，不授权公网部署；未验证邮箱的账号只面向内部开发。既有 Phase Exit 与外部门禁保持各自口径。
+
+同日的工具链迁移 `TASK-PNPM-20261026`（Bun → pnpm 11 + Node 24）已完成，不改变上述服务端/同步范围与验收口径，见 [2026-10-26 Package Manager Migration](#pnpm-migration)。
+
+### Implemented Scope
+
+- `server/` 独立 Go module，固定 Go 1.26.5、Kratos v3.0.0、sqlc 1.31.1、pgx 5.11.0、Goose 3.29.0 与 PostgreSQL 18.6。HTTP/gRPC Protobuf、OpenAPI、SQL migration/sqlc、显式事务与 transport → service → biz → data 分层；Dockerfile、Compose、Makefile、环境示例、独立迁移、健康检查和退出行为已提供。HTTP generator 使用独立 v3 module 的精确 pseudo-version，不能误用 core tag。
+- Argon2id 注册/登录、设备会话、15 分钟 access/30 天 refresh、摘要存储、refresh 轮换、退出/设备撤销、身份隔离及登录限流。注册默认关闭，示例本地配置显式开启；不提供邮箱验证或密码找回。日志仅记录请求标识、耗时和稳定错误，不输出认证信息或业务 Payload；恢复中间件不使用会打印请求的默认 panic 日志。
+- 15 类可移植事实：必要操作来源、目标、项目、任务、时间块、执行 Session/Interval、完成、成就、活动、复盘、精力、放松、偏好和计划来源。字段 allowlist、运行时 DTO 与 Go/TypeScript 共用样例；不传完整本地收据、OS 身份/缓存/Job/Intent、Secret 或派生缓存。Go 不负责重新排程。
+- 租户行锁串行提交游标，原子批次/版本/引用/状态/唯一性校验，完整批次增量拉取与精确重放；初始化上传分片暂存、稳定身份和响应丢失恢复，下载固定快照并在 SQLite 暂存后原子发布。未知字段/版本、缺失依赖、非法关联整体拒绝。冲突可核对并重提可变内容；不可覆盖的完成/结束区间及设备归属由服务端和应用边界保护。
+- SQLite 追加 `0009_cloud_sync` 和 `0010_cloud_bootstrap`，未改 `0000–0008` SQL/checksum。Completion/Activity 改用最小来源 FK，保留原 OperationRecord，并安全重建 Achievement 依赖；Repository 写入同业务事务追加 Outbox，独立导入事务不回声上传，推进本地版本并生成本地计划 envelope/OS 协调 Job。未采用冲突及依赖分支只读归档，无关待提交工作保持；档案不进入正常完成统计。
+- Application Ports/前台合并协调器、网络 Adapter、SecureStore、账号独立数据库、游客首次认领/原库保留、登录/同步/逐字段冲突页面、远端活跃记录只读约束及设备独立 OS 投影。非秘密资料目录存独立 SQLite catalog；凭据存储不可用时本地功能仍能启动，认证前先检查 Keychain。停止/切换/销毁使用 generation 和 abort 隔离迟到结果，退出等待进行中的凭据写入再删除，后台不发起刷新后的新请求。
+
+### Verification Evidence — 2026-10-26
+
+- `pnpm run check` **PASS**：format、lint、两组 typecheck、55 个单元文件 / 462 tests、20 个集成文件 / 88 tests、11 包架构边界、29 Markdown / 26 requirements / 26 AC / 29 cases / 5 E2E 映射、静态 release 检查、Go format/vet/test/build 与 iOS/Android production Hermes bundle export；source inventory 分别为 2290/2283。Bundle 不等于原生或物理设备验收。日志：`.artifacts/cloud/final-check.log`。
+- 真实 PostgreSQL 18.6：`TEST_DATABASE_URL=… pnpm run server:test:integration` 的等价 `make -C server integration` **PASS**，5 项集成测试，开启 Go race；每项隔离 schema，覆盖迁移、认证/refresh/撤销、跨账号、原子回滚、并发游标、版本冲突、批次重放、固定快照和不可变事实。日志：`.artifacts/cloud/postgres-integration.log`。
+- `TEST_DATABASE_URL=… pnpm run server:test:sync` **PASS**，7 条真实 Kratos HTTP + PostgreSQL + 两份独立 SQLite 旅程：离线完成一次、活跃归属、可变冲突重提、云端主线/无回声/无关修改保留、初始化响应丢失重试、300 多条事实跨页快照与期间新提交、并发活跃及依赖完成档案、完成与取消冲突。SQLite 集成另验证暂存文件关闭重开、完整图校验/非法完成回滚、旧库完成/成就无清库升级、事务回滚、版本链与资料目录。日志：`.artifacts/cloud/sqlite-http-journeys.log`。
+- `pnpm run server:codegen:check` **PASS**，sqlc/Protobuf/OpenAPI/Go dispatch/TypeScript manifest 可复现；日志 `.artifacts/cloud/codegen-check.log`。CI 已配置 Go 1.26.5、PostgreSQL 18.6、代码生成、race 与双 SQLite 旅程；未宣称远端 CI 实际执行。
+- 最后补强 HTTP/gRPC 的请求日志错误码，并增加 panic/认证 Payload 脱敏回归；随后 `make -C server check` 与真实 PostgreSQL race 集成再次 **PASS**。日志 `.artifacts/cloud/server-check.log`。本地开发服务已切换最新二进制，HTTP `127.0.0.1:8000`、gRPC `127.0.0.1:9000`、PostgreSQL `127.0.0.1:5548`，移动端 Metro 在 8096；readiness 为 200。
+- `docker build -t execution-cloud:local server` **PASS**；使用该 distroless 非 root 镜像在专用开发网络启动，`/healthz` 与 `/readyz` 均 200，正常停止后容器已移除。日志 `.artifacts/cloud/docker-build.log`、`docker-smoke.log` 与 `docker-smoke.json`。
+- iOS 27 / SDK 58：在独立 `CloudSync_20261026` Simulator（`DBB31E8C-DF44-42AA-A0DB-2EE97E119262`）使用本地 ad hoc 开发签名/测试 entitlement 增量 xcodebuild，**BUILD SUCCEEDED**。UI 实际完成游客任务保存 → 注册自动上传 → 待上传/冲突均 0 → 空冲突页 → 进程终止重开恢复 → 退出 → 第二账号注册隔离 → 首账号重新登录 → 原任务可见。服务端分别确认首账号 tasks=1/revision=1、第二账号 tasks=0/revision=0，退出旧 session 已撤销；OS 投影均默认未启用。
+- 模拟器原游客库保留 1 个任务/10 条迁移（停留在认领时的原样副本），首账号库 1 个任务/11 条迁移，第二账号与新游客库均 0 个任务/11 条迁移；四库 integrity=ok、foreign_key_check=0。没有触碰原 iPhone 18 Pro 模拟器的业务数据。证据 `.artifacts/cloud/ios-ui-verification.json`、`ios-account-synced.png`、`ios-account-restored-task.png`、`ios-keychain-build.log`。
+
+### Failures Corrected and Remaining Evidence
+
+- 曾发现并修复：未签名 Keychain 导致本地启动失败、JSONB 字段顺序导致初始化重试误报冲突、重建完成表时旧 Achievement FK 升级问题、完整计划导入重复插入 provenance、云端冲突主线覆盖无关本地修改、refresh 后切后台仍发请求/退出与凭据写入竞态。新增回归均通过；中间失败或未完成构建不计为验收成功。
+- 本地协议限制：单批最多 20,000 个事实、HTTP/gRPC 请求 16 MiB；超过限额显式失败，不部分发布。没有公网部署、AI 网关、云端 Scheduler、跨设备计时接管或 E2EE 声明。
+- **未验证**：Android 同步页面/交互、物理 iOS/Android、真实 OS Calendar/Notification readback/delivery/取消及多设备投影、长时间运行；本次 `test:e2e` 物理证据门禁未执行，不能由模拟器或 Bundle 替代。新增账号/冲突页已在 iOS 渲染，复杂冲突选择通过真实 HTTP 自动化，尚无物理设备 UI 证据。
+- 原有加密、备份/导出、真实模型、商店签名/发布与开放产品决策继续独立跟踪；release 静态检查的 6 个外部门禁仍 pending。
+- 文档影响逐项评估：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release 均同步内部账号与事实同步范围；新增 ADR-0010，DEC-013 关闭该范围决策；AI Context、独立 Implementation Plan、Status、隐私草案、验收矩阵和 MANIFEST 已同步。其他 Open Decision 未被静默关闭。
+
+## <a id="pnpm-migration"></a>2026-10-26 Package Manager Migration (Bun → pnpm)
+
+`TASK-PNPM-20261026` — 按用户要求“不再使用 bun，使用 pnpm 替代”完成包管理器与脚本运行时迁移。
+
+**Status: COMPLETE — 仓库门禁、expo-doctor、双平台原生 Debug Build 与 iOS Simulator 实际启动均通过**
+
+- 机器事实源：`packageManager` 改为 `pnpm@11.22.0`；新增 `pnpm-workspace.yaml`（`packages: apps/*, packages/*`、`nodeLinker: hoisted`、`overrides.lightningcss: 1.30.1`、`allowBuilds`）与 `pnpm-lock.yaml`；删除 `bun.lock`、`bunfig.toml` 与 `@types/bun`，新增 `tsx 4.23.15` 与 `@types/node 24.19.2`。
+- 布局决策：`nodeLinker: hoisted` 保持与原 Bun hoisted 布局一致的扁平 `node_modules`，避免 Expo/Metro/CocoaPods/Gradle 的原生解析路径变化；根包显式声明 8 个 `@workspace/*` 为 devDependency，否则 pnpm 不会把未声明的工作区包链接到根，根级测试与脚本无法解析。
+- 脚本运行时迁移（全部仓库脚本）：`Bun.spawn` → `node:child_process`，`Bun.file` → `node:fs`，`Bun.sleep` → `node:timers/promises`，`bun:sqlite` → `node:sqlite`，`import.meta.dir` → 由 `import.meta.url` 推导，`bunx` → `pnpm exec`；公共逻辑收敛到 `scripts/lib/runtime.ts`；`bun run.ts` 入口改为 `pnpm exec tsx run.ts`。
+- 根目录交互入口按用户要求改为 Python：原 `run.ts` 删除，新增 `run.py`（`python3 run.py [--port 8081]`）。`package.json` 的 pnpm 脚本面保持全部为 Node/pnpm 命令，不引入 Python 别名；根入口直接用 `python3 run.py` 调用。脚本行为与原 TypeScript 版本一致（复用/启动 `--offline` dev-client Metro、校验 manifest 项目路径、打开已启动的 iOS 模拟器与 Development Build、Ctrl+C 结束本次启动的 Metro），差别是 App identity 改由 `expo config --type public --json` 读取，端口探测改用 `socket`。`scripts/` 下的仓库门禁、测试与工具脚本仍为 TypeScript，由 `tsx` 在 Node 24 下执行，未做语言替换。
+- 实际验证：`python3 run.py` 复用 8081 成功（打开 CloudSync_20261026 并启动 App）；`python3 run.py --port 8082` 自动启动 Metro、加载当前 iOS bundle 成功，SIGINT 后进程退出且 8082 端口释放；`python3 run.py --help` 与非法端口（exit 2）行为与原入口一致。
+- 过程中发现并修复的两个真实问题：pnpm 不读取 `package.json` 的 npm 风格 `overrides`，`lightningcss` 被解析到 1.33.0，与 `lightningcss-darwin-arm64` 原生绑定不匹配，导致 `pnpm run build:check` 在 react-native-css 编译时报 `failed to deserialize; expected an object-like struct named Specifier`；把 `lightningcss: 1.30.1` 写入 `pnpm-workspace.yaml` 的 `overrides` 后恢复。另外 pnpm 不把未声明的工作区包链接到根，根级测试与脚本无法解析 `@workspace/*`；根包现显式声明 8 个工作区包为 devDependency。
+- 版本前移：新 lockfile 重新解析后，SDK 58 内的补丁版本前移（expo `58.0.17`→`58.0.19`、expo-modules-core `58.0.24`→`58.0.26`、expo-router `58.0.25`→`58.0.26`、expo-sqlite `58.0.13`→`58.0.14` 等），`expo install --check` 仍显示依赖为最新；iOS 原生 Pod 已用 `pod update --no-repo-update` 同步到新版本（仅补丁级变化，无主/次版本变化），Android 通过 Gradle 重新编译。
+- 验证：`pnpm run check` 全绿（format、lint、两组 typecheck、unit 55 个文件/462 项、integration 20 个文件/88 项、11 包架构边界、29 Markdown/26 Requirement/26 AC/29 CASE/5 E2E 映射、静态 release 检查、Go format/vet/test/build、iOS/Android production Hermes bundle export）；`pnpm install --frozen-lockfile` 可复现；`expo install --check` 无偏差；`expo-doctor` 20/20；CI 改为 `pnpm/action-setup` + `actions/setup-node` 与 `pnpm install --frozen-lockfile`。
+- 原生构建：iOS `xcodebuild` Debug（CloudSync_20261026 Simulator / iOS 27.0）`** BUILD SUCCEEDED **`；Android `gradlew assembleDebug` `BUILD SUCCESSFUL in 7m31s`；iOS Simulator 重新安装该 Development Build 并经 dev-client 加载当前工作树 JavaScript（Metro `expo start --dev-client`，2456 modules），Today 首页与“账号与同步”页均正常渲染，证明 pnpm 布局下工作区包、expo-sqlite 原生模块与 NativeWind/react-native-css 样式链均可用。
+- 文档影响逐项评估：Architecture、Development、Testing、Build/Release、README、AGENTS 与本 STATUS 的命令表述统一为 pnpm；DECISIONS 新增 DEC-014 记录迁移决策；Product、Requirements、Data Model、API/Contracts、UI/UX、Security 与 ADR 不涉及规则或范围变化；既有 Phase Exit 与外部门禁口径不变。
+
+## Logo Candidate Delivery
+
+2026-10-12 使用已安装的 imagegen CLI fallback，以 `gpt-image-2`、`quality=medium`、`n=1`、请求尺寸 `1024x1024` 成功生成，调用耗时 44.2 秒。有效生成请求成功，因此前次缺少必填 prompt 的诊断请求所返回的 502 不能用于判定实际图片生成不可用。
+
+- 设计方向与资产索引见 [UI/UX](../docs/06-UI-UX.md#18-logo-候选资产)。
+- [原始生成图](../output/imagegen/execution-agent-logo-v1-generated.png)实际为 1254×1254 RGBA，带低 alpha 光晕。保留原始文件，以 Pillow 从生成图提取路径与圆点轮廓、平滑边缘、统一平面配色并归一化尺寸；没有以手写 SVG 代替生成结果。
+- 交付 1024×1024 RGB App 图标、1024×1024 RGBA 透明 Logo、圆角外观预览及 32/48/64/96 像素评审图；检查 PNG 解码、透明通道、正方形尺寸、边缘留白与小尺寸可辨识性。
+- 完整 Prompt、CLI 参数、整理步骤与文件 SHA-256 记录在 [生成记录](../output/imagegen/execution-agent-logo-v1.provenance.json)。记录不包含 API Key 或其他凭据。
+- 验证：资产检查、`git diff --check` 与完整 `pnpm run check` 均通过；单元测试 53 个文件 / 454 项，集成测试 19 个文件 / 79 项，文档检查覆盖 27 个 Markdown 文件，双平台 production JavaScript bundle export 通过。此次仅交付候选资产与文档，没有原生图标接入，不需要业务测试新增、设备 E2E 或原生重建。
+- 文档影响逐项评估：UI/UX 增加候选资产索引，Status 记录实际交付与验证；Product、Requirements、Architecture、Data Model、API/Contracts、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 无规则或范围变化。DEC-003 保持 Open，品牌定稿属于产品决策。
+
+### Second Candidate Delivery
+
+2026-10-12 用户新增并明确提及 `gpt-image-2` 技能后，读取其说明并使用随附 TypeScript CLI，通过已配置网关成功生成第二版，模型为 `gpt-image-2`、quality 为 medium、请求尺寸为 1024×1024，耗时 34.5 秒。前次空返回没有可交付的新文件，不能作为第二版成功的证据；本次以实际保存并解码的 PNG 为准。
+
+- [生成记录](../output/imagegen/execution-agent-logo-v2.provenance.json)保存精确参数、[Prompt](../output/imagegen/execution-agent-logo-v2.prompt.txt)、整理步骤与文件 SHA-256，不包含凭据或网关地址。
+- 网关实际返回 1254×1254 RGBA，带透明背景和边缘杂点。保留原图，从其米白路径及薄荷圆点提取轮廓，平滑后保留各自最大连通区域，统一平面颜色、居中留白，导出 1024×1024 RGB 图标和 RGBA 透明标志；没有手绘替代生成图。
+- 已检查 PNG 解码、尺寸、透明通道、留白及 32/48/64/96 像素视觉预览。第二版与第一版均保存，原生配置未改动。
+- 本次验证范围为图片文件检查、变更文档及 JSON 格式检查、`pnpm run docs:check` 和 `git diff --check`。没有业务代码或 App 配置变更，不新增业务测试，也不重复上一版已完成的全仓库代码及 Bundle 门禁；本次不宣称重新通过原生构建或设备验收。
+- 文档影响与第一版相同：更新 UI/UX 候选索引及 Status，其余十二项无规则或范围变化；DEC-003 继续 Open。
+
+## 2026-10-22 Local Development Launch
+
+- 使用 `EXPO_NO_TELEMETRY=1 pnpm run dev --port 8081 --offline` 启动 Metro；`http://127.0.0.1:8081/status` 返回 `packager-status:running`。`--offline` 仅关闭 Expo 开发工具网络查询，不代表设备断网。
+- 在 iPhone 18 Pro / iOS 27.0 Simulator 上安装并启动既有 `.artifacts/optimization/ios-build/Build/Products/Debug-iphonesimulator/ExecutionAgentdevelopment.app`，通过 `execution-agent-development://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081` 加载当前工作树 JavaScript。没有重新执行原生构建。
+- 当前 Xcode 使用 `/Applications/Xcode.app/Contents/Applications/DeviceHub.app` 展示模拟器。关闭系统打开确认和开发菜单后，实际界面显示“今天”、日期、Asia/Singapore、本地计划可用、待完成排程设置、添加任务与底部导航；没有提交任务、计划或请求 Calendar/Notification 权限。
+- Metro 完成当前 iOS bundle（2415 modules）及 Calendar/Notification lazy bundle。`expo-notifications` 读取注册信息时记录 `ERR_NOTIFICATIONS_KEYCHAIN_ACCESS`（缺少 entitlement）；首页仍正常可见，本次不宣称系统通知功能可用。
+- 开发服务健康状态、Development Build 加载与首页可见性已核对；`pnpm run docs:check`、Status 的 Prettier 检查和 `git diff --check` 通过。没有业务代码变更，业务测试与完整 `pnpm run check` 不适用且未重新执行。本次不增加真机、完整 E2E 或发布通过声明。
+- 文档影响逐项评估：仅 Status 更新当前任务和启动证据；Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 无规则或范围变化。
+
+## 2026-10-23 Expo SDK 58 Upgrade
+
+- 机器事实源：Expo `58.0.17`、React Native `0.88.0`、React `19.3.0`、expo-router `58.0.25`、expo-sqlite `58.0.13`、expo-notifications `58.1.6`、react-native-screens `~4.30.0`、react-native-reanimated `4.7.1`、react-native-worklets `0.13.0`、NativeWind `5.0.0-rc.0`、react-native-css `3.1.0-rc.0`；gluestack core `5.0.15`、Tailwind CSS `4.2.0`、lightningcss `1.30.1`、Zod `4.6.2` 不变。`packages/calendar`、`packages/database`、`packages/notifications` 的 Expo 依赖同步到 SDK 58，避免 hoisted 布局下出现两套 `expo-sqlite` 而产生类型不兼容。
+- 升级过程中定位并修复的三个真实兼容问题：
+  1. `expo-modules-core`（SDK 58）在 `NativeViewManagerAdapter` 中通过 `react-native` 导入 RN 0.88 新增的 `NativeComponentRegistry`；react-native-css 的 Metro resolver 会把 `react-native` 重写到 `react-native-css/components`，而 3.0.7 的组件再导出缺少该 API，导致 Development Build 启动即 `TypeError: Cannot read property 'get' of undefined`（`[runtime not ready]`）。升级到 react-native-css `3.1.0-rc.0`（补齐 `NativeComponentRegistry` 再导出）后恢复。
+  2. SDK 58 默认启用 UIKit scene lifecycle，`expo-build-properties` 的 `ios.enableSceneSupport` 变为冗余并持续 warning，已移除该配置项与该依赖；react-native-screens 同时要求 `UIViewControllerBasedStatusBarAppearance=YES`，已写入 App Config 的 `ios.infoPlist`。
+  3. react-native-css 3.1 在 native 端拒绝 class-qualified `:root` 选择器，`src/global.css` 移除 `:root.dark` / `:root.light`，暗色只保留 `@media (prefers-color-scheme: dark)`。
+- 验证：`pnpm run check` 全绿（unit 53 个文件 / 454 项、integration 19 个文件 / 79 项、format、lint、typecheck、architecture、docs、release:check 与 iOS/Android production Hermes bundle export）；`expo install --check` 无偏差；`expo-doctor` 20/20；`expo prebuild --clean` 重新生成 iOS/Android 原生工程（CNG，目录不入库）。
+- 原生构建：iOS `xcodebuild` Debug（iPhone 18 Pro / iOS 27.0 Simulator）`BUILD SUCCEEDED`；Android `gradlew assembleDebug` `BUILD SUCCESSFUL`（首次 41m44s；移除冗余 `expo-build-properties` 插件并重新 `expo prebuild --platform android` 后再次 `BUILD SUCCESSFUL in 5m37s`）。Android 只完成编译，当前主机没有可用模拟器/AVD，未做 Android 交互验收。
+- 运行验证：iOS Simulator 安装 SDK 58 Debug Development Build 后经 dev-client URL 加载当前工作树 JavaScript，Today 首页、Relax 页（深链 `execution-agent-development://relax`）、Calendar 日视图（深链 `…/calendar`）与 Settings（深链 `…/settings`）均正常渲染，底部导航、Check-in、Relax 入口与 NativeWind/react-native-css 样式可见；Metro 日志无 `[runtime not ready]`。
+- 已知限制：`expo-notifications` 仍记录 `ERR_NOTIFICATIONS_KEYCHAIN_ACCESS`（缺 entitlement，与 SDK 57 相同，不宣称系统通知可用）；iOS 27 下 `RCTStatusBarManager` 在 `UIViewControllerBasedStatusBarAppearance=YES` 时为 no-op，状态栏样式改由 View Controller 决定，Relax 页的 `StatusBar barStyle="light-content"` 不再由 RN 组件直接生效，待真机复核；Android release 构建默认启用 R8 压缩（SDK 58 新默认），本次未做发布构建验证。
+- 文档影响逐项评估：Architecture 与 ADR-0001 的 Expo 主版本更新为 SDK 58；DEC-004 追加主版本升级兼容维护记录；Development 记录 react-native-css 的两条约束；Status 记录本次任务与证据。Product、Requirements、Data Model、API/Contracts、UI/UX、Testing、Security、Build/Release、AI Context、Implementation Plan 无规则或范围变化。
+
+## 2026-10-23 Local Development Reopen
+
+- 按用户“运行起来”请求复用当前 SDK 58 Metro（8081）；健康检查返回 `packager-status:running`，iOS manifest 的 runtime 为 `exposdk:58.0.0`。
+- 打开 Device Hub 中已启动的 iPhone 18 Pro / iOS 27.0，启动已安装的 Development Build，并通过 `execution-agent-development:///today` 返回首页。实际界面显示 10 月 23 日、Asia/Singapore、本地计划可用、待完成排程设置及五个底部导航入口。
+- 既有通知 Keychain entitlement 错误仍可见；本次仅验证本地启动，没有原生重建、业务写入、权限请求或通知可用性验收。没有代码修改，业务测试及完整门禁不适用且未重跑；Status 格式、文档与 diff 检查通过。
+- 文档影响逐项评估：仅 Status 增加启动记录；Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 无规则或范围变化。
+
+## 2026-10-23 Bun Interactive Launcher
+
+- 按用户请求补齐原为空文件的根目录 `run.ts`。`pnpm exec tsx run.ts` 默认使用 8081，可通过 `--port` 覆盖；检查 macOS、iOS runtime 和已安装 development App，优先复用已启动的 iOS Simulator，通过当前 App Config 获取 development identity/scheme，核对 Metro manifest 的项目路径后连接开发包。
+- 没有 Metro 时直接启动 Expo CLI，工作目录固定为 `apps/mobile`，避免 NativeWind 在仓库根目录生成类型文件或改写根 tsconfig。首次实际启动发现该工作目录问题后已修正，并恢复仅由本次启动产生的根 tsconfig 改动、移除本次生成的根类型文件；没有改写此前用户变更。
+- 实际验证：`pnpm exec tsx run.ts` 复用 8081 成功，`pnpm exec tsx run.ts --port 8082` 自动启动 Metro、加载当前 iOS bundle 成功，Ctrl+C 后 8082 无监听；最后再次运行默认命令，复用 8081 并打开 iPhone 18 Pro。首页实际可见；既有通知 Keychain entitlement 限制保持原状，不宣称系统通知可用。
+- 类型检查与脚本 lint 通过；最终完整 `pnpm run check` 通过（53 个单元文件 / 454 tests、19 个集成文件 / 79 tests、format、lint、typecheck、architecture、docs、release 静态检查与双平台 production bundle/module inventory），日志 `/tmp/nexta-run-ts-check.log`。初次从错误工作目录启动导致根生成文件格式检查失败的结果未计为通过；工作目录修复后重新执行上述完整门禁成功。该入口用于交互试运行，不替代自动化 UI 或物理设备 E2E；没有新增业务测试、修改原生工程、重装或清理应用数据。
+- 文档影响逐项评估：README 增加快捷入口，Build/Release 说明脚本职责与前置条件，Status 记录实施与验证；Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、ADR、AI Context、Implementation Plan 无规则或范围变化。
 
 ## Implemented Baseline
 
 ### Repository Foundation
 
 - 已初始化 Git 和 Bun `1.4.0` Monorepo；初始默认分支为 `main`，本轮可追溯提交状态见 Optimization Execution Status。
-- `apps/mobile` 保持 Expo Development Build 骨架与 development / preview / production 配置；中性原生标识不变，SDK 57 兼容 patch 的实际验证见 Optimization Execution Status。
+- `apps/mobile` 保持 Expo Development Build 骨架与 development / preview / production 配置；中性原生标识不变，SDK 58 升级的实际验证见 2026-10-23 Expo SDK 58 Upgrade。
 - strict TypeScript、Prettier、ESLint、Vitest、架构检查、文档检查、Hermes bundle 检查和 GitHub Actions CI 已由 Phase 0 建立。
 - 11 个职责包和 pure TypeScript / Hermes 依赖边界继续由静态检查守护。
 
@@ -165,7 +285,7 @@
 - 根工作区精确锁定 `eas-cli 24.3.0`；`apps/mobile/eas.json` 定义 development client、internal preview、production store build 与 Android internal/draft submit，三套 EAS environment 显式传入非 Secret `APP_VARIANT`。
 - production 使用 EAS remote appVersionSource 与 autoIncrement，避免重复 developer-facing build number；首次关联已有商店记录仍须授权发布者核对远端初值。
 - DEC-008 未关闭时 App Config 对三个 variant 全部显式 `updates.enabled = false`，EAS 不配置 OTA channel，不以字符串配置偷跑 production OTA。
-- 新增 `release:check` 并纳入 `bun run check`：校验版本、profiles、独立 identity、无 Secret-like committed env、OTA 默认、双语隐私草案、release checklist 与明确外部 pending gate；`build:check` 先解析三套 Expo Config，再导出 production iOS/Android Hermes bundle。
+- 新增 `release:check` 并纳入 `pnpm run check`：校验版本、profiles、独立 identity、无 Secret-like committed env、OTA 默认、双语隐私草案、release checklist 与明确外部 pending gate；`build:check` 先解析三套 Expo Config，再导出 production iOS/Android Hermes bundle。
 - 新增 preview/production build、submit 与 `release:gate` 命令；`test:e2e` 只有在物理 iOS/Android 的 E2E-001 至 E2E-005 均附证据并通过时才成功，模板的 pending/placeholder 或模拟器证据都会失败。
 - `release/store-privacy.json` 按当前二进制明确本地数据、Calendar 边界和未启用的远程模型/云同步/OTA/数据库加密/导出恢复，并保留产品、法律、Privacy Policy 与平台问卷审核；没有伪造通过状态。
 - migration 启动器新增唯一的预发布兼容桥：仅识别 `0006_phase6_agent_runs` 的全零占位 checksum，在其他历史全部正确且真实表/索引精确匹配固定 SQL 后事务性修复；成功保留数据、缺索引、任意其他错误 checksum 与其他历史损坏均有 Node SQLite 回归。
@@ -178,18 +298,18 @@
 
 ## Verification Evidence
 
-最新仓库验证日期：2026-10-03。下方 Simulator / 原生构建与授权环境历史证据仍为 2026-09-12，本次分析未重新执行原生构建、连接真机或检查 EAS 登录。
+最新仓库验证日期：2026-10-23。Expo SDK 58 升级后重新执行完整 `pnpm run check`、`expo install --check` 与 `expo-doctor`，并重新执行 iOS/Android 原生 Debug Build 与 iOS Simulator 启动；下方授权环境历史证据仍为 2026-09-12，本次未连接真机、未执行 EAS 登录或发布构建。
 
 ### Latest Repository Gate Snapshot
 
 ```text
-bun run check
+pnpm run check
 PASS
 ```
 
 最新完整快照覆盖：
 
-- unit：51 个测试文件、414 个测试；
+- unit：53 个测试文件、454 个测试；
 - integration：19 个测试文件、79 个测试；
 - format、lint、根工程与 pure package typecheck；
 - 11 个包的架构边界；
@@ -197,9 +317,11 @@ PASS
 - 静态发布配置检查（5 个外部门禁仍为 pending）；
 - iOS / Android Hermes JavaScript bundle export。
 
-2026-10-03 项目分析重新执行完整 `bun run check`，全部通过且测试计数不变；另执行 `bun run test:e2e`，因未设置 `NEXTA_IOS_DEVICE_EVIDENCE` / `NEXTA_ANDROID_DEVICE_EVIDENCE` 返回 exit code 1。这是缺少经审核物理设备证据，不是已执行设备旅程后发现功能失败；本次没有执行 production build/submit 或声明 release gate 通过。
+2026-10-23 Expo SDK 58 升级后完整 `pnpm run check` 再次通过且测试计数不变；`expo install --check` 无版本偏差，`expo-doctor` 20/20。iOS Simulator（iPhone 18 Pro / iOS 27.0）安装 SDK 58 Debug Development Build 后显示 Today 首页与 Relax 页（深链），Metro bundle 为 2433 modules；Android `assembleDebug` 编译通过但本机无可用模拟器/AVD，未做 Android 交互验收。
 
-Task 取消事务、收件箱/未来块编辑可达性、Goal/Project、integration user-action wake/恢复与 Canonical Docs 同步后完整 `bun run check` 通过；最新门禁结果见本节计数。严格 `bun run release:gate` 也已实际执行：代码聚合门禁通过后，按设计在缺少 `NEXTA_IOS_DEVICE_EVIDENCE` / `NEXTA_ANDROID_DEVICE_EVIDENCE` 的物理设备证据入口失败；没有把 Simulator 或 Bundle 结果冒充真机通过。2026-09-12 再次只读复核显示 `eas whoami --non-interactive` 为 `Not logged in`，Xcode 仅枚举本机与 Simulator，且主机未安装 `adb`；因此当前不存在可用于云端签名构建或填写双平台真机验收的已授权环境。
+2026-10-03 项目分析重新执行完整 `pnpm run check`，全部通过且测试计数不变；另执行 `pnpm run test:e2e`，因未设置 `NEXTA_IOS_DEVICE_EVIDENCE` / `NEXTA_ANDROID_DEVICE_EVIDENCE` 返回 exit code 1。这是缺少经审核物理设备证据，不是已执行设备旅程后发现功能失败；本次没有执行 production build/submit 或声明 release gate 通过。
+
+Task 取消事务、收件箱/未来块编辑可达性、Goal/Project、integration user-action wake/恢复与 Canonical Docs 同步后完整 `pnpm run check` 通过；最新门禁结果见本节计数。严格 `pnpm run release:gate` 也已实际执行：代码聚合门禁通过后，按设计在缺少 `NEXTA_IOS_DEVICE_EVIDENCE` / `NEXTA_ANDROID_DEVICE_EVIDENCE` 的物理设备证据入口失败；没有把 Simulator 或 Bundle 结果冒充真机通过。2026-09-12 再次只读复核显示 `eas whoami --non-interactive` 为 `Not logged in`，Xcode 仅枚举本机与 Simulator，且主机未安装 `adb`；因此当前不存在可用于云端签名构建或填写双平台真机验收的已授权环境。
 
 Phase 1 证据继续覆盖 Task 状态/Duration/Deadline/日期时区/父子环、Goal 聚合、Zod 严格输入、幂等冲突与精确重放、唯一完成证据、事务故障注入回滚、`0000` migration/Schema，以及 Goal/Project/Task 到完成事实的 SQLite 纵向集成。取消新增覆盖 inbox 无 Block、运行中 Session/Interval 与 started/planned Block 原子收口、计划/同步作业建立、无完成/成就证据、精确重放及晚期失败全回滚；真实 SQLite 另验证持久化 planRevision/`task_cancel` SchedulePlan/双通道 Job。
 
@@ -266,6 +388,19 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 - EAS CLI 与 profiles 已配置，但当前无 Expo 登录/projectId/owner、Apple/Google 签名和商店账号；neutral `com.personalexecution.agent` identifier 的可用性也未验证。任何 placeholder 或本地主机身份都不能提交到仓库冒充授权配置。
 - `release/store-privacy.json` 仍是 draft，缺公共 Privacy Policy URL、法律/产品批准和基于最终签名二进制的 Apple/Google 问卷；当前明确不宣称业务 SQLite 已加密、可备份或可导出恢复。
 
+## 2026-10-22 Project Analysis
+
+- 分析范围：重新核对 AGENTS、Context、Plan、Status、产品/需求/架构/数据/Contract/开发/安全/验收/发布规范，并检查 Mobile Composition、Capture、生产 scheduling policy、Agent/Model Runtime、SQLite、验证脚本、历史结构化证据与 Git 工作树；本次只补记 Status，不修改业务实现，也不关闭 Open Decision。
+- 当前能力：已有手工 Task → 本地 Schedule Preview/Commit → Focus 暂停/恢复 → 明确完成 → Achievement/Reflection 的离线闭环；Calendar/Notification Adapter 与 durable Job 已接入前台 Runtime。Agent Core、15 个 Tool、通用 ModelProvider 与 Fake Provider 已实现，但生产 Mobile Runtime 仍未构造 Agent/Model Provider，Capture 仍将自然语言原文转入手工确认；SecureStore 只有依赖/plugin，尚无应用凭据存取流程。真实 AI 交付仍需 Adapter、Mobile 接线、凭据与用户确认流程，不能描述为只缺账号或测试证据。
+- 排程边界：生产 MobileNeutralSchedulingInputPolicy 将所有 priority 映射为同一 rank、全部软评分权重设为 0，且不消费 User Model/Check-in 特征。硬约束与确定性排程已经实现，生产优先级语义、稳定性偏好与个性化仍受 DEC-007/011 约束。DEC-001/005/006/009/012 的试用、模型、依赖范围、数据保护和 OS 投影选择也仍需负责人明确；12 个 Decision 中当前 11 个 Open。
+- 完成口径：重新计数 Engineering Readiness，仍为 80 个已勾选、21 个未勾选。80/80 仅是历史授权排除外部阻塞后的本地子集，不代表 V1 产品完成率；Phase 10 是当前工程轨道，不代表 Phase 1–9 正式 Exit 已全部关闭。
+- 本次实际验证：Bun 1.4.0 / Node v24.18.0；完整 `pnpm run check` exit 0，包含 format、lint、两套 typecheck、53 个单元测试文件/454 tests、11 包架构门禁、19 个集成测试文件/79 tests、27 Markdown/24 Requirement/24 Acceptance/27 CASE/5 E2E 的文档映射、静态 release check，以及 iOS/Android production Hermes Bundle export。生产 source inventory 分别检查 2242/2336 个来源，未混入本地测试宿主/工具；release check 明确保留 5 个 pending 外部门禁。
+- 真机验证边界：本次 `pnpm run test:e2e` exit 1，原因为未配置 `NEXTA_IOS_DEVICE_EVIDENCE` / `NEXTA_ANDROID_DEVICE_EVIDENCE` 审核证据文件；这项未通过不能记为设备旅程通过。该入口只校验物理设备证据，不驱动 UI。未重跑 native build、本地 UI/Hermes 宿主或真实 Provider/OS 旅程；2026-10-03 的 Android 模拟器 UI/离线和 Fake Agent Hermes 报告保持历史证据。Scheduler 历史比较记录所列 7 个源码 SHA-256 与当前文件全部匹配，不把历史性能数据描述为本日重测。
+- 工程维护：当前分支 `codex/no-credential-optimization`、HEAD `d1a2635`；已存在本地 Git 基线，但 `git remote -v` 为空，未核实远端 CI。本次开始前已有 `.ai/STATUS.md`、`docs/06-UI-UX.md` 修改及未跟踪 `output/` Logo 候选资产，均保留。数据库仓储约 3436 行、集成服务约 3015 行，是后续修改应重点依靠现有测试保护的复杂模块，不构成本次泛重构授权。
+- 后续建议：优先收敛首轮试用标准与 V1 基础策略/Provider/数据保护选择；据此交付一个真实自然语言输入到确认、排程与执行的纵向链路；补齐双物理平台 Calendar/Notification、强杀恢复和升级验收，再推进生产个性化与正式签名发布。用户模型、自动提交、备份/导出等未接受范围保持原默认。
+- 文档影响逐项评估：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 均无规范或范围变化；Status 补充本次分析与实际验证。业务实现/新增测试不适用于本次分析任务，既有 Phase、Skip Register 与 Next Task 的实施结论不变。
+- 补记后文档验证：`docs:check`、显式 Prettier `--debug-check` 与 `git diff --check` 通过。额外对 Status 执行 Prettier `--check --ignore-path /dev/null` 提示表格格式未对齐；移除本次新增分析段后复核，既有 OPT 表格已存在相同差异，未批量改写原文。仓库普通 format:check 按现行 `.prettierignore` 排除 `.ai/`，其通过记录不代表 Status 全文件符合 Prettier 排版。
+
 ## 2026-10-03 Project Analysis
 
 - 分析范围：对照 Context/Plan/Status、产品与需求、架构/Contract/安全/验收/发布文档，核对 Mobile Composition、Capture、生产 scheduling policy、Agent/Model Runtime、质量脚本与 Git 状态；不修改业务代码或代替负责人关闭 Open Decision。
@@ -288,7 +423,7 @@ Mobile Runtime 已在 iOS Simulator Development Build 完成真实 `0000 → …
 - [Maestro](https://github.com/mobile-dev-inc/Maestro)（Apache-2.0）可用于实际 UI 旅程；[官方平台支持](https://docs.maestro.dev/get-started/supported-platform)覆盖 Android 模拟器/真机和 iOS 模拟器，不能替代 iOS 真机验收。现有 `test:e2e` 仍是已审阅物理设备证据校验器，建议另建 UI 驱动入口而不降低它的门禁。
 - 新发现：`NaturalLanguageCapturePreviewer.preview(text, signal)` 的请求只携带固定 system 约束、本次原文和 Schema，没有显式参考时刻、IANA timeZone 或 locale。真实 Provider 接入应评审时间 Context Contract，并验证“明天/本周五/下周”等相对表达、日期型 Deadline 与缺值不猜测；当前 Fake Provider 证据不能证明真实中文日期解释正确。
 - 优化顺序建议：先建立 Git 可追溯基线与 DEC-001 试用标准；按 DEC-005 交付一个真实 Provider 的自然语言到确认/排程链路；按 DEC-011 评审优先级、拆分与计划稳定性等非学习策略，并并行补齐 UI/真实设备证据；随后评审显式时间偏好、容量反馈、前台重排合并与数据恢复。DEC-007 的学习参数、DEC-002 的自动提交仍保持 Open，不复制其他项目的权重/阈值，也不扩展 V1 到 Cloud Sync、团队协同或常驻 Agent。
-- 本次 Documentation Impact Assessment：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 均无规范或实施范围变更；仅 Status 记录研究证据与待评审建议。验证限于文档与格式，未修改业务代码；本日既有 `bun run check` 结果仍为当前代码基线，不新增外部运行或设备通过声明。
+- 本次 Documentation Impact Assessment：Product、Requirements、Architecture、Data Model、API/Contracts、UI/UX、Development、Testing、Security、Build/Release、ADR、AI Context、Implementation Plan 均无规范或实施范围变更；仅 Status 记录研究证据与待评审建议。验证限于文档与格式，未修改业务代码；本日既有 `pnpm run check` 结果仍为当前代码基线，不新增外部运行或设备通过声明。
 
 ## Optimization Execution Status
 
@@ -310,7 +445,7 @@ OPT-01：初始 check exit 0（51 unit files/414 tests、19 integration files/79
 
 OPT-02：50/200/500 Task × 7/30 天 × sparse/dense 的 12 组中性场景，加一组显式稳定性示例，共 13 组，固定 seed 20261003，preview/replan 各五个预热后样本。热点修复仅在区间合并前过滤窗口外区间，候选、权重、版本与输出行为不变；26 完整输出等价、独立区间 oracle 200 次、确定性/反转/输入不变/约束保护通过。基线、优化后和十样本 profile 对比见 [scheduler-baseline](evidence/optimization/scheduler-baseline.json)、[scheduler-after](evidence/optimization/scheduler-after.json)、[scheduler-comparison](evidence/optimization/scheduler-comparison.json)。Bun 1.4.0 / 同主机 200 Task、30 天、sparse：preview p95 125.494 → 24.267 ms，replan p95 129.532 → 50.207 ms；仅为本地观察，不建立 SLA，也不外推手机耗时。提交 d27dea32cf7bd2a378a83fa6a3c9a4e1154b1c7f。
 
-OPT-03：新增 scripts/test-ui.ts、九个核心 YAML 与两个可用性 flow，稳定 testID、有界等待、development identifier/ownership receipt/实际 AVD 名称核对、命令失败退出码、Junit、原生 SQLite 只读断言。任务 fixture 经真实 UI/Application 写入，重装只作用于专用测试 App 沙盒，未增加生产清库或任意写表后门。两次运行命令 bun run test:ui --platform android --device emulator-5580 --runs 2 exit 0，日志 .artifacts/optimization/ui-android-accepted-run.log；[Android 结果](evidence/optimization/ui-results-android.json)与[当前结果](evidence/optimization/ui-results.json)均记录 consecutiveCleanRunsPassed=2、offline=passed、planAcceptance=passed。原始命令/截图位于 .artifacts/optimization/ui-runs/2026-10-03T10-12-57.353Z/，App/源码 SHA-256、OS 和驱动版本已保存，结束后源码摘要复核一致。
+OPT-03：新增 scripts/test-ui.ts、九个核心 YAML 与两个可用性 flow，稳定 testID、有界等待、development identifier/ownership receipt/实际 AVD 名称核对、命令失败退出码、Junit、原生 SQLite 只读断言。任务 fixture 经真实 UI/Application 写入，重装只作用于专用测试 App 沙盒，未增加生产清库或任意写表后门。两次运行命令 pnpm run test:ui --platform android --device emulator-5580 --runs 2 exit 0，日志 .artifacts/optimization/ui-android-accepted-run.log；[Android 结果](evidence/optimization/ui-results-android.json)与[当前结果](evidence/optimization/ui-results.json)均记录 consecutiveCleanRunsPassed=2、offline=passed、planAcceptance=passed。原始命令/截图位于 .artifacts/optimization/ui-runs/2026-10-03T10-12-57.353Z/，App/源码 SHA-256、OS 和驱动版本已保存，结束后源码摘要复核一致。
 
 每轮从干净沙盒核对一条缺估时 inbox Task、拒绝 Preview 不改 Plan/Block/revision；随后在线和断网各执行 Task → Preview → Commit → Calendar → Focus → Pause → App 进程重启 → Resume → 明确完成 → Achievement。重复点击保留唯一 Task/Plan/Completion/Achievement，暂停重启保留 Session 身份且可信投入不增长，关闭区间按 Domain 的逐区间向下取整秒汇总，Task 分钟投影与 Completion 秒数一致，成就 FK 正确，SQLite integrity=ok。离线前后均观察 airplane=1、wifi=0、mobile_data=0、Active default network:none；仅保留 ADB localhost:8087 开发包通道，结束后恢复专用 AVD 网络。Expo --offline 不被当作设备断网证据。
 
@@ -322,15 +457,15 @@ OPT-04：[usability-review.json](evidence/optimization/usability-review.json)列
 
 OPT-05/06：通用 Provider complete/stream、自定义 mapper、包装错误和 Tool 异常只产生稳定通用码/消息，红灯后修复并复测；Agent 对忽略 Abort 的 Provider/stream/approval/tool 停止等待并隔离迟到事件，不宣称撤销已开始事务，成功收据在后续失败后可复用。Tool 权限/risk floor 不变，无新 SDK 或生产 Fake AI。timeContext 的严格 UTC/Z referenceInstant、IANA timeZone、BCP47 locale 由宿主注入，非法 Context 在 Provider 前拒绝；草稿不持久化，模糊日期、缺估时不补造。八个中文脚本 fixture 证明 Context 传递/输出校验，不代表自然语言准确率。60 Agent tests、类型/lint/架构及 check-agent-capture.log 均通过；契约矩阵见 [agent-contracts](evidence/optimization/agent-contracts.json)。提交 23cf37d6739bdd74f0439b64f4d71d0c613541cb。
 
-实际 Hermes：apps/mobile/testing 独立 Expo manifest/entry 不由生产 Router 导入，不访问业务 SQLite；与 UI 顺序运行同一专用 App。最新 bun run test:hermes --device emulator-5580 --port 8089 exit 0，日志 .artifacts/optimization/hermes-accepted-run.log；[hermes-runtime.json](evidence/optimization/hermes-runtime.json)记录 App 0.1.0、Hermes 250829098.0.17 / Bytecode 98 / hades、13 场景各五个预热后样本、独立不变量、complete/stream 各两轮/一次只读 Tool/成功收据，以及独立合成 Native SQLite Preference update/read passed。源码摘要、原生版本与命令保留；该 Debug 模拟器/Fake 测量独立于 Bun，不代表真实模型、物理设备性能或 OS Provider 验收。
+实际 Hermes：apps/mobile/testing 独立 Expo manifest/entry 不由生产 Router 导入，不访问业务 SQLite；与 UI 顺序运行同一专用 App。最新 pnpm run test:hermes --device emulator-5580 --port 8089 exit 0，日志 .artifacts/optimization/hermes-accepted-run.log；[hermes-runtime.json](evidence/optimization/hermes-runtime.json)记录 App 0.1.0、Hermes 250829098.0.17 / Bytecode 98 / hades、13 场景各五个预热后样本、独立不变量、complete/stream 各两轮/一次只读 Tool/成功收据，以及独立合成 Native SQLite Preference update/read passed。源码摘要、原生版本与命令保留；该 Debug 模拟器/Fake 测量独立于 Bun，不代表真实模型、物理设备性能或 OS Provider 验收。
 
 OPT-07：[recovery-coverage.json](evidence/optimization/recovery-coverage.json)逐项引用 Preview TTL/版本冲突、响应丢失重放、active/paused 文件关闭重开、唯一完成与成就、migration 失败回滚、offline pending、ExternalMutationIntent、lease/claim/attempt/迟到 fence。既有覆盖已证明审查重点，无需新增重复测试。19 files/79 integration tests、worker 31 tests 与 provider/native facade 五个 tests exit 0，日志 recovery-{integration,unit,provider-native-facade}.log。没有 schema、migration、checksum 或备份/导出改动；文件关闭重开不能代替物理 OS 强杀。
 
 OPT-08：[architecture-review.json](evidence/optimization/architecture-review.json)保存 11 包 AST 架构、18 UI 页面无表访问、Agent Tool 到受限 Application、185 个文件的候选凭据模式扫描、依赖用途与文档影响。未发现强凭据模式，不宣称全面安全认证；React Aria/Stately 因 gluestack 依赖/peer 保留，motion/html 用途未被证实可删，不做推测性清理。production 实际 source-map inventory 的 iOS 2242 / Android 2336 sources 排除独立 Hermes entry、benchmark、驱动和下载工具；map 仅本地验证，不上传。
 
-iOS 27 SDK 的 Scene lifecycle 启动故障按 SDK 57 expo-build-properties enableSceneSupport 兼容修复，Expo 及相应 native 模块对齐 SDK 57 patch，RN/React/UI/Schema 组合未变；DEC-004 保留历史 Closed 并追加兼容维护。ios-scene-build.log 与 android-scene-build.log 两平台 actual native Debug build exit 0，当前 App 0.1.0。两个重复 expo-constants 副本移入忽略的备份，bun install --frozen-lockfile exit 0；expo install --check exit 0，expo-doctor 21/21 exit 0，日志 expo-scene-{versions,doctor}-3.log。没有删除检查、伪造 native 结果或引入新框架。
+iOS 27 SDK 的 Scene lifecycle 启动故障按 SDK 57 expo-build-properties enableSceneSupport 兼容修复，Expo 及相应 native 模块对齐 SDK 57 patch，RN/React/UI/Schema 组合未变；DEC-004 保留历史 Closed 并追加兼容维护。ios-scene-build.log 与 android-scene-build.log 两平台 actual native Debug build exit 0，当前 App 0.1.0。两个重复 expo-constants 副本移入忽略的备份，pnpm install --frozen-lockfile exit 0；expo install --check exit 0，expo-doctor 21/21 exit 0，日志 expo-scene-{versions,doctor}-3.log。没有删除检查、伪造 native 结果或引入新框架。
 
-最终代码门禁：bun run check exit 0，日志 .artifacts/optimization/check-optimization-accepted.log，53 unit files/454 tests、19 integration files/79 tests、11 包架构、27 文档、release:check 和双平台 production export 均通过；包含最终网络状态有界等待与 UI 修复。随后只修改文档/结构化证据，文档验证单独执行，不重复全量业务测试。最终 docs:check exit 0（27 文件、24 Requirement、24 Acceptance、27 CASE、5 E2E），format:check exit 0；被普通格式入口排除的文档与 JSON 另做显式 Prettier debug-check，exit 0。日志 docs-optimization-closeout.log、format-optimization-closeout.log、docs-evidence-roundtrip-final.log。一次新引用的生成 anchor 失败已修复并复测，没有把失败记为通过。最终 UI/native/runner/证据实现提交 fa9f70c60bf8abc6f790be59232d89a01c3ea5c0；报告保留采样时 HEAD 与实际源码 SHA，当前源码摘要复核匹配。原始日志和截图保持本地忽略。
+最终代码门禁：pnpm run check exit 0，日志 .artifacts/optimization/check-optimization-accepted.log，53 unit files/454 tests、19 integration files/79 tests、11 包架构、27 文档、release:check 和双平台 production export 均通过；包含最终网络状态有界等待与 UI 修复。随后只修改文档/结构化证据，文档验证单独执行，不重复全量业务测试。最终 docs:check exit 0（27 文件、24 Requirement、24 Acceptance、27 CASE、5 E2E），format:check exit 0；被普通格式入口排除的文档与 JSON 另做显式 Prettier debug-check，exit 0。日志 docs-optimization-closeout.log、format-optimization-closeout.log、docs-evidence-roundtrip-final.log。一次新引用的生成 anchor 失败已修复并复测，没有把失败记为通过。最终 UI/native/runner/证据实现提交 fa9f70c60bf8abc6f790be59232d89a01c3ea5c0；报告保留采样时 HEAD 与实际源码 SHA，当前源码摘要复核匹配。原始日志和截图保持本地忽略。
 
 OPT-09：[DECISIONS 候选包](../docs/DECISIONS.md#optimization-candidate-packet-opt-nc-20261003)覆盖 DEC-001/002/005/007/009/011/012 的试用指标、基础/学习 policy/窗口/容量、前台合并/Undo、Provider/BYOK、备份恢复和 OS 投影故障验收。每项包含取舍、数据影响和最小负责人输入，所有条目仍 Open，生效前默认保持；没有远端遥测、真实请求、共享 Key、生产个性化、自动提交、备份/导出或发布。docs:check exit 0，MANIFEST 仍 27 个文档。
 
@@ -359,7 +494,7 @@ OPT-09：[DECISIONS 候选包](../docs/DECISIONS.md#optimization-candidate-packe
 
 ## Engineering Readiness
 
-`PHASE 10 TECHNICAL RELEASE SCAFFOLD COMPLETE — FORMAL PRODUCT/DEVICE/SIGNING/STORE GATES OPEN`；按用户授权排除三个外部 Skip ID 后，80 / 80 项本地可执行清单均已完成，原清单收口时 `bun run check` 通过（51 个单元测试文件 / 414 tests、19 个集成测试文件 / 79 tests）；本轮最新完整门禁及本地 Android/Hermes 证据见 Optimization Execution Status。计划中没有 Phase 11，但原始 101 项清单中的 21 个正式 Exit 尚未满足，当前仍不能称为已发布且功能完善的 App。
+`PHASE 10 TECHNICAL RELEASE SCAFFOLD COMPLETE — FORMAL PRODUCT/DEVICE/SIGNING/STORE GATES OPEN`；按用户授权排除三个外部 Skip ID 后，80 / 80 项本地可执行清单均已完成，原清单收口时 `pnpm run check` 通过（51 个单元测试文件 / 414 tests、19 个集成测试文件 / 79 tests）；本轮最新完整门禁及本地 Android/Hermes 证据见 Optimization Execution Status。计划中没有 Phase 11，但原始 101 项清单中的 21 个正式 Exit 尚未满足，当前仍不能称为已发布且功能完善的 App。
 
 Phase 1 技术实现与正式关闭项：
 
@@ -371,7 +506,7 @@ Phase 1 技术实现与正式关闭项：
 - [x] Task 明确取消、活跃执行/未完成块收口、计划版本/同步作业与无完成证据事务
 - [x] OperationRecord、TaskActivityEvent、stateVersion 与估时基线基础
 - [x] migration failure、transaction rollback、invalid transition 与纵向集成测试
-- [x] `bun run check` 当前代码聚合门禁
+- [x] `pnpm run check` 当前代码聚合门禁
 - [ ] 产品负责人关闭 DEC-006，确认 TaskDependency V1 范围
 
 Phase 2 技术实现与后续产品/集成项：
@@ -381,7 +516,7 @@ Phase 2 技术实现与后续产品/集成项：
 - [x] `0001` SchedulePlan/TimeBlock/IntegrationJob Schema、migration、Repository 与原子提交
 - [x] 首次有效计划提交的 Task planned / baseline estimate 原子联动与回滚
 - [x] CASE-SCHED-01/02、随机不变量及真实 SQLite CASE-COMMIT-01 技术覆盖
-- [x] 当前完整 `bun run check`
+- [x] 当前完整 `pnpm run check`
 - [ ] 关闭 DEC-006，确定依赖任务 V1 范围
 - [ ] 关闭 DEC-011，确定生产 Task 词表/default 与 Scheduler policy 映射
 - [x] 生产 SchedulingSnapshot / 工作窗口-DST / pre-decision neutral policy Adapter 接入 Mobile；正式 policy 仍待 DEC-011
@@ -396,7 +531,7 @@ Phase 3 技术实现与正式关闭项：
 - [x] IntegrationService projection/reconciliation、owned inventory、intent/checkpoint、revision/claim fence 与显式恢复
 - [x] Expo Calendar/Notifications Adapter、严格 Provider 结果解析和注入 native facade 测试
 - [x] Mobile `expo-sqlite` startup migration、真实 Adapter/Service 构造与 AppState active 前台协调器
-- [x] Node SQLite migration/约束/rollback/故障恢复集成与当前完整 `bun run check`
+- [x] Node SQLite migration/约束/rollback/故障恢复集成与当前完整 `pnpm run check`
 - [x] 接入 production SchedulingSnapshot/ScheduleService、Commit wake 与权限/Calendar 选择/同步状态 UI
 - [x] 从所选 Calendar 执行 30 天有界 refresh，并把失败保留为可重试状态
 - [x] 直接用户 `0–1440` 分钟提醒提前量、当前安全作业 durable requeue 与 in-flight stateVersion 再收敛
@@ -442,7 +577,7 @@ Phase 6 技术实现与正式关闭项：
 - [x] Model Runtime complete/stream 适配、usage/Tool event 聚合、脱敏错误与 Fake Provider
 - [x] `0006` 最小 AgentRun metadata、Repository/Application Service、重启恢复和隐私约束测试
 - [x] 自然语言结构化 Preview 边界与 Provider 未配置时保留原文的明确手工降级 UI
-- [x] CASE-AGENT-01/02/03/04、CASE-PRIVACY-01 自动化技术子集与当前完整 `bun run check`
+- [x] CASE-AGENT-01/02/03/04、CASE-PRIVACY-01 自动化技术子集与当前完整 `pnpm run check`
 - [ ] 产品负责人关闭 DEC-005，选择真实 Provider、凭据存储和数据出境边界
 - [ ] 真实 Provider compatibility、自然语言质量与物理 iOS/Android E2E-001 验收
 
@@ -453,7 +588,7 @@ Phase 7 技术实现与正式关闭项：
 - [x] UserModelService 一致性事实快照、稳定 ID、新鲜度与事务失败回滚
 - [x] Task/Execution 直接用户 `allEffortRecorded` 完整覆盖证据及 Agent 拒绝
 - [x] `personalization.enabled.v1` 默认关闭、Settings 说明与 SchedulingSnapshot policy 输入边界
-- [x] CASE-MODEL-01 自动化技术子集与当前完整 `bun run check`
+- [x] CASE-MODEL-01 自动化技术子集与当前完整 `pnpm run check`
 - [ ] 产品负责人关闭 DEC-007，确认生产窗口、分类、样本阈值、启用阈值与 Scheduler 权重
 - [ ] 按已接受 policy 启用/自动刷新特征，并完成物理 iOS/Android 产品与长期数据验收
 
@@ -464,7 +599,7 @@ Phase 8 技术实现与正式关闭项：
 - [x] Reflection 的 CompletionRecord/TimeBlock 事实摘要、最多三个 Win、用户备注与无模型离线降级
 - [x] Check-in 本地日/时区、可关闭入口、stateVersion 与 SchedulingSnapshot 最新有效记录接线
 - [x] Relax 单 active、真实区间、completed/abandoned、时钟异常与 Focus/Today/Tab/adjust-today 流程
-- [x] CASE-REFL-01、CASE-CHECKIN-01、CASE-RELAX-01、CASE-PSY-01 自动化技术子集与当前完整 `bun run check`
+- [x] CASE-REFL-01、CASE-CHECKIN-01、CASE-RELAX-01、CASE-PSY-01 自动化技术子集与当前完整 `pnpm run check`
 - [ ] 按已接受生产 policy 确认/启用 Check-in 软权重，验证关闭状态与跨时区产品体验
 - [ ] 物理 iOS/Android Development Build 完成 E2E-005、Focus 返回、进程终止恢复和 `0008` migration smoke
 
@@ -485,7 +620,7 @@ Phase 10 技术实现与正式关闭项：
 - [x] production remote build-number autoIncrement 与 DEC-008 前显式 OTA disabled
 - [x] `release:check`/`release:gate`、build/submit 命令、双平台 physical E2E evidence gate
 - [x] 双语 store privacy 草案、机器 release checklist 与未决项显式 pending
-- [x] production variant 双平台 Hermes export 和当前完整 `bun run check`
+- [x] production variant 双平台 Hermes export 和当前完整 `pnpm run check`
 - [x] 已知旧开发 `0006` 占位 checksum 的严格 Schema 验证修复、Node 回归与 iOS Simulator 无清库 `0008` 升级/Relax 冒烟
 - [ ] 授权 Expo owner/projectId/login、确认 store identifier、配置 Apple/Google signing 与 service account
 - [ ] 关闭 DEC-008/009 等发布相关决策，补 Privacy Policy URL 和 store privacy/legal review
@@ -524,4 +659,4 @@ Phase 10 技术实现与正式关闭项：
 
 [无需凭据优化计划 OPT-NC-20261003](PLAN.md#no-credential-optimization-plan)的九个包已完成；本轮没有剩余优化实施项。实际证据见 Optimization Execution Status。
 
-既有用户授权的 80/80 子集没有剩余非跳过项，这不表示产品没有后续代码实施。恢复正式 Phase Exit 时，先解除上述三个 Skip ID 中相应的决策/服务/设备/授权条件，再实施真实 Provider 与 Mobile Agent/凭据接线、生产 policy/特征刷新等对应范围，完成真实 Provider/设备验收、`bun run release:gate`、production build/submit，并更新真实发布结论。本轮优化完成也不解除这些外部门禁。
+既有用户授权的 80/80 子集没有剩余非跳过项，这不表示产品没有后续代码实施。恢复正式 Phase Exit 时，先解除上述三个 Skip ID 中相应的决策/服务/设备/授权条件，再实施真实 Provider 与 Mobile Agent/凭据接线、生产 policy/特征刷新等对应范围，完成真实 Provider/设备验收、`pnpm run release:gate`、production build/submit，并更新真实发布结论。本轮优化完成也不解除这些外部门禁。

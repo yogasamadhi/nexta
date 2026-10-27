@@ -161,9 +161,7 @@ const report = {
   workingTreeDirty:
     statusResult.status === 0 ? statusResult.stdout.trim().length > 0 : null,
   sourceHashes,
-  runtime: process.versions.bun
-    ? 'Bun ' + process.versions.bun
-    : 'Node ' + process.versions.node,
+  runtime: 'Node ' + process.versions.node,
   environment: {
     platform: platform(),
     architecture: arch(),

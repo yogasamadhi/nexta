@@ -21,6 +21,11 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="account" options={{ title: '账号与同步' }} />
+          <Stack.Screen
+            name="sync-conflicts"
+            options={{ title: '核对同步冲突' }}
+          />
           <Stack.Screen name="settings" options={{ title: '设置' }} />
           <Stack.Screen name="inbox" options={{ title: '任务收件箱' }} />
           <Stack.Screen name="goals" options={{ title: '目标' }} />
